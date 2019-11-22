@@ -139,6 +139,7 @@ class Money:
 
     def _amount_tuple(self, nanos_len: int = 9) -> Tuple[str, str]:
         extended_precision = 5
+        extended_precision_len = nanos_len + extended_precision
         sign, digits, exponent = self._amount.as_tuple()
 
         if exponent:
@@ -148,8 +149,8 @@ class Money:
 
         nanos_str = "".join(map(str, digits))[exponent:] if exponent else ""
 
-        nanos_str = nanos_str.rjust((-exponent), "0").ljust(nanos_len + extended_precision, "0")
-        rounding_nanos = Decimal(nanos_str[nanos_len : nanos_len + extended_precision]) / Decimal(10)
+        nanos_str = nanos_str.rjust((-exponent), "0").ljust(extended_precision_len, "0")
+        rounding_nanos = Decimal(nanos_str[nanos_len:extended_precision_len]) / Decimal(10)
         nanos_str = nanos_str[0:nanos_len]
         if rounding_nanos.quantize(Decimal(1)) * Decimal(20) >= Decimal(f"1e{extended_precision}"):
             nanos_str = str(Decimal(f"1{nanos_str}") + Decimal(1))[1:]
@@ -188,9 +189,6 @@ class Money:
 
     def sub(self, other: Any, is_cents: Optional[bool] = None) -> "Money":
         return self - Money(other, is_cents=is_cents)
-
-    def round(self, ndigits: int = 0) -> "Money":
-        return round(self, ndigits=ndigits)
 
     def __setattr__(self, *args: Any) -> None:
         raise AttributeError("Attributes of monetary amounts cannot be changed")

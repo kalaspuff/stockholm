@@ -23,11 +23,11 @@ def test_basic_conversion() -> None:
     assert float(m1) == 50.00
     assert float(m2) == -50.00
 
-    m3 = (m1 / 3).round(2)
+    m3 = round(m1 / 3, 2)  # type: ignore
     assert isinstance(m3, Money)
     assert m3 == Money("16.67", currency="USD")
 
-    m4 = (m2 / 3).round(2)
+    m4 = round(m2 / 3, 2)  # type: ignore
     assert isinstance(m4, Money)
     assert m4 == Money("-16.67", currency="USD")
 
