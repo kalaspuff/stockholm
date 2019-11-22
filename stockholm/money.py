@@ -74,6 +74,11 @@ class Money:
                 output_amount = amount.amount
 
             output_metadata = amount.metadata
+        elif amount is not None and isinstance(amount, Decimal):
+            if is_cents:
+                output_amount = Decimal(amount) / 100
+            else:
+                output_amount = amount
 
         if output_amount is None:
             raise Exception("Missing input values for valid monetary amount")
@@ -143,10 +148,10 @@ class Money:
             except Exception:
                 other_repr = repr(other)
                 self_repr = repr(self)
-                raise Exception(f"Unable to compare {self_repr} with {other_repr}")
+                raise Exception(f"Unable to perform operations on {self_repr} with {other_repr}")
 
         if self._currency and other.currency and self._currency != other.currency:
-            raise Exception("Unable to compare difference in values with differing currencies")
+            raise Exception("Unable to perform operations on values with differing currencies")
 
         return other
 
@@ -181,3 +186,100 @@ class Money:
     def __ge__(self, other):
         other = self._convert_other(other)
         return self.amount >= other.amount
+
+    def __add__(self, other):
+        other = self._convert_other(other)
+        amount = self.amount + other.amount
+        currency = self.currency or other.currency
+        return Money(amount, currency=currency)
+
+    def __radd__(self, other):
+        return self.__add__(other)
+
+    def __sub__(self, other):
+        other = self._convert_other(other)
+        amount = self.amount - other.amount
+        currency = self.currency or other.currency
+        return Money(amount, currency=currency)
+
+    def __rsub__(self, other):
+        other = self._convert_other(other)
+        amount = other.amount - self.amount
+        currency = self.currency or other.currency
+        return Money(amount, currency=currency)
+
+    def __mul__(self, other):
+        if not isinstance(other, Money):
+            other = self._convert_other(other)
+
+        if other.currency is not None and self.currency is not None:
+            raise Exception("Unable to multiply two currency aware monetary amounts with each other")
+
+        amount = self.amount * other.amount
+        currency = self.currency or other.currency
+        return Money(amount, currency=currency)
+
+    def __rmul__(self, other):
+        return self.__mul__(other)
+
+    def __truediv__(self, other):
+        other = self._convert_other(other)
+        amount = self.amount / other.amount
+
+        if other.currency is not None:
+            return amount
+
+        return Money(amount, currency=self.currency)
+
+    def __floordiv__(self, other):
+        other = self._convert_other(other)
+        amount = self.amount // other.amount
+
+        if other.currency is not None:
+            return amount
+
+        return Money(amount, currency=self.currency)
+
+    def __mod__(self, other):
+        other = self._convert_other(other)
+        amount = self.amount % other.amount
+        currency = self.currency or other.currency
+        return Money(amount, currency=currency)
+
+    def __divmod__(self, other):
+        other = self._convert_other(other)
+        quotient, remainder = divmod(self.amount, other.amount)
+        currency = self.currency or other.currency
+
+        if other.currency is not None:
+            return quotient, Money(remainder, currency=currency)
+
+        return Money(quotient, currency=currency), Money(remainder, currency=currency)
+
+    def __pow__(self, other):
+        if not isinstance(other, Money):
+            other = self._convert_other(other)
+
+        if other.currency is not None:
+            raise Exception("Unable to use a currency aware monetary amount as the exponential power")
+
+        amount = self.amount ** other.amount
+        return Money(amount, currency=self.currency)
+
+    def __neg__(self):
+        return Money(-self.amount, currency=self.currency)
+
+    def __pos__(self):
+        return Money(+self.amount, currency=self.currency)
+
+    def __abs__(self):
+        return Money(abs(self.amount), currency=self.currency)
+
+    def __int__(self):
+        return int(self.amount)
+
+    def __float__(self):
+        return float(self.amount)
+
+    def __round__(self, ndigits=0):
+        return Money(round(self.amount, ndigits), currency=self.currency)

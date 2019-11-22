@@ -1,3 +1,4 @@
+from decimal import Decimal
 import pytest
 
 from stockholm import Money
@@ -68,6 +69,13 @@ from stockholm import Money
     (Money("4711.00 USD", currency="USD"), "USD", False),
     (Money("4711.00"), "USD", False),
     (Money("4711.00 SEK"), "USD", True),
+    (None, None, True),
+    (False, None, True),
+    (True, None, True),
+    ("X", None, True),
+    (b"1", None, True),
+    (b"1.00", None, True),
+    (Decimal("1.51"), None, False),
 ])
 def test_input_values(amount, currency, exception_expected):
     try:

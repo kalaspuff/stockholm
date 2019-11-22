@@ -1,3 +1,4 @@
+from decimal import Decimal
 import pytest
 
 from stockholm import Money
@@ -55,6 +56,8 @@ from stockholm import Money
     (Money(1, currency="USD"), "USD", False, "1.00 USD"),
     (Money("4711.00 USD", currency="USD"), "USD", False, "4711.00 USD"),
     (Money("4711.00"), "USD", False, "4711.00 USD"),
+    (Money(Decimal("-0.00")), "TOKEN", False, "0.00 TOKEN"),
+    (Money(Decimal("0.0001")), "BTC", True, "0.000001 BTC"),
 ])
 def test_basic_str_output(amount, currency, is_cents, expected):
     m = Money(amount, currency=currency, is_cents=is_cents)

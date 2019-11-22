@@ -14,10 +14,8 @@ def test_sort_numbers():
         Money("4711", currency="SEK"),
         Money("4711"),
         Money("0 SEK"),
-#        "1338",
         3.14,
         Money("1e-2", currency="SEK", is_cents=True),
-#        "0.3351 SEK",
         Money("-0.5 SEK"),
         -55,
         Money(0.4),
@@ -30,12 +28,10 @@ def test_sort_numbers():
         Money("0"),
         Money("0 SEK"),
         Money("1e-2", currency="SEK", is_cents=True),
-#        "0.3351 SEK",
         Money(0.4),
         Money("1"),
         3.14,
         77.95,
-#        "1338",
         Money("4711"),
         Money("4711", currency="SEK"),
         Money("4711"),
@@ -143,3 +139,21 @@ def test_sorted_with_strings():
     assert Money.sort(lst) == expected
     assert Money.sort(lst, reverse=True) == list(reversed(expected))
 
+
+def test_sort_with_differing_currencies():
+    lst = [
+        Money("1", currency="SEK"),
+        Money("-1", currency="USD"),
+    ]
+
+    with pytest.raises(Exception):
+        lst.sort()
+
+    with pytest.raises(Exception):
+        sorted(lst)
+
+    with pytest.raises(Exception):
+        sorted(lst, key=Money)
+
+    with pytest.raises(Exception):
+        Money.sort(lst)
