@@ -93,9 +93,10 @@ def test_simple_division():
     assert str(m2) == "3.00 EUR"
 
     m3 = m1 / "7 EUR"
-    assert isinstance(m3, Decimal)
-    assert m3 == 3
-    assert str(m3) == "3"
+    assert isinstance(m3, Money)
+    assert m3.amount == 3
+    assert m3.currency is None
+    assert str(m3) == "3.00"
 
 
 def test_true_division():

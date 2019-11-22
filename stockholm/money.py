@@ -1,3 +1,4 @@
+from functools import reduce
 import re
 from typing import Any, Dict, Iterable, Optional, Tuple, Union
 
@@ -16,6 +17,14 @@ class Money:
     @classmethod
     def sort(cls, iterable: Iterable, reverse: bool = False) -> Iterable:
         return sorted(iterable, key=lambda x: x if isinstance(x, Money) else Money(x), reverse=reverse)
+
+    @classmethod
+    def add(cls, iterable: Iterable, currency: Optional[str] = None, is_cents: Optional[bool] = None) -> "Money":
+        return reduce(
+            lambda v, e: v + (e if isinstance(e, Money) else Money(e, is_cents=is_cents)),
+            iterable,
+            Money(0, currency=currency, is_cents=is_cents),
+        )
 
     def __init__(
         self,
@@ -245,21 +254,21 @@ class Money:
     def __rmul__(self, other: Any) -> "Money":
         return self.__mul__(other)
 
-    def __truediv__(self, other: Any) -> Union["Money", Decimal]:
+    def __truediv__(self, other: Any) -> "Money":
         converted_other = self._convert_other(other)
         amount = self.amount / converted_other.amount
 
         if converted_other.currency is not None:
-            return amount
+            return Money(amount)
 
         return Money(amount, currency=self.currency)
 
-    def __floordiv__(self, other: Any) -> Union["Money", Decimal]:
+    def __floordiv__(self, other: Any) -> "Money":
         converted_other = self._convert_other(other)
         amount = self.amount // converted_other.amount
 
         if converted_other.currency is not None:
-            return amount
+            return Money(amount)
 
         return Money(amount, currency=self.currency)
 
@@ -269,13 +278,13 @@ class Money:
         currency = self.currency or converted_other.currency
         return Money(amount, currency=currency)
 
-    def __divmod__(self, other: Any) -> Union[Tuple[Decimal, "Money"], Tuple["Money", "Money"]]:
+    def __divmod__(self, other: Any) -> Tuple["Money", "Money"]:
         converted_other = self._convert_other(other)
         quotient, remainder = divmod(self.amount, converted_other.amount)
         currency = self.currency or converted_other.currency
 
         if converted_other.currency is not None:
-            return quotient, Money(remainder, currency=currency)
+            return Money(quotient), Money(remainder, currency=currency)
 
         return Money(quotient, currency=currency), Money(remainder, currency=currency)
 

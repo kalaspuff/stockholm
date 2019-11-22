@@ -22,6 +22,9 @@ mypy:
 version:
 	poetry version `python stockholm/__version__.py`
 
+black:
+	black -l 120 stockholm/ tests/
+
 build:
 	rm -rf dist/
 	poetry build
