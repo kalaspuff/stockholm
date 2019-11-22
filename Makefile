@@ -28,6 +28,11 @@ build:
 
 release:
 	twine upload dist/stockholm-`python stockholm/__version__.py`.tar.gz dist/stockholm-`python stockholm/__version__.py`-py*.whl
+	git add pyproject.toml stockholm/__version__.py
+	git commit -m "Bumped version" --allow-empty
+	git tag -a `python stockholm/__version__.py` -m `python stockholm/__version__.py`
+	git push
+	git push --tags
 
 test: pytest flake8 mypy
 tests: test
