@@ -17,7 +17,7 @@ flake8:
 	flake8 stockholm/ tests/
 
 mypy:
-	PYTHONPATH=. mypy stockholm/ tests/
+	PYTHONPATH=. mypy stockholm/
 
 version:
 	poetry version `python stockholm/__version__.py`
