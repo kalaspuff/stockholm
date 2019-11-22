@@ -39,13 +39,13 @@ class Money:
                 output_amount = Decimal(str(amount))
         elif amount is not None and isinstance(amount, str) and amount.strip():
             amount = amount.strip()
-            matches = re.match(r'^([-+]?[0-9.]+)[ ]+([a-zA-Z._-]+)$', amount)
+            matches = re.match(r"^([-+]?[0-9.]+)[ ]+([a-zA-Z._-]+)$", amount)
             match_currency = None
             if matches:
                 amount = matches.group(1).strip()
                 match_currency = matches.group(2).strip().upper()
             else:
-                matches = re.match(r'^([a-zA-Z._-]+)[ ]+([-+]?[0-9.]+)$', amount)
+                matches = re.match(r"^([a-zA-Z._-]+)[ ]+([-+]?[0-9.]+)$", amount)
                 if matches:
                     amount = matches.group(2).strip()
                     match_currency = matches.group(1).strip().upper()
@@ -114,7 +114,7 @@ class Money:
 
     def _str_amount(self, min_decimals=2, max_decimals=9):
         try:
-            decimals = len(str(self._amount).split('.')[1][0:max_decimals].rstrip("0"))
+            decimals = len(str(self._amount).split(".")[1][0:max_decimals].rstrip("0"))
         except Exception:
             decimals = min_decimals
 
@@ -125,8 +125,8 @@ class Money:
     def __repr__(self):
         amount = self._str_amount()
         if self._currency:
-            return f"<stockholm.Money: \"{amount} {self._currency}\">"
-        return f"<stockholm.Money: \"{amount}\">"
+            return f'<stockholm.Money: "{amount} {self._currency}">'
+        return f'<stockholm.Money: "{amount}">'
 
     def __str__(self):
         amount = self._str_amount()
