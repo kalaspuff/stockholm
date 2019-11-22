@@ -66,6 +66,11 @@ from stockholm import Money
         (Money("1e-2", currency="SEK"), Money(1, is_cents=True), True),
         (Money("-1e-2", currency="SEK"), -0.01, True),
         (Money("1", currency="SEK"), Money("1e2", is_cents=True), True),
+        (Money(100, currency="SEK", is_cents=True), "SEK", False),
+        (Money(100, currency="SEK", is_cents=True), "SEK SEK", False),
+        (Money(100, currency="SEK", is_cents=True), "5,0 SEK", False),
+        (Money(100, currency="SEK", is_cents=True), "500 ;;;", False),
+        (Money(100, currency="SEK", is_cents=True), "1 USD", False),
     ],
 )
 def test_equal_comparison(money, other, expected):

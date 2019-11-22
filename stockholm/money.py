@@ -36,7 +36,7 @@ class Money:
         if amount is None:
             raise Exception("Missing input values for valid monetary amount")
 
-        if amount is not None and isinstance(amount, Money) and currency is None and is_cents is None:
+        if isinstance(amount, Money) and currency is None and is_cents is None:
             object.__setattr__(self, "_amount", amount.amount)
             object.__setattr__(self, "_currency", amount.currency)
             object.__setattr__(self, "_metadata", amount.metadata)
@@ -132,10 +132,10 @@ class Money:
         return self._metadata
 
     def __setattr__(self, *args: Any) -> None:
-        raise AttributeError("Attributes of stockholm.Money cannot be changed")
+        raise AttributeError("Attributes of monetary amounts cannot be changed")
 
     def __delattr__(self, *args: Any) -> None:
-        raise AttributeError("Attributes of stockholm.Money cannot be deleted")
+        raise AttributeError("Attributes of monetary amounts cannot be deleted")
 
     def _str_amount(self, min_decimals: int = 2, max_decimals: int = 9) -> str:
         try:

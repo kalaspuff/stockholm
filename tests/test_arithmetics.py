@@ -1,4 +1,5 @@
 from decimal import Decimal
+import pytest
 
 from stockholm import Money
 
@@ -78,6 +79,21 @@ def test_simple_multiplication():
     assert m2.currency == "SEK"
     assert str(m2) == "999.9999 SEK"
 
+    m2 = 3 * m1
+    assert isinstance(m2, Money)
+    assert m2.amount == Decimal("999.9999")
+    assert m2.currency == "SEK"
+    assert str(m2) == "999.9999 SEK"
+
+    m2 = m1 * Money(3)
+    assert isinstance(m2, Money)
+    assert m2.amount == Decimal("999.9999")
+    assert m2.currency == "SEK"
+    assert str(m2) == "999.9999 SEK"
+
+    with pytest.raises(Exception):
+        m1 * m1
+
 
 def test_simple_division():
     m1 = Money("21", currency="EUR")
@@ -126,6 +142,12 @@ def test_floor_division():
     assert m2.currency == "SEK"
     assert str(m2) == "33.00 SEK"
 
+    m2 = m1 // "3 SEK"
+    assert isinstance(m2, Money)
+    assert m2.amount == 33
+    assert m2.currency is None
+    assert str(m2) == "33.00"
+
 
 def test_modulus():
     m1 = Money("49", currency="SEK")
@@ -160,6 +182,18 @@ def test_divmod():
     assert m3.currency == "SEK"
     assert str(m3) == "7.00 SEK"
 
+    m2, m3 = divmod(m1, Money(14, currency="SEK"))
+
+    assert isinstance(m2, Money)
+    assert m2.amount == 3
+    assert m2.currency is None
+    assert str(m2) == "3.00"
+
+    assert isinstance(m3, Money)
+    assert m3.amount == 7
+    assert m3.currency == "SEK"
+    assert str(m3) == "7.00 SEK"
+
 
 def test_pow():
     m1 = Money("2", currency="BIT")
@@ -173,3 +207,27 @@ def test_pow():
     assert m2.amount == 16
     assert m2.currency == "BIT"
     assert str(m2) == "16.00 BIT"
+
+    m2 = m1 ** Money(4)
+    assert isinstance(m2, Money)
+    assert m2.amount == 16
+    assert m2.currency == "BIT"
+    assert str(m2) == "16.00 BIT"
+
+    with pytest.raises(Exception):
+        m1 ** m1
+
+    assert Money(2) ** Money(4) == 16
+
+
+def test_bad_values():
+    m = Money(1, currency="SEK")
+
+    with pytest.raises(Exception):
+        m + "5,0"
+
+    with pytest.raises(Exception):
+        m + "USD USD"
+
+    with pytest.raises(Exception):
+        m - "50 000"

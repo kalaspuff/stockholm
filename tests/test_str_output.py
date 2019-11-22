@@ -32,6 +32,9 @@ from stockholm import Money
         ("1.1001", None, False, "1.1001"),
         ("1.100100", None, False, "1.1001"),
         ("0", "SEK", False, "0.00 SEK"),
+        (" -22.50  SEK ", None, False, "-22.50 SEK"),
+        (" -22.50  SEK ", "sek", False, "-22.50 SEK"),
+        (" -22.50  usd ", None, False, "-22.50 USD"),
         (0, "SEK", False, "0.00 SEK"),
         (0.0, "SEK", False, "0.00 SEK"),
         ("4711", "EUR", False, "4711.00 EUR"),
@@ -65,3 +68,11 @@ from stockholm import Money
 def test_basic_str_output(amount, currency, is_cents, expected):
     m = Money(amount, currency=currency, is_cents=is_cents)
     assert str(m) == expected
+
+
+def test_repr():
+    m = Money(1000, currency="EUR")
+    assert repr(m) == '<stockholm.Money: "1000.00 EUR">'
+
+    m = Money(-400)
+    assert repr(m) == '<stockholm.Money: "-400.00">'
