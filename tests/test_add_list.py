@@ -1,3 +1,5 @@
+from typing import Any
+
 import pytest
 
 from stockholm import Money
@@ -17,9 +19,9 @@ from stockholm import Money
         (["3.14", "3.14", "3.14", "ABC"], None, True),
     ],
 )
-def test_add_list(values, expected, exception_expected):
+def test_add_list(values: Any, expected: Any, exception_expected: bool) -> None:
     try:
-        m = Money.add(values)
+        m = Money.sum(values)
         if exception_expected:
             assert False, "Exception expected"
         assert isinstance(m, Money)
@@ -31,9 +33,9 @@ def test_add_list(values, expected, exception_expected):
     assert True
 
 
-def test_add_list_cent_values():
+def test_add_list_cent_values() -> None:
     values = [471100, 10000, 509000, 350200, "313450", "900400", "1000", "100", 13999]
-    m = Money.add(values, currency="SEK", is_cents=True)
+    m = Money.sum(values, currency="SEK", is_cents=True)
 
     assert isinstance(m, Money)
     assert m == Money(2569249, currency="SEK", is_cents=True)

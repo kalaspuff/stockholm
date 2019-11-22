@@ -13,7 +13,7 @@ def test_update_data() -> None:
     assert m.metadata == {"is_cents": None}
 
     with pytest.raises(AttributeError):
-        m._amount = 10
+        m._amount = Decimal(10)
 
     with pytest.raises(AttributeError):
         m._currency = "USD"

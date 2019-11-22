@@ -4,7 +4,7 @@ import pytest
 from stockholm import Money
 
 
-def test_simple_addition():
+def test_simple_addition() -> None:
     m1 = Money(0)
     assert isinstance(m1, Money)
     assert m1.amount == 0
@@ -24,7 +24,7 @@ def test_simple_addition():
     assert str(m3) == "2.50 SEK"
 
 
-def test_one_line_addition():
+def test_one_line_addition() -> None:
     m = Money(0) + "1 EUR" + "2.5" + 1.51
     assert isinstance(m, Money)
     assert m.amount == Decimal("5.01")
@@ -32,7 +32,7 @@ def test_one_line_addition():
     assert str(m) == "5.01 EUR"
 
 
-def test_complex_addition():
+def test_complex_addition() -> None:
     m = 1000 + 500 + Money(150, currency="NOK") + "4711.15000" + Money(-10000) + Money("55.70 NOK") + Decimal("25.01")
     assert isinstance(m, Money)
     assert m.amount == Decimal("-3558.14")
@@ -40,7 +40,7 @@ def test_complex_addition():
     assert str(m) == "-3558.14 NOK"
 
 
-def test_simple_subtraction():
+def test_simple_subtraction() -> None:
     m1 = Money("1000")
     assert isinstance(m1, Money)
     assert m1.amount == 1000
@@ -66,7 +66,7 @@ def test_simple_subtraction():
     assert str(m4) == "1001.00 SEK"
 
 
-def test_simple_multiplication():
+def test_simple_multiplication() -> None:
     m1 = Money("333.3333", currency="SEK")
     assert isinstance(m1, Money)
     assert m1.amount == Decimal("333.3333")
@@ -95,7 +95,7 @@ def test_simple_multiplication():
         m1 * m1
 
 
-def test_simple_division():
+def test_simple_division() -> None:
     m1 = Money("21", currency="EUR")
     assert isinstance(m1, Money)
     assert m1.amount == 21
@@ -115,7 +115,7 @@ def test_simple_division():
     assert str(m3) == "3.00"
 
 
-def test_true_division():
+def test_true_division() -> None:
     m1 = Money("100", currency="SEK")
     assert isinstance(m1, Money)
     assert m1.amount == 100
@@ -129,7 +129,7 @@ def test_true_division():
     assert str(m2) == "33.333333333 SEK"
 
 
-def test_floor_division():
+def test_floor_division() -> None:
     m1 = Money("100", currency="SEK")
     assert isinstance(m1, Money)
     assert m1.amount == 100
@@ -149,7 +149,7 @@ def test_floor_division():
     assert str(m2) == "33.00"
 
 
-def test_modulus():
+def test_modulus() -> None:
     m1 = Money("49", currency="SEK")
     assert isinstance(m1, Money)
     assert m1.amount == 49
@@ -163,7 +163,7 @@ def test_modulus():
     assert str(m2) == "7.00 SEK"
 
 
-def test_divmod():
+def test_divmod() -> None:
     m1 = Money("49", currency="SEK")
     assert isinstance(m1, Money)
     assert m1.amount == 49
@@ -195,7 +195,7 @@ def test_divmod():
     assert str(m3) == "7.00 SEK"
 
 
-def test_pow():
+def test_pow() -> None:
     m1 = Money("2", currency="BIT")
     assert isinstance(m1, Money)
     assert m1.amount == 2
@@ -220,7 +220,7 @@ def test_pow():
     assert Money(2) ** Money(4) == 16
 
 
-def test_bad_values():
+def test_bad_values() -> None:
     m = Money(1, currency="SEK")
 
     with pytest.raises(Exception):
@@ -231,3 +231,16 @@ def test_bad_values():
 
     with pytest.raises(Exception):
         m - "50 000"
+
+
+def test_object_arithmetics() -> None:
+    m = Money(0, currency="SEK")
+    assert m.add(1).add(2).add(3) == Money(6, currency="SEK")
+    assert m.add(10).sub(5) == Money(5, currency="SEK")
+
+    with pytest.raises(Exception):
+        assert m.add(1).add(2).add(3) == Money(6, currency="EUR")
+
+    m2 = Money(471100, is_cents=True)
+    assert m2.add(133800, is_cents=True) == Money(604900, is_cents=True)
+    assert m2.add(133800, is_cents=True) == Money("6049.00")

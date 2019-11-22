@@ -1,3 +1,5 @@
+from typing import Any
+
 from decimal import Decimal
 import pytest
 
@@ -90,9 +92,15 @@ from stockholm import Money
         (Money("1.50", is_cents=True), None, False),
         (Money(Decimal("150"), is_cents=True), None, False),
         (Money(Money("150"), is_cents=True), None, False),
+        ("999999999999999999.999999999", None, False),
+        ("-999999999999999999.999999999", None, False),
+        ("999999999999999999.9999999999", None, True),
+        ("-999999999999999999.9999999999", None, True),
+        ("1000000000000000000", None, True),
+        ("-1000000000000000000", None, True),
     ],
 )
-def test_input_values(amount, currency, exception_expected):
+def test_input_values(amount: Any, currency: Any, exception_expected: bool) -> None:
     try:
         m = Money(amount, currency=currency)
         if exception_expected:

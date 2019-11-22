@@ -1,7 +1,7 @@
 from stockholm import Money
 
 
-def test_basic_conversion():
+def test_basic_conversion() -> None:
     m1 = Money(50, currency="USD")
     m2 = Money(-50, currency="USD")
 
@@ -23,12 +23,16 @@ def test_basic_conversion():
     assert float(m1) == 50.00
     assert float(m2) == -50.00
 
-    m3 = round(m1 / 3, 2)
+    m3 = (m1 / 3).round(2)
     assert isinstance(m3, Money)
     assert m3 == Money("16.67", currency="USD")
 
+    m4 = (m2 / 3).round(2)
+    assert isinstance(m4, Money)
+    assert m4 == Money("-16.67", currency="USD")
 
-def test_metadata_alive():
+
+def test_metadata_alive() -> None:
     m1 = Money(471100, currency="SEK", is_cents=True)
     m2 = Money(m1)
     assert m1.metadata == {"is_cents": True}

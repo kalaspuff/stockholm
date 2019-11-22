@@ -1,3 +1,5 @@
+from typing import Any, Optional
+
 from decimal import Decimal
 import pytest
 
@@ -63,14 +65,16 @@ from stockholm import Money
         (Money("4711.00"), "USD", False, "4711.00 USD"),
         (Money(Decimal("-0.00")), "TOKEN", False, "0.00 TOKEN"),
         (Money(Decimal("0.0001")), "BTC", True, "0.000001 BTC"),
+        (Money(1000) / Money(3), None, False, "333.333333333"),
+        ((Money(1000) / Money(3)) * Money(2), None, False, "666.666666667"),
     ],
 )
-def test_basic_str_output(amount, currency, is_cents, expected):
+def test_basic_str_output(amount: Any, currency: Any, is_cents: Optional[bool], expected: str) -> None:
     m = Money(amount, currency=currency, is_cents=is_cents)
     assert str(m) == expected
 
 
-def test_repr():
+def test_repr() -> None:
     m = Money(1000, currency="EUR")
     assert repr(m) == '<stockholm.Money: "1000.00 EUR">'
 

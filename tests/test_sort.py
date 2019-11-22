@@ -3,7 +3,7 @@ import pytest
 from stockholm import Money
 
 
-def test_sort_numbers():
+def test_sort_numbers() -> None:
     lst = [
         Money("1"),
         Money("-1"),
@@ -45,7 +45,7 @@ def test_sort_numbers():
     assert lst == expected
 
 
-def test_sort_with_strings():
+def test_sort_with_strings() -> None:
     lst = [
         Money("1"),
         Money("-1"),
@@ -91,12 +91,12 @@ def test_sort_with_strings():
 
     assert lst != expected
 
-    lst.sort(key=Money)
+    lst.sort(key=lambda x: Money(x))
 
     assert lst == expected
 
 
-def test_sorted_with_strings():
+def test_sorted_with_strings() -> None:
     lst = [
         Money("1"),
         Money("-1"),
@@ -135,12 +135,12 @@ def test_sorted_with_strings():
         Money("4711.55"),
     ]
 
-    assert sorted(lst, key=Money) == expected
+    assert sorted(lst, key=lambda x: Money(x)) == expected
     assert Money.sort(lst) == expected
     assert Money.sort(lst, reverse=True) == list(reversed(expected))
 
 
-def test_sort_with_differing_currencies():
+def test_sort_with_differing_currencies() -> None:
     lst = [
         Money("1", currency="SEK"),
         Money("-1", currency="USD"),

@@ -19,7 +19,7 @@ class Money:
         return sorted(iterable, key=lambda x: x if isinstance(x, Money) else Money(x), reverse=reverse)
 
     @classmethod
-    def add(cls, iterable: Iterable, currency: Optional[str] = None, is_cents: Optional[bool] = None) -> "Money":
+    def sum(cls, iterable: Iterable, currency: Optional[str] = None, is_cents: Optional[bool] = None) -> "Money":
         return reduce(
             lambda v, e: v + (e if isinstance(e, Money) else Money(e, is_cents=is_cents)),
             iterable,
@@ -28,7 +28,7 @@ class Money:
 
     def __init__(
         self,
-        amount: Optional[Union["Money", Decimal, int, float, str]] = None,
+        amount: Optional[Union["Money", Decimal, int, float, str, object]] = None,
         currency: Optional[str] = None,
         is_cents: Optional[bool] = None,
         **kwargs: Any,
@@ -105,6 +105,12 @@ class Money:
         if output_amount is None:
             raise Exception("Missing input values for valid monetary amount")
 
+        if output_amount > Decimal("999999999999999999.999999999"):
+            raise Exception("Input amount is too high, max value is 999999999999999999.999999999")
+
+        if output_amount < Decimal("-999999999999999999.999999999"):
+            raise Exception("Input amount is too low, min value is -999999999999999999.999999999")
+
         if output_currency and not re.match(r"^[a-zA-Z._-]+$", output_currency):
             raise Exception("Invalid currency")
 
@@ -131,40 +137,98 @@ class Money:
     def metadata(self) -> Dict:
         return self._metadata
 
+    def _amount_tuple(self, nanos_len: int = 9) -> Tuple[str, str]:
+        extended_precision = 5
+        sign, digits, exponent = self._amount.as_tuple()
+
+        if exponent:
+            units_str = "".join(map(str, digits))[:exponent] or "0"
+        else:
+            units_str = "".join(map(str, digits))
+
+        nanos_str = "".join(map(str, digits))[exponent:] if exponent else ""
+
+        nanos_str = nanos_str.rjust((-exponent), "0").ljust(nanos_len + extended_precision, "0")
+        rounding_nanos = Decimal(nanos_str[nanos_len:nanos_len + extended_precision]) / Decimal(10)
+        nanos_str = nanos_str[0:nanos_len]
+        if rounding_nanos.quantize(Decimal(1)) * Decimal(20) >= Decimal(f"1e{extended_precision}"):
+            nanos_str = str(Decimal(f"1{nanos_str}") + Decimal(1))[1:]
+            if int(nanos_str) == 0:
+                units_str = str(Decimal(f"1{units_str}") + Decimal(1))[1:]
+
+        if sign:
+            if int(units_str) != 0:
+                units_str = f"-{units_str}"
+            if int(nanos_str) != 0:
+                nanos_str = f"-{nanos_str}"
+
+        return units_str, nanos_str
+
+    @property
+    def units(self) -> int:
+        units, _ = self._amount_tuple()
+        return int(units)
+
+    @property
+    def nanos(self) -> int:
+        _, nanos = self._amount_tuple()
+        return int(nanos)
+
+    @property
+    def values(self) -> Dict:
+        return {
+            "units": self.units,
+            "nanos": self.nanos,
+            "as_string": self.amount_as_string(),
+            "currency": self._currency,
+        }
+
+    def add(self, other: Any, is_cents: Optional[bool] = None) -> "Money":
+        return self + Money(other, is_cents=is_cents)
+
+    def sub(self, other: Any, is_cents: Optional[bool] = None) -> "Money":
+        return self - Money(other, is_cents=is_cents)
+
+    def round(self, ndigits: int = 0) -> "Money":
+        return round(self, ndigits=ndigits)
+
     def __setattr__(self, *args: Any) -> None:
         raise AttributeError("Attributes of monetary amounts cannot be changed")
 
     def __delattr__(self, *args: Any) -> None:
         raise AttributeError("Attributes of monetary amounts cannot be deleted")
 
-    def _str_amount(self, min_decimals: int = 2, max_decimals: int = 9) -> str:
-        try:
-            decimals = len(str(self.amount).split(".")[1][0:max_decimals].rstrip("0"))
-        except Exception:
-            decimals = min_decimals
+    def amount_as_string(self, min_decimals: int = 2, max_decimals: int = 9) -> str:
+        units, nanos = self._amount_tuple(nanos_len=max_decimals)
 
-        decimals = min(max(min_decimals, decimals), max_decimals)
+        decimals_value = nanos.lstrip("-")[0:max_decimals].rstrip("0")
+        decimals = len(decimals_value)
 
-        return str(self.amount.quantize(Decimal(f"1e-{decimals}"), ROUND_HALF_UP))
+        used_decimal_count = min(max(min_decimals, decimals), max_decimals)
+        decimals_value = decimals_value.ljust(used_decimal_count, "0")
+
+        if int(units) == 0 and int(nanos) < 0:
+            return f"-{units}.{decimals_value}"
+        return f"{units}.{decimals_value}"
 
     def __repr__(self) -> str:
-        amount = self._str_amount()
+        amount = self.amount_as_string()
         if self._currency:
             return f'<stockholm.Money: "{amount} {self._currency}">'
         return f'<stockholm.Money: "{amount}">'
 
     def __str__(self) -> str:
-        amount = self._str_amount()
+        amount = self.amount_as_string()
 
         if self._currency:
             return f"{amount} {self._currency}"
         return str(amount)
 
     def __hash__(self) -> int:
-        return hash(("stockholm", self.amount, self._currency, frozenset(self._metadata)))
+        return hash(("stockholm", self._amount, self._currency, frozenset(self._metadata)))
 
     def __bool__(self) -> bool:
-        return bool(self.amount)
+        return bool(self._amount)
 
     def _convert_other(self, other: Any) -> "Money":
         if not isinstance(other, Money):
@@ -177,7 +241,7 @@ class Money:
         else:
             converted_other = other
 
-        if self.currency and converted_other.currency and self.currency != converted_other.currency:
+        if self._currency and converted_other._currency and self._currency != converted_other._currency:
             raise Exception("Unable to perform operations on values with differing currencies")
 
         return converted_other
@@ -191,36 +255,36 @@ class Money:
         else:
             converted_other = other
 
-        if self.currency and converted_other.currency and self.currency != converted_other.currency:
-            if self.amount == 0 and converted_other.amount == 0:
+        if self._currency and converted_other._currency and self._currency != converted_other._currency:
+            if self._amount == 0 and converted_other._amount == 0:
                 return True
             return False
 
-        return self.amount == converted_other.amount
+        return self._amount == converted_other._amount
 
     def __ne__(self, other: Any) -> bool:
         return not self == other
 
     def __lt__(self, other: Any) -> bool:
         converted_other = self._convert_other(other)
-        return self.amount < converted_other.amount
+        return self._amount < converted_other._amount
 
     def __le__(self, other: Any) -> bool:
         converted_other = self._convert_other(other)
-        return self.amount <= converted_other.amount
+        return self._amount <= converted_other._amount
 
     def __gt__(self, other: Any) -> bool:
         converted_other = self._convert_other(other)
-        return self.amount > converted_other.amount
+        return self._amount > converted_other._amount
 
     def __ge__(self, other: Any) -> bool:
         converted_other = self._convert_other(other)
-        return self.amount >= converted_other.amount
+        return self._amount >= converted_other._amount
 
     def __add__(self, other: Any) -> "Money":
         converted_other = self._convert_other(other)
-        amount = self.amount + converted_other.amount
-        currency = self.currency or converted_other.currency
+        amount = self._amount + converted_other._amount
+        currency = self._currency or converted_other._currency
         return Money(amount, currency=currency)
 
     def __radd__(self, other: Any) -> "Money":
@@ -228,14 +292,14 @@ class Money:
 
     def __sub__(self, other: Any) -> "Money":
         converted_other = self._convert_other(other)
-        amount = self.amount - converted_other.amount
-        currency = self.currency or converted_other.currency
+        amount = self._amount - converted_other._amount
+        currency = self._currency or converted_other._currency
         return Money(amount, currency=currency)
 
     def __rsub__(self, other: Any) -> "Money":
         converted_other = self._convert_other(other)
-        amount = converted_other.amount - self.amount
-        currency = self.currency or converted_other.currency
+        amount = converted_other._amount - self._amount
+        currency = self._currency or converted_other._currency
         return Money(amount, currency=currency)
 
     def __mul__(self, other: Any) -> "Money":
@@ -244,11 +308,11 @@ class Money:
         else:
             converted_other = other
 
-        if converted_other.currency is not None and self.currency is not None:
+        if converted_other._currency is not None and self._currency is not None:
             raise Exception("Unable to multiply two currency aware monetary amounts with each other")
 
-        amount = self.amount * converted_other.amount
-        currency = self.currency or converted_other.currency
+        amount = self._amount * converted_other._amount
+        currency = self._currency or converted_other._currency
         return Money(amount, currency=currency)
 
     def __rmul__(self, other: Any) -> "Money":
@@ -256,34 +320,34 @@ class Money:
 
     def __truediv__(self, other: Any) -> "Money":
         converted_other = self._convert_other(other)
-        amount = self.amount / converted_other.amount
+        amount = self._amount / converted_other._amount
 
-        if converted_other.currency is not None:
+        if converted_other._currency is not None:
             return Money(amount)
 
-        return Money(amount, currency=self.currency)
+        return Money(amount, currency=self._currency)
 
     def __floordiv__(self, other: Any) -> "Money":
         converted_other = self._convert_other(other)
-        amount = self.amount // converted_other.amount
+        amount = self._amount // converted_other._amount
 
-        if converted_other.currency is not None:
+        if converted_other._currency is not None:
             return Money(amount)
 
-        return Money(amount, currency=self.currency)
+        return Money(amount, currency=self._currency)
 
     def __mod__(self, other: Any) -> "Money":
         converted_other = self._convert_other(other)
-        amount = self.amount % converted_other.amount
-        currency = self.currency or converted_other.currency
+        amount = self._amount % converted_other._amount
+        currency = self._currency or converted_other._currency
         return Money(amount, currency=currency)
 
     def __divmod__(self, other: Any) -> Tuple["Money", "Money"]:
         converted_other = self._convert_other(other)
-        quotient, remainder = divmod(self.amount, converted_other.amount)
-        currency = self.currency or converted_other.currency
+        quotient, remainder = divmod(self._amount, converted_other._amount)
+        currency = self._currency or converted_other._currency
 
-        if converted_other.currency is not None:
+        if converted_other._currency is not None:
             return Money(quotient), Money(remainder, currency=currency)
 
         return Money(quotient, currency=currency), Money(remainder, currency=currency)
@@ -294,26 +358,26 @@ class Money:
         else:
             converted_other = other
 
-        if converted_other.currency is not None:
+        if converted_other._currency is not None:
             raise Exception("Unable to use a currency aware monetary amount as the exponential power")
 
-        amount = self.amount ** converted_other.amount
-        return Money(amount, currency=self.currency)
+        amount = self._amount ** converted_other._amount
+        return Money(amount, currency=self._currency)
 
     def __neg__(self) -> "Money":
-        return Money(-self.amount, currency=self.currency)
+        return Money(-self._amount, currency=self._currency)
 
     def __pos__(self) -> "Money":
-        return Money(+self.amount, currency=self.currency)
+        return Money(+self._amount, currency=self._currency)
 
     def __abs__(self) -> "Money":
-        return Money(abs(self.amount), currency=self.currency)
+        return Money(abs(self._amount), currency=self._currency)
 
     def __int__(self) -> int:
-        return int(self.amount)
+        return int(self._amount)
 
     def __float__(self) -> float:
-        return float(self.amount)
+        return float(self._amount)
 
     def __round__(self, ndigits: int = 0) -> "Money":
-        return Money(round(self.amount, ndigits), currency=self.currency)
+        return Money(round(self._amount, ndigits), currency=self._currency)

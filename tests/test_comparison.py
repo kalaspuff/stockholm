@@ -1,3 +1,5 @@
+from typing import Any
+
 import pytest
 
 from stockholm import Money
@@ -73,7 +75,7 @@ from stockholm import Money
         (Money(100, currency="SEK", is_cents=True), "1 USD", False),
     ],
 )
-def test_equal_comparison(money, other, expected):
+def test_equal_comparison(money: Money, other: Any, expected: bool) -> None:
     result = bool(money == other)
     assert result is expected
 
@@ -84,7 +86,7 @@ def test_equal_comparison(money, other, expected):
     assert result is not expected
 
 
-def test_falsy_truish():
+def test_falsy_truish() -> None:
     assert bool(Money(1))
     assert not bool(Money(0))
     assert not bool(Money("0.00"))
@@ -94,7 +96,7 @@ def test_falsy_truish():
     assert bool(Money("-0.01"))
 
 
-def test_compare_weights():
+def test_compare_weights() -> None:
     assert Money(1) > Money(0)
     assert Money(4711) > Money(4710)
     assert Money(4711) >= Money(4710)
@@ -150,7 +152,7 @@ def test_compare_weights():
     assert Money("31338.511115") >= "31338 USD"
 
 
-def test_compare_different_currencies():
+def test_compare_different_currencies() -> None:
     assert Money("0", currency="USD") == Money("0", currency="SEK")
     assert not Money("0", currency="USD") != Money("0", currency="SEK")
     assert Money("4711", currency="USD") != Money("4711", currency="SEK")
