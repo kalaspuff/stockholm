@@ -17,7 +17,13 @@ class Money:
     def sort(cls, iterable: Iterable, reverse: bool = False) -> Iterable:
         return sorted(iterable, key=lambda x: x if isinstance(x, Money) else Money(x), reverse=reverse)
 
-    def __init__(self, amount: Optional[Union["Money", Decimal, int, float, str]] = None, currency: Optional[str] = None, is_cents: Optional[bool] = None, **kwargs: Any) -> None:
+    def __init__(
+        self,
+        amount: Optional[Union["Money", Decimal, int, float, str]] = None,
+        currency: Optional[str] = None,
+        is_cents: Optional[bool] = None,
+        **kwargs: Any,
+    ) -> None:
         if amount is None:
             raise Exception("Missing input values for valid monetary amount")
 
