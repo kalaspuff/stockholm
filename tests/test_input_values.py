@@ -63,6 +63,11 @@ from stockholm import Money
     ("USD -1984.51", "USD", False),
     ("-1984.51 USD ", "USD", False),
     ("-1984.51 USD USD", "USD", True),
+    (Money(1), "USD", False),
+    (Money(1, currency="USD"), "USD", False),
+    (Money("4711.00 USD", currency="USD"), "USD", False),
+    (Money("4711.00"), "USD", False),
+    (Money("4711.00 SEK"), "USD", True),
 ])
 def test_input_values(amount, currency, exception_expected):
     try:

@@ -9,19 +9,30 @@ __all__ = ["Money"]
 class Money:
     __slots__ = ("_amount", "_currency", "_metadata")
 
-    def __init__(self, amount=None, currency=None, is_cents=False, **kwargs):
+    @classmethod
+    def sort(cls, iterable, reverse=False):
+        return sorted(iterable, key=lambda x: x if isinstance(x, Money) else Money(x), reverse=reverse)
+
+    def __init__(self, amount=None, currency=None, is_cents=None, **kwargs):
+        if amount is not None and isinstance(amount, Money) and currency is None and is_cents is None:
+            object.__setattr__(self, "_amount", amount.amount)
+            object.__setattr__(self, "_currency", amount.currency)
+            object.__setattr__(self, "_metadata", amount.metadata)
+            return
+
         if currency is not None and not isinstance(currency, str):
             raise Exception("Invalid currency")
 
         output_amount = None
         output_currency = currency.strip().upper() if currency and currency.strip() else None
+        output_metadata = {}
 
         if amount is not None and isinstance(amount, int) and not isinstance(amount, bool):
             if is_cents:
                 output_amount = Decimal(amount) / 100
             else:
                 output_amount = Decimal(amount)
-        if amount is not None and isinstance(amount, float):
+        elif amount is not None and isinstance(amount, float):
             if is_cents:
                 output_amount = Decimal(str(amount)) / 100
             else:
@@ -41,7 +52,7 @@ class Money:
 
             if match_currency is not None:
                 if output_currency is not None and match_currency != output_currency:
-                    raise Exception("Mismatching currency in input amount string and currency argument")
+                    raise Exception("Mismatching currency in input value and currency argument")
                 output_currency = match_currency
 
             try:
@@ -51,6 +62,18 @@ class Money:
                     output_amount = Decimal(amount)
             except Exception:
                 raise Exception("Value cannot be used as monetary amount")
+        elif amount is not None and isinstance(amount, Money):
+            if amount.currency:
+                if output_currency is not None and amount.currency != output_currency:
+                    raise Exception("Mismatching currency in input value and currency argument")
+                output_currency = amount.currency
+
+            if is_cents:
+                output_amount = Decimal(amount.amount) / 100
+            else:
+                output_amount = amount.amount
+
+            output_metadata = amount.metadata
 
         if output_amount is None:
             raise Exception("Missing input values for valid monetary amount")
@@ -61,9 +84,9 @@ class Money:
         object.__setattr__(self, "_amount", output_amount)
         object.__setattr__(self, "_currency", output_currency)
 
-        output_metadata = {
-            "is_cents": bool(is_cents)
-        }
+        if "is_cents" not in output_metadata or (is_cents is not None and output_metadata["is_cents"] is not is_cents):
+            output_metadata["is_cents"] = is_cents
+
         object.__setattr__(self, "_metadata", output_metadata)
 
     @property
@@ -73,6 +96,10 @@ class Money:
     @property
     def currency(self):
         return self._currency
+
+    @property
+    def metadata(self):
+        return self._metadata
 
     def __setattr__(self, *args):
         raise AttributeError("Attributes of stockholm.Money cannot be changed")

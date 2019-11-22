@@ -48,6 +48,13 @@ from stockholm import Money
     ("4711.999101000", "USD", False, "4711.999101 USD"),
     ("-0", None, False, "0.00"),
     (-0, None, False, "0.00"),
+    (Money("-0.00"), None, False, "0.00"),
+    (Money(0), None, False, "0.00"),
+    (Money(1), None, False, "1.00"),
+    (Money(1), "USD", False, "1.00 USD"),
+    (Money(1, currency="USD"), "USD", False, "1.00 USD"),
+    (Money("4711.00 USD", currency="USD"), "USD", False, "4711.00 USD"),
+    (Money("4711.00"), "USD", False, "4711.00 USD"),
 ])
 def test_basic_str_output(amount, currency, is_cents, expected):
     m = Money(amount, currency=currency, is_cents=is_cents)
