@@ -149,7 +149,7 @@ class Money:
         nanos_str = "".join(map(str, digits))[exponent:] if exponent else ""
 
         nanos_str = nanos_str.rjust((-exponent), "0").ljust(nanos_len + extended_precision, "0")
-        rounding_nanos = Decimal(nanos_str[nanos_len:nanos_len + extended_precision]) / Decimal(10)
+        rounding_nanos = Decimal(nanos_str[nanos_len : nanos_len + extended_precision]) / Decimal(10)
         nanos_str = nanos_str[0:nanos_len]
         if rounding_nanos.quantize(Decimal(1)) * Decimal(20) >= Decimal(f"1e{extended_precision}"):
             nanos_str = str(Decimal(f"1{nanos_str}") + Decimal(1))[1:]
