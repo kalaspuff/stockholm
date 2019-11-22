@@ -24,7 +24,7 @@ jobs:
         poetry install
     - name: Test with pytest
       run: |
-        PYTHONPATH=. poetry run pytest tests/
+        PYTHONPATH=. poetry run pytest --cov stockholm/
     - name: Lint with flake8
       run: |
         poetry run flake8 stockholm/ tests/
