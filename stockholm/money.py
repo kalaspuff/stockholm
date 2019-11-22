@@ -2,7 +2,7 @@ from functools import reduce
 import re
 from typing import Any, Dict, Iterable, Optional, Tuple, Union
 
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import Decimal
 
 
 __all__ = ["Money"]
