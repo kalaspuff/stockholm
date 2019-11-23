@@ -72,11 +72,9 @@ class Money:
                     if not match_currency:
                         raise AttributeError
                 except AttributeError:
-                    matches = re.match(r"^([-+]?[0-9.]+)[ ]+([a-zA-Z]+)$", str(amount))
-                    if matches:
-                        match_currency = matches.group(2)
-
-                    matches = re.match(r"^([a-zA-Z]+)[ ]+([-+]?[0-9.]+)$", str(amount))
+                    matches = re.match(r"^(?:[-+]?[0-9.]+)[ ]+([a-zA-Z]+)$", str(amount))
+                    if not matches:
+                        matches = re.match(r"^([a-zA-Z]+)[ ]+(?:[-+]?[0-9.]+)$", str(amount))
                     if matches:
                         match_currency = matches.group(1)
 
@@ -98,15 +96,12 @@ class Money:
             amount = amount.strip()
             match_currency = None
 
-            matches = re.match(r"^([-+]?[0-9.]+)[ ]+([a-zA-Z]+)$", amount)
+            matches = re.match(r"^(?P<amount>[-+]?[0-9.]+)[ ]+(?P<currency>[a-zA-Z]+)$", amount)
+            if not matches:
+                matches = re.match(r"^(?P<currency>[a-zA-Z]+)[ ]+(?P<amount>[-+]?[0-9.]+)$", amount)
             if matches:
-                amount = matches.group(1).strip()
-                match_currency = matches.group(2).strip().upper()
-
-            matches = re.match(r"^([a-zA-Z]+)[ ]+([-+]?[0-9.]+)$", amount)
-            if matches:
-                amount = matches.group(2).strip()
-                match_currency = matches.group(1).strip().upper()
+                amount = matches.group("amount").strip()
+                match_currency = matches.group("currency").strip().upper()
 
             if match_currency is not None:
                 if output_currency is not None and match_currency != output_currency:
