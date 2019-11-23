@@ -4,14 +4,18 @@ from typing import Any, Iterable, Optional, Tuple, Union
 
 from decimal import Decimal, ROUND_HALF_UP
 
+from .exceptions import CurrencyMismatchError, ConversionError, InvalidOperandError
+
 
 __all__ = ["Money"]
 
 DEFAULT_MIN_DECIMALS = 2
 DEFAULT_MAX_DECIMALS = 9
+MAX_DECIMALS = 9
+NANOS_LENGTH = 9
+
 HIGHEST_SUPPORTED_AMOUNT = "999999999999999999.999999999"
 LOWEST_SUPPORTED_AMOUNT = "-999999999999999999.999999999"
-NANOS_LENGTH = 9
 
 
 class Money:
@@ -43,7 +47,7 @@ class Money:
         **kwargs: Any,
     ) -> None:
         if amount is None:
-            raise Exception("Missing input values for monetary amount")
+            raise ConversionError("Missing input values for monetary amount")
 
         if isinstance(amount, Money) and currency is None and is_cents is None:
             object.__setattr__(self, "_amount", amount._amount)
@@ -51,19 +55,46 @@ class Money:
             return
 
         if currency is not None and not isinstance(currency, str):
-            raise Exception("Invalid currency")
+            raise ConversionError("Invalid currency value")
 
         output_amount = None
         output_currency = currency.strip().upper() if currency and currency.strip() else None
 
         if Money._is_unknown_amount_type(amount):
-            amount = str(amount)
+            try:
+                match_amount = getattr(amount, "amount")
+                if match_amount is None or Money._is_unknown_amount_type(match_amount):
+                    raise AttributeError
 
-        if isinstance(amount, int) and not isinstance(amount, bool):
+                match_currency = None
+                try:
+                    match_currency = getattr(amount, "currency")
+                    if not match_currency:
+                        raise AttributeError
+                except AttributeError:
+                    matches = re.match(r"^([-+]?[0-9.]+)[ ]+([a-zA-Z]+)$", str(amount))
+                    if matches:
+                        match_currency = matches.group(2)
+
+                    matches = re.match(r"^([a-zA-Z]+)[ ]+([-+]?[0-9.]+)$", str(amount))
+                    if matches:
+                        match_currency = matches.group(1)
+
+                if match_currency is not None:
+                    match_currency = match_currency.strip().upper()
+                    if output_currency is not None and match_currency != output_currency:
+                        raise ConversionError("Mismatching currency in input value and currency argument")
+                    output_currency = match_currency
+
+                amount = match_amount
+            except AttributeError:
+                amount = str(amount)
+
+        if amount is not None and isinstance(amount, int) and not isinstance(amount, bool):
             output_amount = Decimal(amount)
-        elif isinstance(amount, float):
+        elif amount is not None and isinstance(amount, float):
             output_amount = Decimal(str(amount))
-        elif isinstance(amount, str) and amount.strip():
+        elif amount is not None and isinstance(amount, str) and amount.strip():
             amount = amount.strip()
             match_currency = None
 
@@ -79,46 +110,46 @@ class Money:
 
             if match_currency is not None:
                 if output_currency is not None and match_currency != output_currency:
-                    raise Exception("Mismatching currency in input value and currency argument")
+                    raise ConversionError("Mismatching currency in input value and currency argument")
                 output_currency = match_currency
 
             try:
                 output_amount = Decimal(amount)
             except Exception:
-                raise Exception("Value cannot be used as monetary amount")
-        elif isinstance(amount, Money):
+                raise ConversionError("Value cannot be used as monetary amount")
+        elif amount is not None and isinstance(amount, Money):
             if amount.currency:
                 if output_currency is not None and amount.currency != output_currency:
-                    raise Exception("Mismatching currency in input value and currency argument")
+                    raise ConversionError("Mismatching currency in input value and currency argument")
                 output_currency = amount.currency
 
             output_amount = amount._amount
-        elif isinstance(amount, Decimal):
+        elif amount is not None and isinstance(amount, Decimal):
             output_amount = amount
 
         if output_amount is None:
-            raise Exception("Missing input values for monetary amount")
+            raise ConversionError("Missing input values for monetary amount")
 
         if output_amount.is_infinite():
-            raise Exception("Monetary amounts cannot be infinite")
+            raise ConversionError("Monetary amounts cannot be infinite")
 
         if output_amount.is_nan():
-            raise Exception("Input amount is not a number")
+            raise ConversionError("Input amount is not a number")
 
         if is_cents:
             output_amount = output_amount / 100
 
         if output_amount > Decimal(HIGHEST_SUPPORTED_AMOUNT):
-            raise Exception(f"Input amount is too high, max value is {HIGHEST_SUPPORTED_AMOUNT}")
+            raise ConversionError(f"Input amount is too high, max value is {HIGHEST_SUPPORTED_AMOUNT}")
 
         if output_amount < Decimal(LOWEST_SUPPORTED_AMOUNT):
-            raise Exception(f"Input amount is too low, min value is {LOWEST_SUPPORTED_AMOUNT}")
+            raise ConversionError(f"Input amount is too low, min value is {LOWEST_SUPPORTED_AMOUNT}")
 
         if output_currency and not re.match(r"^[a-zA-Z]+$", output_currency):
-            raise Exception("Invalid currency")
+            raise ConversionError("Invalid currency")
 
         if output_amount == 0 and str(output_amount).startswith("-"):
-            output_amount = Decimal(str(output_amount)[1:])
+            output_amount = Decimal(0)
 
         object.__setattr__(self, "_amount", output_amount)
         object.__setattr__(self, "_currency", output_currency)
@@ -184,6 +215,9 @@ class Money:
     ) -> str:
         units, nanos = self._amount_tuple
 
+        max_decimals = min(max_decimals, MAX_DECIMALS)
+        min_decimals = min(min_decimals, max_decimals)
+
         decimals_value = nanos.lstrip("-")[0:max_decimals].rstrip("0")
         decimals = len(decimals_value)
 
@@ -217,15 +251,15 @@ class Money:
         if not isinstance(other, Money):
             try:
                 converted_other = Money(other)
-            except Exception:
+            except ConversionError:
                 other_repr = repr(other)
                 self_repr = repr(self)
-                raise Exception(f"Unable to perform operations on {self_repr} with {other_repr}")
+                raise InvalidOperandError(f"Unable to perform operations on {self_repr} with {other_repr}")
         else:
             converted_other = other
 
         if self._currency and converted_other._currency and self._currency != converted_other._currency:
-            raise Exception("Unable to perform operations on values with differing currencies")
+            raise CurrencyMismatchError("Unable to perform operations on values with differing currencies")
 
         return converted_other
 
@@ -233,7 +267,7 @@ class Money:
         if not isinstance(other, Money):
             try:
                 converted_other = Money(other)
-            except Exception:
+            except ConversionError:
                 return False
         else:
             converted_other = other
@@ -292,7 +326,7 @@ class Money:
             converted_other = other
 
         if converted_other._currency is not None and self._currency is not None:
-            raise Exception("Unable to multiply two currency aware monetary amounts with each other")
+            raise InvalidOperandError("Unable to multiply two monetary amounts with each other")
 
         amount = self._amount * converted_other._amount
         currency = self._currency or converted_other._currency
@@ -342,7 +376,7 @@ class Money:
             converted_other = other
 
         if converted_other._currency is not None:
-            raise Exception("Unable to use a currency aware monetary amount as the exponential power")
+            raise InvalidOperandError("Unable to use a monetary amount as an exponent")
 
         amount = self._amount ** converted_other._amount
         return Money(amount, currency=self._currency)

@@ -2,7 +2,7 @@ from typing import Any
 
 import pytest
 
-from stockholm import Money
+from stockholm import Money, CurrencyMismatchError
 
 
 @pytest.mark.parametrize(
@@ -86,14 +86,20 @@ def test_equal_comparison(money: Money, other: Any, expected: bool) -> None:
     assert result is not expected
 
 
-def test_falsy_truish() -> None:
-    assert bool(Money(1))
-    assert not bool(Money(0))
-    assert not bool(Money("0.00"))
-    assert bool(Money("0.01"))
-    assert bool(Money(-1))
-    assert not bool(Money("-0.00"))
-    assert bool(Money("-0.01"))
+@pytest.mark.parametrize(
+    "money, expected",
+    [
+        (Money(1), True),
+        (Money(0), False),
+        (Money("0.00"), False),
+        (Money("0.01"), True),
+        (Money(-1), True),
+        (Money("-0.00"), False),
+        (Money("-0.01"), True),
+    ],
+)
+def test_falsy_truish(money, expected) -> None:
+    assert bool(money) is expected
 
 
 def test_compare_weights() -> None:
@@ -150,6 +156,12 @@ def test_compare_weights() -> None:
     assert not Money("31338.511115") <= "31338 USD"
     assert Money("31338.000") <= "31338 USD"
     assert Money("31338.511115") >= "31338 USD"
+    assert not (Money(10) / 3) == Money("3.333333333333")
+    assert (Money(10) / 3) >= Money("3.333333333333")
+    assert (Money(10) / 3) > Money("3.333333333333")
+    assert Money(str(Money(10) / 3)) == Money(str(Money("3.333333333333")))
+    assert Money(str(Money(10) / 3)) >= Money(str(Money("3.333333333333")))
+    assert not Money(str(Money(10) / 3)) > Money(str(Money("3.333333333333")))
 
 
 def test_compare_different_currencies() -> None:
@@ -158,16 +170,16 @@ def test_compare_different_currencies() -> None:
     assert Money("4711", currency="USD") != Money("4711", currency="SEK")
     assert not Money("4711", currency="USD") == Money("4711", currency="SEK")
 
-    with pytest.raises(Exception):
+    with pytest.raises(CurrencyMismatchError):
         Money("4711", currency="USD") >= Money("4711", currency="SEK")
 
-    with pytest.raises(Exception):
+    with pytest.raises(CurrencyMismatchError):
         Money("4711", currency="USD") > Money("4711", currency="SEK")
 
-    with pytest.raises(Exception):
+    with pytest.raises(CurrencyMismatchError):
         Money("4711", currency="USD") <= Money("4711", currency="SEK")
 
-    with pytest.raises(Exception):
+    with pytest.raises(CurrencyMismatchError):
         Money("4711", currency="USD") < Money("4711", currency="SEK")
 
     assert Money("4711", currency="USD") > "1338.00"
@@ -180,13 +192,13 @@ def test_compare_different_currencies() -> None:
     assert Money("4711", currency="USD") >= "1338.00 USD"
     assert Money("4711 USD") > "1338.00 USD"
     assert Money("4711 USD") >= "1338.00 USD"
-    with pytest.raises(Exception):
+    with pytest.raises(CurrencyMismatchError):
         Money("4711", currency="USD") > "1338.00 SEK"
-    with pytest.raises(Exception):
+    with pytest.raises(CurrencyMismatchError):
         Money(0, currency="USD") > "1338.00 SEK"
-    with pytest.raises(Exception):
+    with pytest.raises(CurrencyMismatchError):
         Money(0, currency="USD") > "SEK 0"
-    with pytest.raises(Exception):
+    with pytest.raises(CurrencyMismatchError):
         Money("0.00 USD", currency="USD") > "1338.00 SEK"
-    with pytest.raises(Exception):
+    with pytest.raises(CurrencyMismatchError):
         Money("0.00 USD") > "SEK 0"

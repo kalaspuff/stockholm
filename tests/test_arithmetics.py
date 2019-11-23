@@ -1,7 +1,7 @@
 from decimal import Decimal
 import pytest
 
-from stockholm import Money
+from stockholm import Money, InvalidOperandError
 
 
 def test_simple_addition() -> None:
@@ -91,7 +91,7 @@ def test_simple_multiplication() -> None:
     assert m2.currency == "SEK"
     assert str(m2) == "999.9999 SEK"
 
-    with pytest.raises(Exception):
+    with pytest.raises(InvalidOperandError):
         m1 * m1
 
 
@@ -214,7 +214,7 @@ def test_pow() -> None:
     assert m2.currency == "BIT"
     assert str(m2) == "16.00 BIT"
 
-    with pytest.raises(Exception):
+    with pytest.raises(InvalidOperandError):
         m1 ** m1
 
     assert Money(2) ** Money(4) == 16
@@ -223,13 +223,13 @@ def test_pow() -> None:
 def test_bad_values() -> None:
     m = Money(1, currency="SEK")
 
-    with pytest.raises(Exception):
+    with pytest.raises(InvalidOperandError):
         m + "5,0"
 
-    with pytest.raises(Exception):
+    with pytest.raises(InvalidOperandError):
         m + "USD USD"
 
-    with pytest.raises(Exception):
+    with pytest.raises(InvalidOperandError):
         m - "50 000"
 
 

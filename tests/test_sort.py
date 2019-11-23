@@ -1,6 +1,6 @@
 import pytest
 
-from stockholm import Money
+from stockholm import Money, CurrencyMismatchError
 
 
 def test_sort_numbers() -> None:
@@ -146,14 +146,14 @@ def test_sort_with_differing_currencies() -> None:
         Money("-1", currency="USD"),
     ]
 
-    with pytest.raises(Exception):
+    with pytest.raises(CurrencyMismatchError):
         lst.sort()
 
-    with pytest.raises(Exception):
+    with pytest.raises(CurrencyMismatchError):
         sorted(lst)
 
-    with pytest.raises(Exception):
+    with pytest.raises(CurrencyMismatchError):
         sorted(lst, key=Money)
 
-    with pytest.raises(Exception):
+    with pytest.raises(CurrencyMismatchError):
         Money.sort(lst)
