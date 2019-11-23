@@ -244,9 +244,7 @@ class Money:
     def __delattr__(self, *args: Any) -> None:
         raise AttributeError("Attributes of monetary amounts cannot be deleted")
 
-    def amount_as_string(
-        self, min_decimals: Optional[int] = None, max_decimals: Optional[int] = None
-    ) -> str:
+    def amount_as_string(self, min_decimals: Optional[int] = None, max_decimals: Optional[int] = None) -> str:
         if min_decimals is None and max_decimals is None:
             min_decimals = DEFAULT_MIN_DECIMALS
             max_decimals = DEFAULT_MAX_DECIMALS
