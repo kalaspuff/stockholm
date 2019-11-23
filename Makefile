@@ -39,5 +39,5 @@ release:
 
 test: pytest flake8 mypy
 tests: test
-dist: release
+dist: build
 
