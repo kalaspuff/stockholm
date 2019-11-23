@@ -226,6 +226,12 @@ class Money:
     def as_float(self) -> float:
         return float(self)
 
+    def is_signed(self) -> bool:
+        return self._amount.is_signed()
+
+    def is_zero(self) -> bool:
+        return self._amount == 0
+
     def add(self, other: Any, is_cents: Optional[bool] = None) -> "Money":
         return self + Money(other, is_cents=is_cents)
 

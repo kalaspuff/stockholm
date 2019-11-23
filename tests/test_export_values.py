@@ -71,3 +71,25 @@ def test_info_methods() -> None:
     assert m.as_decimal() == Decimal("4711.75")
     assert m.as_int() == 4711
     assert m.as_float() == float(m)
+    assert m.is_zero() is False
+    assert m.is_signed() is False
+
+    assert Money(0).is_zero() is True
+    assert Money(0).is_signed() is False
+
+    assert Money(-1).is_signed() is True
+
+    m = Money("-0.0000000001", currency="EUR")
+
+    assert m.amount == Decimal("-0.0000000001")
+    assert m.currency == "EUR"
+    assert m.units == 0
+    assert m.nanos == 0
+
+    assert m.amount_as_string() == "0.00"
+    assert m.amount_as_string(max_decimals=10) == "-0.0000000001"
+    assert m.as_string() == "0.00 EUR"
+    assert m.as_decimal() == Decimal("-0.0000000001")
+    assert m.as_int() == 0
+    assert m.is_zero() is False
+    assert m.is_signed() is True
