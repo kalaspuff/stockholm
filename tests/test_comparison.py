@@ -202,3 +202,6 @@ def test_compare_different_currencies() -> None:
         Money("0.00 USD", currency="USD") > "1338.00 SEK"
     with pytest.raises(CurrencyMismatchError):
         Money("0.00 USD") > "SEK 0"
+
+    assert min(Money("4711 SEK"), Money("1338 SEK")) == Money("1338 SEK")
+    assert max(Money("4711.005"), Money("551 USD")) == Money("4711.005")

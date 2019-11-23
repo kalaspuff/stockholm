@@ -66,6 +66,16 @@ def test_info_methods() -> None:
     assert m.nanos == 750000000
 
     assert m.amount_as_string() == "4711.75"
+    assert m.amount_as_string(min_decimals=5, max_decimals=8) == "4711.75000"
+    assert m.amount_as_string(min_decimals=0, max_decimals=8) == "4711.75"
+    assert m.amount_as_string(min_decimals=0, max_decimals=1) == "4711.8"
+    assert m.amount_as_string(min_decimals=0, max_decimals=0) == "4712"
+    assert m.amount_as_string(max_decimals=0) == "4712"
+    assert m.amount_as_string(min_decimals=10) == "4711.7500000000"
+
+    with pytest.raises(ValueError):
+        m.amount_as_string(min_decimals=2, max_decimals=0)
+
     assert m.as_string() == "4711.75 EUR"
     assert m.as_str() == "4711.75 EUR"
     assert m.as_decimal() == Decimal("4711.75")

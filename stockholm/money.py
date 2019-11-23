@@ -245,9 +245,17 @@ class Money:
         raise AttributeError("Attributes of monetary amounts cannot be deleted")
 
     def amount_as_string(
-        self, min_decimals: int = DEFAULT_MIN_DECIMALS, max_decimals: int = DEFAULT_MAX_DECIMALS
+        self, min_decimals: Optional[int] = None, max_decimals: Optional[int] = None
     ) -> str:
-        min_decimals = min(min_decimals, max_decimals)
+        if min_decimals is None and max_decimals is None:
+            min_decimals = DEFAULT_MIN_DECIMALS
+            max_decimals = DEFAULT_MAX_DECIMALS
+        elif min_decimals is None:
+            min_decimals = min(DEFAULT_MIN_DECIMALS, max_decimals)
+        elif max_decimals is None:
+            max_decimals = max(min_decimals, DEFAULT_MAX_DECIMALS)
+        if min_decimals > max_decimals:
+            raise ValueError("Invalid values for min_decimals and max_decimals")
 
         amount = self._amount.quantize(Decimal(f"1e-{min_decimals}"), ROUND_HALF_UP)
         if amount == 0:
