@@ -11,7 +11,6 @@ __all__ = ["Money"]
 
 DEFAULT_MIN_DECIMALS = 2
 DEFAULT_MAX_DECIMALS = 9
-MAX_DECIMALS = 9
 UNITS_MAX_LENGTH = 18
 NANOS_LENGTH = 9
 
@@ -242,13 +241,14 @@ class Money:
     def amount_as_string(
         self, min_decimals: int = DEFAULT_MIN_DECIMALS, max_decimals: int = DEFAULT_MAX_DECIMALS
     ) -> str:
-        max_decimals = min(max_decimals, MAX_DECIMALS)
         min_decimals = min(min_decimals, max_decimals)
 
         amount = self._amount.quantize(Decimal(f"1e-{min_decimals}"), ROUND_HALF_UP)
         if amount == 0:
             amount = Decimal(0).quantize(Decimal(f"1e-{min_decimals}"))
-        if max_decimals > min_decimals and amount != self._amount.quantize(Decimal(f"1e-{max_decimals}"), ROUND_HALF_UP):
+        if max_decimals > min_decimals and amount != self._amount.quantize(
+            Decimal(f"1e-{max_decimals}"), ROUND_HALF_UP
+        ):
             amount = self._amount.quantize(Decimal(f"1e-{max_decimals}"), ROUND_HALF_UP)
             value = f"{amount:f}".rstrip("0")
         else:
