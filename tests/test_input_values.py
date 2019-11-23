@@ -166,16 +166,16 @@ def test_object_input() -> None:
     assert m.amount == Decimal("1.6666")
     assert str(m) == "1.6666 SEK"
 
-    m = Money(ThirdPartyMoney("1.6666", "SEK"), "SEK")
+    m = Money(ThirdPartyMoney("1.6666", "SEK"), currency="SEK")
     assert m.amount == Decimal("1.6666")
     assert str(m) == "1.6666 SEK"
 
-    m = Money(ThirdPartyMoney("1.6666"), "SEK")
+    m = Money(ThirdPartyMoney("1.6666"), currency="SEK")
     assert m.amount == Decimal("1.6666")
     assert str(m) == "1.6666 SEK"
 
     with pytest.raises(ConversionError):
-        Money(ThirdPartyMoney("1.6666", "USD"), "SEK")
+        Money(ThirdPartyMoney("1.6666", "USD"), currency="SEK")
 
 
 def test_dumb_object_input() -> None:
@@ -215,6 +215,10 @@ def test_dumb_object_input() -> None:
     m = Money(ThirdPartyMoney(1, output="1338.4711"))
     assert m.amount == Decimal("1.00")
     assert str(m) == "1.00"
+
+    m = Money(ThirdPartyMoney(1, output="1338.4711"), currency="SEK")
+    assert m.amount == Decimal("1.00")
+    assert str(m) == "1.00 SEK"
 
     m = Money(ThirdPartyMoney(1, output="USD 1338.4711"))
     assert m.amount == Decimal("1.00")

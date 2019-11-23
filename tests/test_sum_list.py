@@ -43,3 +43,23 @@ def test_sum_list_cent_values() -> None:
     assert m == Money(2569249, currency="SEK", is_cents=True)
     assert m == Money("25692.49 SEK")
     assert str(m) == "25692.49 SEK"
+
+
+def test_builtin_sum() -> None:
+    values = [
+        Money(471100, currency="SEK"),
+        Money("1338.50", currenccy="SEK"),
+    ]
+
+    m = sum(values)
+    assert isinstance(m, Money)
+    assert m == Money("472438.5", currency="SEK")
+    assert str(m) == "472438.50 SEK"
+
+    m = sum(values + [Money("-0.50")])
+    assert isinstance(m, Money)
+    assert m == Money(472438, currency="SEK")
+    assert str(m) == "472438.00 SEK"
+
+    with pytest.raises(CurrencyMismatchError):
+        m = sum(values + [Money("-0.50", currency="EUR")])

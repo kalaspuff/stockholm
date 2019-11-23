@@ -37,7 +37,7 @@ class Money:
 
     @classmethod
     def _is_unknown_amount_type(cls, amount: Optional[Union["Money", Decimal, int, float, str, object]]) -> bool:
-        return not any(map(lambda type_: isinstance(amount, type_), (int, bool, float, str, Money, Decimal)))
+        return not any(map(lambda type_: isinstance(amount, type_), (Money, Decimal, int, bool, float, str)))
 
     def __init__(
         self,
