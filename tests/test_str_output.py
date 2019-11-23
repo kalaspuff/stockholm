@@ -6,6 +6,19 @@ import pytest
 from stockholm import Money
 
 
+class ThirdPartyMoney:
+    amount: int
+    currency: str
+
+    def __init__(self, amount: int, currency: str) -> None:
+        self.amount = Decimal(amount) / Decimal(100)
+        self.currency = currency
+
+    def __str__(self) -> str:
+        amount = str(self.amount)
+        return f"{self.currency} {amount}"
+
+
 @pytest.mark.parametrize(
     "amount, currency, is_cents, expected",
     [
@@ -67,6 +80,9 @@ from stockholm import Money
         (Money(Decimal("0.0001")), "BTC", True, "0.000001 BTC"),
         (Money(1000) / Money(3), None, False, "333.333333333"),
         ((Money(1000) / Money(3)) * Money(2), None, False, "666.666666667"),
+        (ThirdPartyMoney(1, "SEK"), None, False, "0.01 SEK"),
+        (ThirdPartyMoney("100", "SEK"), None, False, "1.00 SEK"),
+        (ThirdPartyMoney(471150, "EUR"), "EUR", False, "4711.50 EUR"),
     ],
 )
 def test_basic_str_output(amount: Any, currency: Any, is_cents: Optional[bool], expected: str) -> None:

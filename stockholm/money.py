@@ -1,18 +1,23 @@
 from functools import reduce
 import re
-from typing import Any, Dict, Iterable, Optional, Tuple, Union
+from typing import Any, Iterable, Optional, Tuple, Union
 
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 
 
 __all__ = ["Money"]
 
+DEFAULT_MIN_DECIMALS = 2
+DEFAULT_MAX_DECIMALS = 9
+HIGHEST_SUPPORTED_AMOUNT = "999999999999999999.999999999"
+LOWEST_SUPPORTED_AMOUNT = "-999999999999999999.999999999"
+NANOS_LENGTH = 9
+
 
 class Money:
-    __slots__ = ("_amount", "_currency", "_metadata")
+    __slots__ = ("_amount", "_currency")
     _amount: Decimal
     _currency: Optional[str]
-    _metadata: Dict
 
     @classmethod
     def sort(cls, iterable: Iterable, reverse: bool = False) -> Iterable:
@@ -34,12 +39,11 @@ class Money:
         **kwargs: Any,
     ) -> None:
         if amount is None:
-            raise Exception("Missing input values for valid monetary amount")
+            raise Exception("Missing input values for monetary amount")
 
         if isinstance(amount, Money) and currency is None and is_cents is None:
-            object.__setattr__(self, "_amount", amount.amount)
-            object.__setattr__(self, "_currency", amount.currency)
-            object.__setattr__(self, "_metadata", amount.metadata)
+            object.__setattr__(self, "_amount", amount._amount)
+            object.__setattr__(self, "_currency", amount._currency)
             return
 
         if currency is not None and not isinstance(currency, str):
@@ -47,30 +51,27 @@ class Money:
 
         output_amount = None
         output_currency = currency.strip().upper() if currency and currency.strip() else None
-        output_metadata: Dict = {}
+
+        if isinstance(amount, object) and not isinstance(amount, Money) and not isinstance(amount, Decimal):
+            amount = str(amount)
 
         if isinstance(amount, int) and not isinstance(amount, bool):
-            if is_cents:
-                output_amount = Decimal(amount) / 100
-            else:
-                output_amount = Decimal(amount)
+            output_amount = Decimal(amount)
         elif isinstance(amount, float):
-            if is_cents:
-                output_amount = Decimal(str(amount)) / 100
-            else:
-                output_amount = Decimal(str(amount))
+            output_amount = Decimal(str(amount))
         elif isinstance(amount, str) and amount.strip():
             amount = amount.strip()
-            matches = re.match(r"^([-+]?[0-9.]+)[ ]+([a-zA-Z._-]+)$", amount)
             match_currency = None
+
+            matches = re.match(r"^([-+]?[0-9.]+)[ ]+([a-zA-Z]+)$", amount)
             if matches:
                 amount = matches.group(1).strip()
                 match_currency = matches.group(2).strip().upper()
-            else:
-                matches = re.match(r"^([a-zA-Z._-]+)[ ]+([-+]?[0-9.]+)$", amount)
-                if matches:
-                    amount = matches.group(2).strip()
-                    match_currency = matches.group(1).strip().upper()
+
+            matches = re.match(r"^([a-zA-Z]+)[ ]+([-+]?[0-9.]+)$", amount)
+            if matches:
+                amount = matches.group(2).strip()
+                match_currency = matches.group(1).strip().upper()
 
             if match_currency is not None:
                 if output_currency is not None and match_currency != output_currency:
@@ -78,10 +79,7 @@ class Money:
                 output_currency = match_currency
 
             try:
-                if is_cents:
-                    output_amount = Decimal(amount) / 100
-                else:
-                    output_amount = Decimal(amount)
+                output_amount = Decimal(amount)
             except Exception:
                 raise Exception("Value cannot be used as monetary amount")
         elif isinstance(amount, Money):
@@ -90,28 +88,29 @@ class Money:
                     raise Exception("Mismatching currency in input value and currency argument")
                 output_currency = amount.currency
 
-            if is_cents:
-                output_amount = Decimal(amount.amount) / 100
-            else:
-                output_amount = amount.amount
-
-            output_metadata = amount.metadata
+            output_amount = amount._amount
         elif isinstance(amount, Decimal):
-            if is_cents:
-                output_amount = Decimal(amount) / 100
-            else:
-                output_amount = amount
+            output_amount = amount
 
         if output_amount is None:
-            raise Exception("Missing input values for valid monetary amount")
+            raise Exception("Missing input values for monetary amount")
 
-        if output_amount > Decimal("999999999999999999.999999999"):
-            raise Exception("Input amount is too high, max value is 999999999999999999.999999999")
+        if output_amount.is_infinite():
+            raise Exception("Monetary amounts cannot be infinite")
 
-        if output_amount < Decimal("-999999999999999999.999999999"):
-            raise Exception("Input amount is too low, min value is -999999999999999999.999999999")
+        if output_amount.is_nan():
+            raise Exception("Input amount is not a number")
 
-        if output_currency and not re.match(r"^[a-zA-Z._-]+$", output_currency):
+        if is_cents:
+            output_amount = output_amount / 100
+
+        if output_amount > Decimal(HIGHEST_SUPPORTED_AMOUNT):
+            raise Exception(f"Input amount is too high, max value is {HIGHEST_SUPPORTED_AMOUNT}")
+
+        if output_amount < Decimal(LOWEST_SUPPORTED_AMOUNT):
+            raise Exception(f"Input amount is too low, min value is {LOWEST_SUPPORTED_AMOUNT}")
+
+        if output_currency and not re.match(r"^[a-zA-Z]+$", output_currency):
             raise Exception("Invalid currency")
 
         if output_amount == 0 and str(output_amount).startswith("-"):
@@ -119,11 +118,6 @@ class Money:
 
         object.__setattr__(self, "_amount", output_amount)
         object.__setattr__(self, "_currency", output_currency)
-
-        if "is_cents" not in output_metadata or (is_cents is not None and output_metadata["is_cents"] is not is_cents):
-            output_metadata["is_cents"] = is_cents
-
-        object.__setattr__(self, "_metadata", output_metadata)
 
     @property
     def amount(self) -> Decimal:
@@ -134,55 +128,40 @@ class Money:
         return self._currency
 
     @property
-    def metadata(self) -> Dict:
-        return self._metadata
+    def _amount_tuple(self) -> Tuple[str, str]:
+        amount = self._amount.quantize(Decimal(f"1e-{NANOS_LENGTH}"), ROUND_HALF_UP)
+        sign, digits, exponent = amount.as_tuple()
 
-    def _amount_tuple(self, nanos_len: int = 9) -> Tuple[str, str]:
-        extended_precision = 5
-        extended_precision_len = nanos_len + extended_precision
-        sign, digits, exponent = self._amount.as_tuple()
+        units_str = "".join(map(str, digits))[:exponent] or "0"
 
-        if exponent:
-            units_str = "".join(map(str, digits))[:exponent] or "0"
-        else:
-            units_str = "".join(map(str, digits))
+        nanos_str = "".join(map(str, digits))[exponent:]
+        nanos_str = nanos_str.rjust((-exponent), "0").ljust(NANOS_LENGTH, "0")[0:NANOS_LENGTH]
 
-        nanos_str = "".join(map(str, digits))[exponent:] if exponent else ""
-
-        nanos_str = nanos_str.rjust((-exponent), "0").ljust(extended_precision_len, "0")
-        rounding_nanos = Decimal(nanos_str[nanos_len:extended_precision_len]) / Decimal(10)
-        nanos_str = nanos_str[0:nanos_len]
-        if rounding_nanos.quantize(Decimal(1)) * Decimal(20) >= Decimal(f"1e{extended_precision}"):
-            nanos_str = str(Decimal(f"1{nanos_str}") + Decimal(1))[1:]
-            if int(nanos_str) == 0:
-                units_str = str(Decimal(f"1{units_str}") + Decimal(1))[1:]
-
-        if sign:
-            if int(units_str) != 0:
-                units_str = f"-{units_str}"
-            if int(nanos_str) != 0:
-                nanos_str = f"-{nanos_str}"
+        if sign and int(units_str):
+            units_str = f"-{units_str}"
+        if sign and int(nanos_str):
+            nanos_str = f"-{nanos_str}"
 
         return units_str, nanos_str
 
     @property
     def units(self) -> int:
-        units, _ = self._amount_tuple()
+        units, _ = self._amount_tuple
         return int(units)
 
     @property
     def nanos(self) -> int:
-        _, nanos = self._amount_tuple()
+        _, nanos = self._amount_tuple
         return int(nanos)
 
-    @property
-    def values(self) -> Dict:
-        return {
-            "units": self.units,
-            "nanos": self.nanos,
-            "as_string": self.amount_as_string(),
-            "currency": self._currency,
-        }
+    def as_string(self) -> str:
+        return str(self)
+
+    def as_str(self) -> str:
+        return self.as_string()
+
+    def as_decimal(self) -> Decimal:
+        return self._amount
 
     def add(self, other: Any, is_cents: Optional[bool] = None) -> "Money":
         return self + Money(other, is_cents=is_cents)
@@ -196,8 +175,8 @@ class Money:
     def __delattr__(self, *args: Any) -> None:
         raise AttributeError("Attributes of monetary amounts cannot be deleted")
 
-    def amount_as_string(self, min_decimals: int = 2, max_decimals: int = 9) -> str:
-        units, nanos = self._amount_tuple(nanos_len=max_decimals)
+    def amount_as_string(self, min_decimals: int = DEFAULT_MIN_DECIMALS, max_decimals: int = DEFAULT_MAX_DECIMALS) -> str:
+        units, nanos = self._amount_tuple
 
         decimals_value = nanos.lstrip("-")[0:max_decimals].rstrip("0")
         decimals = len(decimals_value)
@@ -205,7 +184,7 @@ class Money:
         used_decimal_count = min(max(min_decimals, decimals), max_decimals)
         decimals_value = decimals_value.ljust(used_decimal_count, "0")
 
-        if int(units) == 0 and int(nanos) < 0:
+        if not int(units) and int(nanos) < 0:
             return f"-{units}.{decimals_value}"
         return f"{units}.{decimals_value}"
 
@@ -223,7 +202,7 @@ class Money:
         return str(amount)
 
     def __hash__(self) -> int:
-        return hash(("stockholm", self._amount, self._currency, frozenset(self._metadata)))
+        return hash(("stockholm.Money", self._amount, self._currency))
 
     def __bool__(self) -> bool:
         return bool(self._amount)

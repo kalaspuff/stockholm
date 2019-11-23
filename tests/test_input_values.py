@@ -98,6 +98,14 @@ from stockholm import Money
         ("-999999999999999999.9999999999", None, True),
         ("1000000000000000000", None, True),
         ("-1000000000000000000", None, True),
+        ("Infinity", None, True),
+        ("-Infinity", None, True),
+        ("NaN", None, True),
+        ("-Nan", None, True),
+        ("1,00 SEK", None, True),
+        (Decimal("Infinity"), None, True),
+        (Decimal("-Infinity"), None, True),
+        (Decimal("NaN"), None, True),
     ],
 )
 def test_input_values(amount: Any, currency: Any, exception_expected: bool) -> None:

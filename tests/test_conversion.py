@@ -1,7 +1,7 @@
 from stockholm import Money
 
 
-def test_basic_conversion() -> None:
+def test_conversion_extensions() -> None:
     m1 = Money(50, currency="USD")
     m2 = Money(-50, currency="USD")
 
@@ -23,17 +23,46 @@ def test_basic_conversion() -> None:
     assert float(m1) == 50.00
     assert float(m2) == -50.00
 
-    m3 = round(m1 / 3, 2)  # type: ignore
-    assert isinstance(m3, Money)
-    assert m3 == Money("16.67", currency="USD")
+    m = m1 / 3
+    assert isinstance(m, Money)
+    assert m != Money("16.666666667", currency="USD")
+    assert str(m) == Money("16.666666667", currency="USD")
 
-    m4 = round(m2 / 3, 2)  # type: ignore
-    assert isinstance(m4, Money)
-    assert m4 == Money("-16.67", currency="USD")
+    m = m2 / 3
+    assert isinstance(m, Money)
+    assert m != Money("-16.666666667", currency="USD")
+    assert str(m) == Money("-16.666666667", currency="USD")
 
+    m = (m1 / 3) * 2
+    assert isinstance(m, Money)
+    assert m != Money("33.333333333", currency="USD")
+    assert str(m) == Money("33.333333333", currency="USD")
 
-def test_metadata_alive() -> None:
-    m1 = Money(471100, currency="SEK", is_cents=True)
-    m2 = Money(m1)
-    assert m1.metadata == {"is_cents": True}
-    assert m2.metadata == {"is_cents": True}
+    m = (m2 / 3) * 2
+    assert isinstance(m, Money)
+    assert m != Money("-33.333333333", currency="USD")
+    assert str(m) == Money("-33.333333333", currency="USD")
+
+    m = round(m1 / 3, 2)  # type: ignore
+    assert isinstance(m, Money)
+    assert m == Money("16.67", currency="USD")
+
+    m = round(m2 / 3, 2)  # type: ignore
+    assert isinstance(m, Money)
+    assert m == Money("-16.67", currency="USD")
+
+    m = round((m1 / 3) * 2, 2)  # type: ignore
+    assert isinstance(m, Money)
+    assert m == Money("33.33", currency="USD")
+
+    m = round((m2 / 3) * 2, 2)  # type: ignore
+    assert isinstance(m, Money)
+    assert m == Money("-33.33", currency="USD")
+
+    m = round(m1 / 3)  # type: ignore
+    assert isinstance(m, Money)
+    assert m == Money("17", currency="USD")
+
+    m = round(m2 / 3)  # type: ignore
+    assert isinstance(m, Money)
+    assert m == Money("-17", currency="USD")

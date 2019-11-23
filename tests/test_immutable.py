@@ -10,7 +10,6 @@ def test_update_data() -> None:
 
     assert m.amount == Decimal(4711)
     assert m.currency == "SEK"
-    assert m.metadata == {"is_cents": None}
 
     with pytest.raises(AttributeError):
         m._amount = Decimal(10)
