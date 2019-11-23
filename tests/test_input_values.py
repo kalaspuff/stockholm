@@ -234,3 +234,45 @@ def test_dumb_object_input() -> None:
 
     with pytest.raises(ConversionError):
         Money(ThirdPartyMoney(None, output="USD USD"))
+
+
+def test_units_input() -> None:
+    assert Money(units=0, nanos=0) == 0
+    assert Money(units=0) == 0
+    assert Money(nanos=0) == 0
+    assert Money(units=0, nanos=1) == Money("0.000000001")
+    assert Money(nanos=2) == Money("0.000000002")
+    assert Money(nanos=-2) == Money("-0.000000002")
+    assert Money(units=4711) == Money(4711)
+    assert Money(units=-4711) == Money(-4711)
+    assert Money(units=1, nanos=750000000) == Money("1.75")
+    assert Money(units=0, nanos=100000000) == Money("0.1")
+    assert Money(units=-1, nanos=-750000000) == Money("-1.75")
+    assert Money(units=13381339, nanos=5005335) == Money("13381339.005005335")
+    assert Money(units=999999999999999999, nanos=999999999) == Money("999999999999999999.999999999")
+    assert Money(units=-999999999999999999, nanos=-999999999) == Money("-999999999999999999.999999999")
+
+    assert Money(units=1338, amount=1338) == Money(1338)
+    assert Money(units=1338, nanos=250000000, amount=Decimal("1338.25")) == Money("1338.25")
+    assert Money(units=1338, nanos=250000000, amount="1338.25 SEK") == Money("1338.25", currency="SEK")
+
+    with pytest.raises(ConversionError):
+        Money(units=-1, nanos=750000000)
+
+    with pytest.raises(ConversionError):
+        Money(units=1, nanos=-1)
+
+    with pytest.raises(ConversionError):
+        Money(nanos=1000000000)
+
+    with pytest.raises(ConversionError):
+        Money(units=1000000000000000000)
+
+    with pytest.raises(ConversionError):
+        Money(units=1338, amount=1337)
+
+    with pytest.raises(ConversionError):
+        Money(units=1338, nanos=250000000, amount=1338)
+
+    with pytest.raises(ConversionError):
+        Money(units=1338, nanos=250000000, amount="1338")

@@ -1,3 +1,5 @@
+import pytest
+
 import stockholm
 
 
@@ -13,3 +15,8 @@ def test_init() -> None:
 def test_hash() -> None:
     m = stockholm.Money(0)
     assert hash(m)
+
+
+def test_empty_construct() -> None:
+    with pytest.raises(stockholm.ConversionError):
+        stockholm.Money()

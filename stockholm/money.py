@@ -12,6 +12,7 @@ __all__ = ["Money"]
 DEFAULT_MIN_DECIMALS = 2
 DEFAULT_MAX_DECIMALS = 9
 MAX_DECIMALS = 9
+UNITS_MAX_LENGTH = 18
 NANOS_LENGTH = 9
 
 HIGHEST_SUPPORTED_AMOUNT = "999999999999999999.999999999"
@@ -44,12 +45,37 @@ class Money:
         amount: Optional[Union["Money", Decimal, int, float, str, object]] = None,
         currency: Optional[str] = None,
         is_cents: Optional[bool] = None,
+        units: Optional[int] = None,
+        nanos: Optional[int] = None,
         **kwargs: Any,
     ) -> None:
+        validate_amounts = []
+
+        if units is not None or nanos is not None:
+            try:
+                units = units or 0
+                nanos = nanos or 0
+                if (units > 0 and nanos < 0) or (units < 0 and nanos > 0):
+                    raise ValueError
+                units_str = str(units).lstrip("-")
+                nanos_str = str(nanos).lstrip("-").rjust(NANOS_LENGTH, "0")
+                if len(units_str) > UNITS_MAX_LENGTH:
+                    raise ValueError
+                if len(nanos_str) != NANOS_LENGTH:
+                    raise ValueError
+                sign = "-" if nanos < 0 or units < 0 else ""
+                units_amount = Decimal(f"{sign}{units_str}.{nanos_str}")
+                if amount is None:
+                    amount = units_amount
+                else:
+                    validate_amounts.append(units_amount)
+            except Exception:
+                raise ConversionError("Invalid values for units and nanos")
+
         if amount is None:
             raise ConversionError("Missing input values for monetary amount")
 
-        if isinstance(amount, Money) and currency is None and is_cents is None:
+        if isinstance(amount, Money) and currency is None and is_cents is None and units is None and nanos is None:
             object.__setattr__(self, "_amount", amount._amount)
             object.__setattr__(self, "_currency", amount._currency)
             return
@@ -145,6 +171,9 @@ class Money:
 
         if output_amount == 0 and str(output_amount).startswith("-"):
             output_amount = Decimal(0)
+
+        if any([output_amount != a for a in validate_amounts]):
+            raise ConversionError("Input arguments does not match")
 
         object.__setattr__(self, "_amount", output_amount)
         object.__setattr__(self, "_currency", output_currency)
