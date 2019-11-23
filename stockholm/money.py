@@ -31,6 +31,10 @@ class Money:
             Money(0, currency=currency, is_cents=is_cents),
         )
 
+    @classmethod
+    def _is_unknown_amount_type(cls, amount: Optional[Union["Money", Decimal, int, float, str, object]]) -> bool:
+        return not any(map(lambda type_: isinstance(amount, type_), (int, bool, float, str, Money, Decimal)))
+
     def __init__(
         self,
         amount: Optional[Union["Money", Decimal, int, float, str, object]] = None,
@@ -52,7 +56,7 @@ class Money:
         output_amount = None
         output_currency = currency.strip().upper() if currency and currency.strip() else None
 
-        if isinstance(amount, object) and not isinstance(amount, Money) and not isinstance(amount, Decimal):
+        if Money._is_unknown_amount_type(amount):
             amount = str(amount)
 
         if isinstance(amount, int) and not isinstance(amount, bool):

@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import Any
 
 import pytest
@@ -53,3 +54,17 @@ def test_value_tuple(value: Any, expected_units: int, expected_nanos: int, expec
     assert m.units == expected_units
     assert m.nanos == expected_nanos
     assert m.amount_as_string() == expected_string
+
+
+def test_info_methods() -> None:
+    m = Money("4711.75", currency="EUR")
+
+    assert m.amount == Decimal("4711.75")
+    assert m.currency == "EUR"
+    assert m.units == 4711
+    assert m.nanos == 750000000
+
+    assert m.amount_as_string() == "4711.75"
+    assert m.as_string() == "4711.75 EUR"
+    assert m.as_str() == "4711.75 EUR"
+    assert m.as_decimal() == Decimal("4711.75")
