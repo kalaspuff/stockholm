@@ -175,7 +175,9 @@ class Money:
     def __delattr__(self, *args: Any) -> None:
         raise AttributeError("Attributes of monetary amounts cannot be deleted")
 
-    def amount_as_string(self, min_decimals: int = DEFAULT_MIN_DECIMALS, max_decimals: int = DEFAULT_MAX_DECIMALS) -> str:
+    def amount_as_string(
+        self, min_decimals: int = DEFAULT_MIN_DECIMALS, max_decimals: int = DEFAULT_MAX_DECIMALS
+    ) -> str:
         units, nanos = self._amount_tuple
 
         decimals_value = nanos.lstrip("-")[0:max_decimals].rstrip("0")
