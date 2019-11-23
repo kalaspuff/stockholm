@@ -69,3 +69,5 @@ def test_info_methods() -> None:
     assert m.as_string() == "4711.75 EUR"
     assert m.as_str() == "4711.75 EUR"
     assert m.as_decimal() == Decimal("4711.75")
+    assert m.as_int() == 4711
+    assert m.as_float() == float(m)

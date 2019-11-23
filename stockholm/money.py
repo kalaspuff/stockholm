@@ -64,11 +64,11 @@ class Money:
                 if len(nanos_str) != NANOS_LENGTH:
                     raise ValueError
                 sign = "-" if nanos < 0 or units < 0 else ""
-                units_amount = Decimal(f"{sign}{units_str}.{nanos_str}")
+                new_amount = Decimal(f"{sign}{units_str}.{nanos_str}")
                 if amount is None:
-                    amount = units_amount
+                    amount = new_amount
                 else:
-                    validate_amounts.append(units_amount)
+                    validate_amounts.append(new_amount)
             except Exception:
                 raise ConversionError("Invalid values for units and nanos")
 
@@ -84,7 +84,7 @@ class Money:
             raise ConversionError("Invalid currency value")
 
         output_amount = None
-        output_currency = currency.strip().upper() if currency and currency.strip() else None
+        output_currency = (currency or "").strip().upper() or None
 
         if Money._is_unknown_amount_type(amount):
             try:
@@ -105,7 +105,7 @@ class Money:
                         match_currency = matches.group(1)
 
                 if match_currency is not None:
-                    match_currency = match_currency.strip().upper()
+                    match_currency = str(match_currency).strip().upper()
                     if output_currency is not None and match_currency != output_currency:
                         raise ConversionError("Mismatching currency in input value and currency argument")
                     output_currency = match_currency
@@ -166,10 +166,10 @@ class Money:
         if output_amount < Decimal(LOWEST_SUPPORTED_AMOUNT):
             raise ConversionError(f"Input amount is too low, min value is {LOWEST_SUPPORTED_AMOUNT}")
 
-        if output_currency and not re.match(r"^[a-zA-Z]+$", output_currency):
+        if output_currency and not re.match(r"^[A-Z]+$", output_currency):
             raise ConversionError("Invalid currency")
 
-        if output_amount == 0 and str(output_amount).startswith("-"):
+        if output_amount == 0 and output_amount.is_signed():
             output_amount = Decimal(0)
 
         if any([output_amount != a for a in validate_amounts]):
@@ -192,7 +192,6 @@ class Money:
         sign, digits, exponent = amount.as_tuple()
 
         units_str = "".join(map(str, digits))[:exponent] or "0"
-
         nanos_str = "".join(map(str, digits))[exponent:]
         nanos_str = nanos_str.rjust((-exponent), "0").ljust(NANOS_LENGTH, "0")[0:NANOS_LENGTH]
 
@@ -222,6 +221,12 @@ class Money:
     def as_decimal(self) -> Decimal:
         return self._amount
 
+    def as_int(self) -> int:
+        return int(self)
+
+    def as_float(self) -> float:
+        return float(self)
+
     def add(self, other: Any, is_cents: Optional[bool] = None) -> "Money":
         return self + Money(other, is_cents=is_cents)
 
@@ -237,20 +242,18 @@ class Money:
     def amount_as_string(
         self, min_decimals: int = DEFAULT_MIN_DECIMALS, max_decimals: int = DEFAULT_MAX_DECIMALS
     ) -> str:
-        units, nanos = self._amount_tuple
-
         max_decimals = min(max_decimals, MAX_DECIMALS)
         min_decimals = min(min_decimals, max_decimals)
 
-        decimals_value = nanos.lstrip("-")[0:max_decimals].rstrip("0")
-        decimals = len(decimals_value)
-
-        used_decimal_count = min(max(min_decimals, decimals), max_decimals)
-        decimals_value = decimals_value.ljust(used_decimal_count, "0")
-
-        if not int(units) and int(nanos) < 0:
-            return f"-{units}.{decimals_value}"
-        return f"{units}.{decimals_value}"
+        amount = self._amount.quantize(Decimal(f"1e-{min_decimals}"), ROUND_HALF_UP)
+        if amount == 0:
+            amount = Decimal(0).quantize(Decimal(f"1e-{min_decimals}"))
+        if max_decimals > min_decimals and amount != self._amount.quantize(Decimal(f"1e-{max_decimals}"), ROUND_HALF_UP):
+            amount = self._amount.quantize(Decimal(f"1e-{max_decimals}"), ROUND_HALF_UP)
+            value = f"{amount:f}".rstrip("0")
+        else:
+            value = f"{amount:f}"
+        return value
 
     def __repr__(self) -> str:
         amount = self.amount_as_string()
