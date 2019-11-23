@@ -205,3 +205,7 @@ def test_compare_different_currencies() -> None:
 
     assert min(Money("4711 SEK"), Money("1338 SEK")) == Money("1338 SEK")
     assert max(Money("4711.005"), Money("551 USD")) == Money("4711.005")
+
+    assert Money(0) or Money(1) or Money(2) == Money(1)
+    assert bool(Money(0) and Money(1)) is False
+    assert bool(Money(2) and Money(1)) is True
