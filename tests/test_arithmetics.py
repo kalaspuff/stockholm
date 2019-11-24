@@ -128,6 +128,16 @@ def test_true_division() -> None:
     assert m2.currency == "SEK"
     assert str(m2) == "33.333333333 SEK"
 
+    with pytest.raises(ZeroDivisionError):
+        m1 / 0
+
+    m3 = Money("10.39", currency="USD")
+    exchange_rate = m1 / m3
+    assert isinstance(exchange_rate, Money)
+    assert round(exchange_rate, 2) == Decimal("9.62")
+    assert exchange_rate.currency is None
+    assert str(exchange_rate) == "9.624639076"
+
 
 def test_floor_division() -> None:
     m1 = Money("100", currency="SEK")
@@ -147,6 +157,16 @@ def test_floor_division() -> None:
     assert m2.amount == 33
     assert m2.currency is None
     assert str(m2) == "33.00"
+
+    with pytest.raises(ZeroDivisionError):
+        m1 // 0
+
+    m3 = Money("10.39", currency="USD")
+    full_usd_amounts = m1 // m3
+    assert isinstance(full_usd_amounts, Money)
+    assert full_usd_amounts == 9
+    assert full_usd_amounts.currency is None
+    assert str(full_usd_amounts) == "9.00"
 
 
 def test_modulus() -> None:

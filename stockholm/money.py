@@ -38,6 +38,14 @@ _parse_format_specifier_regex = re.compile(
 )
 
 
+class Currency:
+    pass
+
+
+class DefaultCurrency:
+    pass
+
+
 class Money:
     __slots__ = ("_amount", "_currency")
     _amount: Decimal
@@ -48,7 +56,7 @@ class Money:
         return sorted(iterable, key=lambda x: x if isinstance(x, Money) else Money(x), reverse=reverse)
 
     @classmethod
-    def sum(cls, iterable: Iterable, currency: Optional[str] = None, is_cents: Optional[bool] = None) -> "Money":
+    def sum(cls, iterable: Iterable, currency: Optional[Union[DefaultCurrency, Currency, str]] = DefaultCurrency, is_cents: Optional[bool] = None) -> "Money":
         return reduce(
             lambda v, e: v + (e if isinstance(e, Money) else Money(e, is_cents=is_cents)),
             iterable,
@@ -62,7 +70,7 @@ class Money:
     def __init__(
         self,
         amount: Optional[Union["Money", Decimal, int, float, str, object]] = None,
-        currency: Optional[str] = None,
+        currency: Optional[Union[DefaultCurrency, Currency, str]] = DefaultCurrency,
         is_cents: Optional[bool] = None,
         units: Optional[int] = None,
         nanos: Optional[int] = None,
@@ -94,16 +102,19 @@ class Money:
         if amount is None:
             raise ConversionError("Missing input values for monetary amount")
 
-        if isinstance(amount, Money) and currency is None and is_cents is None and units is None and nanos is None:
+        if isinstance(amount, Money) and currency is DefaultCurrency and is_cents is None and units is None and nanos is None:
             object.__setattr__(self, "_amount", amount._amount)
             object.__setattr__(self, "_currency", amount._currency)
             return
 
-        if currency is not None and not isinstance(currency, str):
+        if currency is not DefaultCurrency and not isinstance(currency, str) and not isinstance(currency, Currency) and currency is not None:
             raise ConversionError("Invalid currency value")
 
         output_amount = None
-        output_currency = (currency or "").strip().upper() or None
+        if currency is DefaultCurrency:
+            output_currency = None
+        else:
+            output_currency = str(currency or "").strip().upper() or None
 
         if Money._is_unknown_amount_type(amount):
             try:
@@ -158,7 +169,7 @@ class Money:
             except Exception:
                 raise ConversionError("Value cannot be used as monetary amount")
         elif amount is not None and isinstance(amount, Money):
-            if amount.currency and not output_currency:
+            if amount.currency and not output_currency and currency is not DefaultCurrency:
                 output_currency = amount.currency
 
             output_amount = amount._amount
@@ -403,30 +414,27 @@ class Money:
     def __bool__(self) -> bool:
         return bool(self._amount)
 
-    def _convert_other(self, other: Any) -> "Money":
+    def _convert_other(self, other: Any, allow_currency_mismatch: bool = False) -> "Money":
         if not isinstance(other, Money):
             try:
                 converted_other = Money(other)
-            except ConversionError:
+            except ConversionError as ex:
                 other_repr = repr(other)
                 self_repr = repr(self)
-                raise InvalidOperandError(f"Unable to perform operations on {self_repr} with {other_repr}")
+                raise InvalidOperandError(f"Unable to perform operations on {self_repr} with {other_repr}") from ex
         else:
             converted_other = other
 
-        if self._currency and converted_other._currency and self._currency != converted_other._currency:
+        if not allow_currency_mismatch and self._currency and converted_other._currency and self._currency != converted_other._currency:
             raise CurrencyMismatchError("Unable to perform operations on values with differing currencies")
 
         return converted_other
 
     def __eq__(self, other: Any) -> bool:
-        if not isinstance(other, Money):
-            try:
-                converted_other = Money(other)
-            except ConversionError:
-                return False
-        else:
-            converted_other = other
+        try:
+            converted_other = self._convert_other(other, allow_currency_mismatch=True)
+        except (ConversionError, InvalidOperandError):
+            return False
 
         if self._currency and converted_other._currency and self._currency != converted_other._currency:
             if self._amount == 0 and converted_other._amount == 0:
@@ -492,20 +500,28 @@ class Money:
         return self.__mul__(other)
 
     def __truediv__(self, other: Any) -> "Money":
-        converted_other = self._convert_other(other)
+        converted_other = self._convert_other(other, allow_currency_mismatch=True)
+
+        if converted_other.amount == 0:
+            raise ZeroDivisionError("division by zero")
+
         amount = self._amount / converted_other._amount
 
         if converted_other._currency is not None:
-            return Money(amount)
+            return Money(amount, currency=None)
 
         return Money(amount, currency=self._currency)
 
     def __floordiv__(self, other: Any) -> "Money":
-        converted_other = self._convert_other(other)
+        converted_other = self._convert_other(other, allow_currency_mismatch=True)
+
+        if converted_other.amount == 0:
+            raise ZeroDivisionError("division by zero")
+
         amount = self._amount // converted_other._amount
 
         if converted_other._currency is not None:
-            return Money(amount)
+            return Money(amount, currency=None)
 
         return Money(amount, currency=self._currency)
 
