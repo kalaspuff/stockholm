@@ -10,9 +10,13 @@ An up to date human friendly and flexible approach for development with any kind
 
 At its bone a `Money` class for Python 3.x. This is a library to be used by backend and frontend API coders of fintech companies, web merchants and subscription services. A simple, yet powerful way of coding with money.
 
+#### `from stockholm import Money`
 The `stockholm.Money` object has full arithmetic support together with `int`, `float`, `Decimal`, other `Money` objects as well as `string`. The `stockholm.Money` object also supports complex string formatting functionality for easy debugging and a clean coding pattern.
 
-Currencies to monetary amounts can be specified using either currencies built with the `stockholm.Currency` metaclasses or simply by specifying the currency ticker as a string (for example `"SEK"` or `"EUR"`) when creating a new `Money` object. Currencies using the `stockholm.Currency` metaclasses can hold additional options, such as default number of decimals in string output. Note that the amounts are usually never behind the scenes and uses the same precision and backend as `Decimal` values and can as well be interchangable with such values.
+#### `from stockholm import Currency`
+Currencies to monetary amounts can be specified using either currencies built with the `stockholm.Currency` metaclasses or simply by specifying the currency ticker as a string (for example `"SEK"` or `"EUR"`) when creating a new `Money` object. 
+
+Currencies using the `stockholm.Currency` metaclasses can hold additional options, such as default number of decimals in string output. Note that the amounts are usually never behind the scenes and uses the same precision and backend as `Decimal` values and can as well be interchangable with such values.
 
 ### Installation with `pip`
 ```
