@@ -12,7 +12,7 @@ def test_init() -> None:
     assert len(stockholm.__version__)
 
 
-def test_hash() -> None:
+def test_money_hashable() -> None:
     m = stockholm.Money(0)
     assert hash(m)
 
