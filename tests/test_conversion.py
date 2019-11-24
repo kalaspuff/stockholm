@@ -1,3 +1,5 @@
+import pytest
+
 from stockholm import Money
 
 
@@ -22,6 +24,10 @@ def test_conversion_extensions() -> None:
     assert isinstance(float(m1), float)
     assert float(m1) == 50.00
     assert float(m2) == -50.00
+
+    assert round(Money("2.5")) == Money(3)
+    assert round(Money("2.5"), 0) == Money(3)
+    assert round(Money("2.5"), 1) == Money("2.5")
 
     m = m1 / 3
     assert isinstance(m, Money)
@@ -66,3 +72,129 @@ def test_conversion_extensions() -> None:
     m = round(m2 / 3)  # type: ignore
     assert isinstance(m, Money)
     assert m == Money("-17", currency="USD")
+
+    m = Money("123456.50", currency="GBP")
+    assert f"{m}" == "123456.50 GBP"
+    assert f"{m:}" == "123456.50 GBP"
+    assert f"{m:f}" == "123456.50"
+    assert f"{m:.2f}" == "123456.50"
+    assert f"{m:.0f}" == "123457"
+    assert f"{m:.5f}" == "123456.50000"
+    assert f"{m:m}" == "123456.50 GBP"
+    assert f"{m:.2m}" == "123456.50 GBP"
+    assert f"{m:.0m}" == "123457 GBP"
+    assert f"{m:.5m}" == "123456.50000 GBP"
+    assert f"{m:-.5m}" == "123456.50000 GBP"
+    assert f"{m:+.5m}" == "+123456.50000 GBP"
+    assert f"{m: .5m}" == " 123456.50000 GBP"
+    assert f"{m:M}" == "GBP 123456.50"
+    assert f"{m:.2M}" == "GBP 123456.50"
+    assert f"{m:.0M}" == "GBP 123457"
+    assert f"{m:.5M}" == "GBP 123456.50000"
+    assert f"{m:-.5M}" == "GBP 123456.50000"
+    assert f"{m:+.5M}" == "GBP +123456.50000"
+    assert f"{m: .5M}" == "GBP  123456.50000"
+    assert f"{m:d}" == "123457"
+    assert f"{m:+d}" == "+123457"
+    assert f"{m: d}" == " 123457"
+    assert f"{m:s}" == "123456.50 GBP"
+    assert f"{m:c}" == "GBP"
+
+    m = Money(123456, currency="GBP")
+    assert f"{m}" == "123456.00 GBP"
+    assert f"{m:f}" == "123456.00"
+    assert f"{m:.0f}" == "123456"
+    assert f"{m:.1f}" == "123456.0"
+    assert f"{m:.2f}" == "123456.00"
+
+    m = Money("123457.50", currency="GBP")
+    assert f"{m}" == "123457.50 GBP"
+    assert f"{m:.2f}" == "123457.50"
+    assert f"{m:.0f}" == "123458"
+    assert f"{m:.5f}" == "123457.50000"
+    assert f"{m:d}" == "123458"
+
+    m = Money(123457, currency="GBP")
+    assert f"{m:.2f}" == "123457.00"
+
+    m = Money("-0.01", currency="SEK")
+    assert f"{m:.4m}" == "-0.0100 SEK"
+    assert f"{m:m}" == "-0.01 SEK"
+    assert f"{m:.1m}" == "0.0 SEK"
+    assert f"{m:.0m}" == "0 SEK"
+    assert f"{m:+m}" == "-0.01 SEK"
+    assert f"{m:+.1m}" == "+0.0 SEK"
+    assert f"{m:+.0m}" == "+0 SEK"
+
+    m = Money("0.005", currency="SEK")
+    assert f"{m:.4m}" == "0.0050 SEK"
+    assert f"{m:m}" == "0.005 SEK"
+    assert f"{m:.2m}" == "0.01 SEK"
+    assert f"{m:.1m}" == "0.0 SEK"
+    assert f"{m:.0m}" == "0 SEK"
+    assert f"{m:+.4m}" == "+0.0050 SEK"
+
+    m = Money("0.0050", currency="ETH")
+    assert f"{m:5.4m}" == "0.0050 ETH"
+    assert f"{m:+5.4m}" == "+0.0050 ETH"
+    assert f"{m:05.2m}" == "00.01 ETH"
+    assert f"{m:+05.2m}" == "+0.01 ETH"
+    assert f"{m:05.3m}" == "0.005 ETH"
+    assert f"{m:+05.3m}" == "+0.005 ETH"
+    assert f"{m:10.4m}" == "    0.0050 ETH"
+    assert f"{-m:10.4m}" == "   -0.0050 ETH"
+    assert f"{m:+10.4m}" == "   +0.0050 ETH"
+    assert f"{m:10.4M}" == "ETH     0.0050"
+    assert f"{-m:10.4M}" == "ETH    -0.0050"
+    assert f"{m:+10.4M}" == "ETH    +0.0050"
+    assert f"{m:10.0m}" == "         0 ETH"
+    assert f"{-m:10.0m}" == "         0 ETH"
+    assert f"{m:+10.0m}" == "        +0 ETH"
+    assert f"{-m:+10.0m}" == "        +0 ETH"
+    assert f"{m:010.4m}" == "00000.0050 ETH"
+    assert f"{-m:010.4m}" == "-0000.0050 ETH"
+    assert f"{m:+010.4m}" == "+0000.0050 ETH"
+    assert f"{m: 010.4m}" == " 0000.0050 ETH"
+    assert f"{m:+10.4m}" == "   +0.0050 ETH"
+    assert f"{-m:010.4M}" == "ETH -0000.0050"
+    assert f"{m:+010.4M}" == "ETH +0000.0050"
+    assert f"{m:010.0m}" == "0000000000 ETH"
+    assert f"{-m:010.0m}" == "0000000000 ETH"
+    assert f"{-m:+010.0m}" == "+000000000 ETH"
+    assert f"{-m:010.0f}" == "0000000000"
+
+    m = Money("22.12345", currency="ETH")
+    assert f"{m:010.5m}" == "0022.12345 ETH"
+    assert f"{-m:010.5m}" == "-022.12345 ETH"
+    assert f"{-m:10.5m}" == " -22.12345 ETH"
+    assert f"{m:010.4m}" == "00022.1235 ETH"
+    assert f"{-m:010.4m}" == "-0022.1235 ETH"
+    assert f"{-m:10.4m}" == "  -22.1235 ETH"
+    assert f"{m:010.3m}" == "000022.123 ETH"
+    assert f"{m:+010.3m}" == "+00022.123 ETH"
+    assert f"{-m:010.3m}" == "-00022.123 ETH"
+    assert f"{-m:10.3m}" == "   -22.123 ETH"
+    assert f"{m:+10.3m}" == "   +22.123 ETH"
+    assert f"{m:+10.3f}" == "   +22.123"
+    assert f"{m:x<15}" == "22.12345 ETHxxx"
+    assert f"{m:<15}" == "22.12345 ETH   "
+    assert f"{m: <15}" == "22.12345 ETH   "
+    assert f"{m: >15}" == "   22.12345 ETH"
+    assert f"{m:x<15.3f}" == "22.123xxxxxxxxx"
+    assert f"{m:<15}" == "22.12345 ETH   "
+    assert f"{-m:=10m}" == "- 22.12345 ETH"
+    assert f"{m:=+10m}" == "+ 22.12345 ETH"
+    assert f"{-m:x=10m}" == "-x22.12345 ETH"
+    assert f"{m:x=+10m}" == "+x22.12345 ETH"
+
+    with pytest.raises(ValueError):
+        f"{m:x<015.3f}"
+
+    with pytest.raises(ValueError):
+        f"{m:<015.3f}"
+
+    with pytest.raises(ValueError):
+        f"{m:=15}"
+
+    with pytest.raises(ValueError):
+        f"{m:X}"

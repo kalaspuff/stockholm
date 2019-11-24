@@ -2,6 +2,7 @@ from functools import reduce
 import re
 from typing import Any, Iterable, Optional, Tuple, Union
 
+import decimal
 from decimal import Decimal, ROUND_HALF_UP
 
 from .exceptions import CurrencyMismatchError, ConversionError, InvalidOperandError
@@ -16,6 +17,25 @@ NANOS_LENGTH = 9
 
 HIGHEST_SUPPORTED_AMOUNT = "999999999999999999.999999999"
 LOWEST_SUPPORTED_AMOUNT = "-999999999999999999.999999999"
+
+RoundingContext = decimal.Context(rounding=ROUND_HALF_UP)
+
+_parse_format_specifier_regex = re.compile(
+    r"""\A
+(?:
+   (?P<fill>.)?
+   (?P<align>[<>=^])
+)?
+(?P<sign>[-+ ])?
+(?P<zeropad>0)?
+(?P<minimumwidth>(?!0)\d+)?
+(?P<thousands_sep>[,_])?
+(?:\.(?P<precision>0|(?!0)\d+))?
+(?P<type>[cCdfFmMs])?
+\Z
+""",
+    re.VERBOSE,
+)
 
 
 class Money:
@@ -211,11 +231,15 @@ class Money:
         _, nanos = self._amount_tuple
         return int(nanos)
 
-    def as_string(self) -> str:
-        return str(self)
+    def as_string(self, *args: Any, **kwargs: Any) -> str:
+        amount = self.amount_as_string(*args, **kwargs)
 
-    def as_str(self) -> str:
-        return self.as_string()
+        if self._currency:
+            return f"{amount} {self._currency}"
+        return str(amount)
+
+    def as_str(self, *args: Any, **kwargs: Any) -> str:
+        return self.as_string(*args, **kwargs)
 
     def as_decimal(self) -> Decimal:
         return self._amount
@@ -268,17 +292,91 @@ class Money:
         return value
 
     def __repr__(self) -> str:
-        amount = self.amount_as_string()
-        if self._currency:
-            return f'<stockholm.Money: "{amount} {self._currency}">'
-        return f'<stockholm.Money: "{amount}">'
+        return f'<stockholm.Money: "{self}">'
 
     def __str__(self) -> str:
-        amount = self.amount_as_string()
+        return self.as_string()
 
-        if self._currency:
-            return f"{amount} {self._currency}"
-        return str(amount)
+    def __format__(self, format_spec: str) -> str:
+        if not format_spec:
+            return str(self)
+
+        m = _parse_format_specifier_regex.match(format_spec)
+        if m is None:
+            raise ValueError(f"Invalid format specifier: {format_spec}")
+
+        format_dict = m.groupdict()
+
+        fill = format_dict["fill"]
+        align = format_dict["align"]
+        zeropad = format_dict["zeropad"] is not None
+        if zeropad:
+            if fill is not None:
+                raise ValueError(f"Fill character conflicts with '0' in format specifier: {format_spec}")
+            if align is not None:
+                raise ValueError(f"Alignment conflicts with '0' in format specifier: {format_spec}")
+            fill = "0"
+            align = ">"
+        fill = fill or " "
+        align = align or ">"
+
+        sign = format_dict["sign"] or "-"
+
+        minimumwidth = int(format_dict["minimumwidth"] or 0)
+        precision = int(format_dict["precision"]) if format_dict["precision"] is not None else None
+
+        thousands_sep = format_dict["thousands_sep"] if format_dict["thousands_sep"] is not None else ""
+
+        output = ""
+
+        if format_dict["type"] == "c":
+            output = self._currency or ""
+
+        if format_dict["type"] == "d":
+            format_dict["type"] = "f"
+            precision = 0
+
+        with decimal.localcontext(RoundingContext):
+            if format_dict["type"] in ("m", "M", "f", "F"):
+                if precision is not None:
+                    output = self.amount_as_string(min_decimals=precision, max_decimals=precision)
+                else:
+                    output = self.amount_as_string()
+
+                output_amount = Money(output).amount
+
+                if format_dict["align"] == "=":
+                    format_dict["align"] = None
+                    zeropad = True
+
+                if zeropad:
+                    if output.startswith("-"):
+                        output = output[1:].rjust(minimumwidth - 1, fill)
+                        output = f"-{output}"
+                    else:
+                        output = output.rjust(minimumwidth, fill)
+                    if sign != "-" and output_amount >= 0:
+                        if output.startswith(fill) and not output.startswith("0."):
+                            output = f"{sign}{output[1:]}"
+                        else:
+                            output = f"{sign}{output}"
+                elif sign != "-" and output_amount >= 0:
+                    output = f"{sign}{output}"
+
+                if not zeropad and not format_dict["align"] and align and fill and minimumwidth:
+                    output = f"{output:{fill}{align}{minimumwidth}}"
+
+                if format_dict["type"] == "m":
+                    output = f"{output} {self._currency}"
+                elif format_dict["type"] == "M":
+                    output = f"{self._currency} {output}"
+            elif format_dict["type"] in ("s", "", None):
+                output = self.as_string()
+
+        if format_dict["align"] and align and fill and minimumwidth:
+            output = f"{output:{fill}{align}{minimumwidth}}"
+
+        return output
 
     def __hash__(self) -> int:
         return hash(("stockholm.Money", self._amount, self._currency))
@@ -436,4 +534,7 @@ class Money:
         return float(self._amount)
 
     def __round__(self, ndigits: int = 0) -> "Money":
-        return Money(round(self._amount, ndigits), currency=self._currency)
+        with decimal.localcontext(RoundingContext):
+            amount = round(self._amount, ndigits)
+
+        return Money(amount, currency=self._currency)
