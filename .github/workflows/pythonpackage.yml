@@ -30,4 +30,7 @@ jobs:
         poetry run flake8 stockholm/ tests/
     - name: Type check with mypy
       run: |
-        PYTHONPATH=. poetry run mypy stockholm/
+        poetry run mypy stockholm/
+    - name: Codecov
+      run: |
+        poetry run codecov --token=${{ secrets.CODECOV_TOKEN }}
