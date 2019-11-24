@@ -24,7 +24,7 @@ def test_currency_arithmetics():
     assert EUR != SEK
     assert EUR != ""
     assert EUR != 0
-    assert EUR != False
+    assert EUR is not False
 
     m1 = Money(100, EUR)
     m2 = Money(100, "EUR")
@@ -79,7 +79,7 @@ def test_metacurrency():
     assert repr(EUR) == '<stockholm.Currency: "EUR">'
     assert repr(AppleStock) == '<stockholm.Currency: "APPL">'
 
-    assert EUR != None
+    assert EUR is not None
     assert EUR != ""
     assert EUR != 0
     assert EUR != Money(0, EUR)
@@ -98,6 +98,7 @@ def test_metacurrency():
     assert CurrencyConcept != 0
     assert CurrencyConcept != Money(0, EUR)
 
+
 def test_immutability():
     class EUR(Currency):
         pass
@@ -111,10 +112,10 @@ def test_immutability():
         BTC.ticker = "ETH"
 
     with pytest.raises(AttributeError):
-        del(EUR.ticker)
+        del EUR.ticker
 
     with pytest.raises(AttributeError):
-        del(BTC.ticker)
+        del BTC.ticker
 
 
 def test_custom_currency():

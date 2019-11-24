@@ -1,9 +1,9 @@
-from typing import Any, Dict, Optional, Tuple, Type, TypeVar, Union
+from typing import Any, Dict, Optional, Tuple, Type, Union
 
 
 class MetaCurrency(type):
     def __new__(cls, name: str, bases: Tuple[type, ...], attributedict: Dict) -> type:
-        ticker = attributedict.get('ticker', attributedict.get('_ticker', attributedict.get('__qualname__')))
+        ticker = attributedict.get("ticker", attributedict.get("_ticker", attributedict.get("__qualname__")))
         attributedict["ticker"] = ticker.split(".")[-1] if ticker else ""
         attributedict["currency"] = attributedict["ticker"]
 
