@@ -1,5 +1,7 @@
 import pytest
 
+from decimal import Decimal
+
 from stockholm import Money
 
 
@@ -24,6 +26,11 @@ def test_conversion_extensions() -> None:
     assert isinstance(float(m1), float)
     assert float(m1) == 50.00
     assert float(m2) == -50.00
+
+
+def test_rounding() -> None:
+    m1 = Money(50, currency="USD")
+    m2 = Money(-50, currency="USD")
 
     assert round(Money("2.5")) == Money(3)
     assert round(Money("2.5"), 0) == Money(3)
@@ -73,6 +80,8 @@ def test_conversion_extensions() -> None:
     assert isinstance(m, Money)
     assert m == Money("-17", currency="USD")
 
+
+def test_string_formatting() -> None:
     m = Money("123456.50", currency="GBP")
     assert f"{m}" == "123456.50 GBP"
     assert f"{m:}" == "123456.50 GBP"
@@ -238,3 +247,12 @@ def test_conversion_extensions() -> None:
 
     with pytest.raises(ValueError):
         f"{m:,s}"
+
+
+def test_string_formatting_sentence() -> None:
+    m1 = Money(1352953, "JPY")
+    exchange_rate = Decimal("0.08861326")
+    m2 = Money(m1 * exchange_rate, "SEK")
+
+    expected = "I have 1,352,953 JPY which equals around 119,889.58 SEK if the exchange rate is 0.08861326 (JPY -> SEK)."
+    assert f"I have {m1:,.0m} which equals around {m2:,.2m} if the exchange rate is {exchange_rate} ({m1:c} -> {m2:c})." == expected

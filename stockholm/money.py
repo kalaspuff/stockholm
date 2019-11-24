@@ -158,9 +158,7 @@ class Money:
             except Exception:
                 raise ConversionError("Value cannot be used as monetary amount")
         elif amount is not None and isinstance(amount, Money):
-            if amount.currency:
-                if output_currency is not None and amount.currency != output_currency:
-                    raise ConversionError("Mismatching currency in input value and currency argument")
+            if amount.currency and not output_currency:
                 output_currency = amount.currency
 
             output_amount = amount._amount
