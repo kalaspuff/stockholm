@@ -135,12 +135,16 @@ class Money:
         if Money._is_unknown_amount_type(amount):
             try:
                 match_amount = getattr(amount, "amount")
+                match_amount = (match_amount()) if match_amount and callable(match_amount) else match_amount
                 if match_amount is None or Money._is_unknown_amount_type(match_amount):
                     raise AttributeError
 
                 match_currency = None
                 try:
                     match_currency = getattr(amount, "currency")
+                    match_currency = (
+                        (match_currency()) if match_currency and callable(match_currency) else match_currency
+                    )
                     if not match_currency:
                         raise AttributeError
                 except AttributeError:
