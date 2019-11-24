@@ -127,9 +127,8 @@ class Money:
             raise ConversionError("Invalid currency value")
 
         output_amount = None
-        if currency is DefaultCurrency:
-            output_currency = None
-        else:
+        output_currency: Optional[Union[Currency, str]] = None
+        if currency is not DefaultCurrency:
             output_currency = str(currency or "").strip().upper() or None
 
         if Money._is_unknown_amount_type(amount):
@@ -214,7 +213,7 @@ class Money:
         if output_amount < Decimal(LOWEST_SUPPORTED_AMOUNT):
             raise ConversionError(f"Input amount is too low, min value is {LOWEST_SUPPORTED_AMOUNT}")
 
-        if output_currency and not re.match(r"^[A-Z]+$", output_currency):
+        if output_currency and not re.match(r"^[A-Z]+$", str(output_currency)):
             raise ConversionError("Invalid currency")
 
         if output_amount == 0 and output_amount.is_signed():
@@ -231,7 +230,7 @@ class Money:
         return self._amount
 
     @property
-    def currency(self) -> Optional[str]:
+    def currency(self) -> Optional[Union[Currency, str]]:
         return self._currency
 
     @property
@@ -362,7 +361,7 @@ class Money:
         output = ""
 
         if format_dict["type"] == "c":
-            output = self._currency or ""
+            output = str(self._currency or "")
 
         if format_dict["type"] == "d":
             format_dict["type"] = "f"
@@ -458,6 +457,11 @@ class Money:
 
         return converted_other
 
+    def _preferred_currency(self, other: "Money") -> Optional[Union[Currency, str]]:
+        currency = self._currency if self._currency and isinstance(self._currency, Currency) else None
+        currency = other._currency if not currency and other._currency and isinstance(other, Currency) else None
+        return currency or self._currency or other._currency
+
     def __eq__(self, other: Any) -> bool:
         try:
             converted_other = self._convert_other(other, allow_currency_mismatch=True)
@@ -493,7 +497,7 @@ class Money:
     def __add__(self, other: Any) -> "Money":
         converted_other = self._convert_other(other)
         amount = self._amount + converted_other._amount
-        currency = self._currency or converted_other._currency
+        currency = self._preferred_currency(converted_other)
         return Money(amount, currency=currency)
 
     def __radd__(self, other: Any) -> "Money":
@@ -502,13 +506,13 @@ class Money:
     def __sub__(self, other: Any) -> "Money":
         converted_other = self._convert_other(other)
         amount = self._amount - converted_other._amount
-        currency = self._currency or converted_other._currency
+        currency = self._preferred_currency(converted_other)
         return Money(amount, currency=currency)
 
     def __rsub__(self, other: Any) -> "Money":
         converted_other = self._convert_other(other)
         amount = converted_other._amount - self._amount
-        currency = self._currency or converted_other._currency
+        currency = self._preferred_currency(converted_other)
         return Money(amount, currency=currency)
 
     def __mul__(self, other: Any) -> "Money":
@@ -521,7 +525,7 @@ class Money:
             raise InvalidOperandError("Unable to multiply two monetary amounts with each other")
 
         amount = self._amount * converted_other._amount
-        currency = self._currency or converted_other._currency
+        currency = self._preferred_currency(converted_other)
         return Money(amount, currency=currency)
 
     def __rmul__(self, other: Any) -> "Money":
@@ -554,15 +558,24 @@ class Money:
         return Money(amount, currency=self._currency)
 
     def __mod__(self, other: Any) -> "Money":
-        converted_other = self._convert_other(other)
+        converted_other = self._convert_other(other, allow_currency_mismatch=True)
         amount = self._amount % converted_other._amount
-        currency = self._currency or converted_other._currency
+
+        if self._currency == converted_other._currency:
+            currency = self._preferred_currency(converted_other)
+        else:
+            currency = self._currency
+
         return Money(amount, currency=currency)
 
     def __divmod__(self, other: Any) -> Tuple["Money", "Money"]:
-        converted_other = self._convert_other(other)
+        converted_other = self._convert_other(other, allow_currency_mismatch=True)
         quotient, remainder = divmod(self._amount, converted_other._amount)
-        currency = self._currency or converted_other._currency
+
+        if self._currency == converted_other._currency:
+            currency = self._preferred_currency(converted_other)
+        else:
+            currency = self._currency
 
         if converted_other._currency is not None:
             return Money(quotient), Money(remainder, currency=currency)

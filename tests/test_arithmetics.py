@@ -182,6 +182,18 @@ def test_modulus() -> None:
     assert m2.currency == "SEK"
     assert str(m2) == "7.00 SEK"
 
+    m3 = m1 % Money(14, currency="USD")
+    assert isinstance(m3, Money)
+    assert m3.amount == 7
+    assert m3.currency == "SEK"
+    assert str(m3) == "7.00 SEK"
+
+    m4 = m1 % Money(14, currency="SEK")
+    assert isinstance(m3, Money)
+    assert m4.amount == 7
+    assert m4.currency == "SEK"
+    assert str(m4) == "7.00 SEK"
+
 
 def test_divmod() -> None:
     m1 = Money("49", currency="SEK")
@@ -202,17 +214,29 @@ def test_divmod() -> None:
     assert m3.currency == "SEK"
     assert str(m3) == "7.00 SEK"
 
-    m2, m3 = divmod(m1, Money(14, currency="SEK"))
-
-    assert isinstance(m2, Money)
-    assert m2.amount == 3
-    assert m2.currency is None
-    assert str(m2) == "3.00"
+    m3, m4 = divmod(m1, Money(14, currency="USD"))
 
     assert isinstance(m3, Money)
-    assert m3.amount == 7
-    assert m3.currency == "SEK"
-    assert str(m3) == "7.00 SEK"
+    assert m3.amount == 3
+    assert m3.currency is None
+    assert str(m3) == "3.00"
+
+    assert isinstance(m4, Money)
+    assert m4.amount == 7
+    assert m4.currency == "SEK"
+    assert str(m4) == "7.00 SEK"
+
+    m5, m6 = divmod(m1, Money(14, currency="SEK"))
+
+    assert isinstance(m5, Money)
+    assert m5.amount == 3
+    assert m5.currency is None
+    assert str(m5) == "3.00"
+
+    assert isinstance(m6, Money)
+    assert m6.amount == 7
+    assert m6.currency == "SEK"
+    assert str(m6) == "7.00 SEK"
 
 
 def test_pow() -> None:
