@@ -46,7 +46,7 @@ print(round(output / 3, 1))
 # 4828.20 SEK
 ```
 
-*Advanced string formatting functionality*
+*Advanced string formatting functionality.*
 ```python
 from stockholm import Money
 
@@ -72,7 +72,7 @@ print(f"{sek_money:.0f}")
 # 119890
 ```
 
-*Flexible ways for assigning values to a monetary amount*
+*Flexible ways for assigning values to a monetary amount using many different input data types and methods.*
 ```python
 from decimal import Decimal
 from stockholm import Money
@@ -99,7 +99,7 @@ Money(cents_as_str, currency="USD", is_cents=True)
 # <stockholm.Money: "4711.00 USD">
 ```
 
-*Adding several monetary amounts from a list*
+*Adding several monetary amounts from a list.*
 ```python
 from stockholm import Money
 
