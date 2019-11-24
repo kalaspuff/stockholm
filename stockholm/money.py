@@ -378,10 +378,11 @@ class Money:
                 sign = None
                 thousands_sep = None
 
-                if format_dict["type"] == "m":
-                    output = f"{output} {self._currency}"
-                elif format_dict["type"] == "M":
-                    output = f"{self._currency} {output}"
+                if self._currency:
+                    if format_dict["type"] == "m":
+                        output = f"{output} {self._currency}"
+                    elif format_dict["type"] == "M":
+                        output = f"{self._currency} {output}"
             elif format_dict["type"] in ("s", "", None):
                 format_dict["type"] = "s"
                 output = self.as_string()

@@ -212,6 +212,15 @@ def test_conversion_extensions() -> None:
     assert f"{m:,.0m}" == "-1,000 SEK"
     assert f"{m:,.0f}" == "-1,000"
 
+    m = Money(1000)
+    assert f"{m}" == "1000.00"
+    assert f"{m:}" == "1000.00"
+    assert f"{m:s}" == "1000.00"
+    assert f"{m:f}" == "1000.00"
+    assert f"{m:m}" == "1000.00"
+    assert f"{m:.5m}" == "1000.00000"
+    assert f"{m:.5f}" == "1000.00000"
+
     with pytest.raises(ValueError):
         f"{m:x<015.3f}"
 
