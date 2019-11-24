@@ -1,6 +1,6 @@
 from functools import reduce
 import re
-from typing import Any, Iterable, Optional, Tuple, Union
+from typing import Any, Iterable, Optional, Tuple, Type, Union, cast
 
 import decimal
 from decimal import Decimal, ROUND_HALF_UP
@@ -56,7 +56,12 @@ class Money:
         return sorted(iterable, key=lambda x: x if isinstance(x, Money) else Money(x), reverse=reverse)
 
     @classmethod
-    def sum(cls, iterable: Iterable, currency: Optional[Union[DefaultCurrency, Currency, str]] = DefaultCurrency, is_cents: Optional[bool] = None) -> "Money":
+    def sum(
+        cls,
+        iterable: Iterable,
+        currency: Optional[Union[Type[DefaultCurrency], Currency, str]] = DefaultCurrency,
+        is_cents: Optional[bool] = None,
+    ) -> "Money":
         return reduce(
             lambda v, e: v + (e if isinstance(e, Money) else Money(e, is_cents=is_cents)),
             iterable,
@@ -70,7 +75,7 @@ class Money:
     def __init__(
         self,
         amount: Optional[Union["Money", Decimal, int, float, str, object]] = None,
-        currency: Optional[Union[DefaultCurrency, Currency, str]] = DefaultCurrency,
+        currency: Optional[Union[Type[DefaultCurrency], Currency, str]] = DefaultCurrency,
         is_cents: Optional[bool] = None,
         units: Optional[int] = None,
         nanos: Optional[int] = None,
@@ -102,12 +107,23 @@ class Money:
         if amount is None:
             raise ConversionError("Missing input values for monetary amount")
 
-        if isinstance(amount, Money) and currency is DefaultCurrency and is_cents is None and units is None and nanos is None:
+        if (
+            isinstance(amount, Money)
+            and currency is DefaultCurrency
+            and is_cents is None
+            and units is None
+            and nanos is None
+        ):
             object.__setattr__(self, "_amount", amount._amount)
             object.__setattr__(self, "_currency", amount._currency)
             return
 
-        if currency is not DefaultCurrency and not isinstance(currency, str) and not isinstance(currency, Currency) and currency is not None:
+        if (
+            currency is not DefaultCurrency
+            and not isinstance(currency, str)
+            and not isinstance(currency, Currency)
+            and currency is not None
+        ):
             raise ConversionError("Invalid currency value")
 
         output_amount = None
@@ -285,6 +301,9 @@ class Money:
             min_decimals = min(DEFAULT_MIN_DECIMALS, max_decimals)
         elif max_decimals is None:
             max_decimals = max(min_decimals, DEFAULT_MAX_DECIMALS)
+
+        min_decimals = cast(int, min_decimals)
+        max_decimals = cast(int, max_decimals)
         if min_decimals > max_decimals:
             raise ValueError("Invalid values for min_decimals and max_decimals")
 
@@ -363,7 +382,7 @@ class Money:
                         output = f"{integral:{thousands_sep}.0f}"
 
                 if format_dict["align"] == "=":
-                    format_dict["align"] = None
+                    format_dict["align"] = ""
                     zeropad = True
 
                 if zeropad:
@@ -384,8 +403,8 @@ class Money:
                     output = f"{output:{fill}{align}{minimumwidth}}"
 
                 zeropad = False
-                sign = None
-                thousands_sep = None
+                sign = ""
+                thousands_sep = ""
 
                 if self._currency:
                     if format_dict["type"] == "m":
@@ -425,7 +444,12 @@ class Money:
         else:
             converted_other = other
 
-        if not allow_currency_mismatch and self._currency and converted_other._currency and self._currency != converted_other._currency:
+        if (
+            not allow_currency_mismatch
+            and self._currency
+            and converted_other._currency
+            and self._currency != converted_other._currency
+        ):
             raise CurrencyMismatchError("Unable to perform operations on values with differing currencies")
 
         return converted_other
