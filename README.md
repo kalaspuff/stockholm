@@ -23,7 +23,9 @@ Currencies using the `stockholm.Currency` metaclasses can hold additional option
 $ pip install stockholm
 ```
 
-### Examples
+## Examples
+
+#### Arithmetics
 *Full arithmetic support with different types, backed by `Decimal` for dealing with rounding errors, while also keeping the monetary amount fully currency aware.*
 ```python
 from stockholm import Money
@@ -46,6 +48,7 @@ print(round(output / 3, 1))
 # 4828.20 SEK
 ```
 
+#### Formatting
 *Advanced string formatting functionality.*
 ```python
 from stockholm import Money
@@ -72,6 +75,7 @@ print(f"{sek_money:.0f}")
 # 119890
 ```
 
+#### Input data types
 *Flexible ways for assigning values to a monetary amount using many different input data types and methods.*
 ```python
 from decimal import Decimal
@@ -99,6 +103,7 @@ Money(cents_as_str, currency="USD", is_cents=True)
 # <stockholm.Money: "4711.00 USD">
 ```
 
+#### List arithmetics
 *Adding several monetary amounts from a list.*
 ```python
 from stockholm import Money
@@ -118,5 +123,5 @@ sum(amounts)
 # <stockholm.Money: "1002.50">
 ```
 
-### Acknowledgements
+## Acknowledgements
 Built with inspiration from https://github.com/carlospalol/money and https://github.com/vimeo/py-money
