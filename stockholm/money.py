@@ -5,6 +5,7 @@ from typing import Any, Iterable, Optional, Tuple, Type, Union, cast
 import decimal
 from decimal import Decimal, ROUND_HALF_UP
 
+from .currency import Currency
 from .exceptions import CurrencyMismatchError, ConversionError, InvalidOperandError
 
 
@@ -38,10 +39,6 @@ _parse_format_specifier_regex = re.compile(
 )
 
 
-class Currency:
-    pass
-
-
 class DefaultCurrency:
     pass
 
@@ -49,7 +46,7 @@ class DefaultCurrency:
 class Money:
     __slots__ = ("_amount", "_currency")
     _amount: Decimal
-    _currency: Optional[str]
+    _currency: Optional[Union[Currency, str]]
 
     @classmethod
     def sort(cls, iterable: Iterable, reverse: bool = False) -> Iterable:
@@ -129,7 +126,10 @@ class Money:
         output_amount = None
         output_currency: Optional[Union[Currency, str]] = None
         if currency is not DefaultCurrency:
-            output_currency = str(currency or "").strip().upper() or None
+            if isinstance(currency, Currency):
+                output_currency = currency
+            else:
+                output_currency = str(currency or "").strip().upper() or None
 
         if Money._is_unknown_amount_type(amount):
             try:
@@ -157,7 +157,7 @@ class Money:
                     match_currency = str(match_currency).strip().upper()
                     if output_currency is not None and match_currency != output_currency:
                         raise ConversionError("Mismatching currency in input value and currency argument")
-                    output_currency = match_currency
+                    output_currency = output_currency if isinstance(output_currency, Currency) else match_currency
 
                 amount = match_amount
             except AttributeError:
@@ -181,7 +181,7 @@ class Money:
             if match_currency is not None:
                 if output_currency is not None and match_currency != output_currency:
                     raise ConversionError("Mismatching currency in input value and currency argument")
-                output_currency = match_currency
+                output_currency = output_currency if isinstance(output_currency, Currency) else match_currency
 
             try:
                 output_amount = Decimal(amount)
