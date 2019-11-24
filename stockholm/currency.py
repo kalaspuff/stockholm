@@ -2,7 +2,9 @@ from typing import Any, Dict, Optional, Tuple, Type, Union
 
 
 class MetaCurrency(type):
-    def __new__(cls, name: str, bases: Tuple[type, ...], attributedict: Dict) -> type:
+    ticker: str
+
+    def __new__(cls, name: str, bases: Tuple[type, ...], attributedict: Dict) -> "MetaCurrency":
         ticker = attributedict.get("ticker", attributedict.get("_ticker", attributedict.get("__qualname__")))
         attributedict["ticker"] = ticker.split(".")[-1] if ticker else ""
         attributedict["currency"] = attributedict["ticker"]
@@ -30,22 +32,22 @@ class MetaCurrency(type):
         if self.ticker:
             if not other:
                 return False
-            if isinstance(other, Currency):
-                return self.ticker == other.ticker
-            if isinstance(other, str):
-                return self.ticker == other
+            elif isinstance(other, Currency):
+                return bool(self.ticker == other.ticker)
+            elif isinstance(other, str):
+                return bool(self.ticker == other)
         else:
             if isinstance(other, Currency):
                 return not other.ticker
-            if isinstance(other, str):
-                return other == ""
-            return False
+            elif isinstance(other, str):
+                return bool(other == "")
+        return False
 
     def __ne__(self, other: Any) -> bool:
         return not self == other
 
-    @property
-    def __class__(self):
+    @property  # type: ignore
+    def __class__(self) -> Any:
         return Currency
 
     def __hash__(self) -> int:
@@ -56,6 +58,8 @@ class MetaCurrency(type):
 
 
 class Currency(metaclass=MetaCurrency):
+    ticker: str
+
     def __init__(self, currency: Optional[Union["Currency", str]] = None) -> None:
         if currency and isinstance(currency, str):
             object.__setattr__(self, "ticker", currency)
@@ -86,16 +90,16 @@ class Currency(metaclass=MetaCurrency):
         if self.ticker:
             if not other:
                 return False
-            if isinstance(other, Currency):
-                return self.ticker == other.ticker
-            if isinstance(other, str):
-                return self.ticker == other
+            elif isinstance(other, Currency):
+                return bool(self.ticker == other.ticker)
+            elif isinstance(other, str):
+                return bool(self.ticker == other)
         else:
             if isinstance(other, Currency):
                 return not other.ticker
-            if isinstance(other, str):
-                return other == ""
-            return False
+            elif isinstance(other, str):
+                return bool(other == "")
+        return False
 
     def __ne__(self, other: Any) -> bool:
         return not self == other
