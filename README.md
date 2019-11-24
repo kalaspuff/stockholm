@@ -1,7 +1,8 @@
 # `stockholm` — `Money` for Python 3
 [![pypi](https://badge.fury.io/py/stockholm.svg)](https://pypi.python.org/pypi/stockholm/)
 [![MIT License](https://img.shields.io/github/license/kalaspuff/stockholm.svg)](https://github.com/kalaspuff/stockholm/blob/master/LICENSE)
-[![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
+[![Code coverage](https://codecov.io/gh/kalaspuff/stockholm/branch/master/graph/badge.svg)](https://codecov.io/gh/kalaspuff/stockholm/tree/master/stockholm)
+[![Made with Python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
 
 Library for formatting and performing arithmetic and comparison operations on monetary amounts. Also with support for currency handling, exchange and network transport structure generation as well as parsing.
 
