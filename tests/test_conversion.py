@@ -187,6 +187,31 @@ def test_conversion_extensions() -> None:
     assert f"{-m:x=10m}" == "-x22.12345 ETH"
     assert f"{m:x=+10m}" == "+x22.12345 ETH"
 
+    m = Money("-100030055.05555", currency="SEK")
+    assert f"{m:,m}" == "-100,030,055.05555 SEK"
+    assert f"{m:,f}" == "-100,030,055.05555"
+    assert f"{m:,.2m}" == "-100,030,055.06 SEK"
+    assert f"{m:,.2M}" == "SEK -100,030,055.06"
+    assert f"{m:,.2f}" == "-100,030,055.06"
+    assert f"{m:,.0m}" == "-100,030,055 SEK"
+    assert f"{m:,.0f}" == "-100,030,055"
+
+    m = Money("5100030055.05555", currency="SEK")
+    assert f"{m:,m}" == "5,100,030,055.05555 SEK"
+    assert f"{m:,f}" == "5,100,030,055.05555"
+
+    m = Money("0.5", currency="SEK")
+    assert f"{m:,m}" == "0.50 SEK"
+    assert f"{m:,f}" == "0.50"
+    assert f"{m:,.0m}" == "1 SEK"
+    assert f"{m:,.0f}" == "1"
+
+    m = Money("-999.5", currency="SEK")
+    assert f"{m:,m}" == "-999.50 SEK"
+    assert f"{m:,f}" == "-999.50"
+    assert f"{m:,.0m}" == "-1,000 SEK"
+    assert f"{m:,.0f}" == "-1,000"
+
     with pytest.raises(ValueError):
         f"{m:x<015.3f}"
 
@@ -198,3 +223,9 @@ def test_conversion_extensions() -> None:
 
     with pytest.raises(ValueError):
         f"{m:X}"
+
+    with pytest.raises(ValueError):
+        f"{m:+s}"
+
+    with pytest.raises(ValueError):
+        f"{m:,s}"

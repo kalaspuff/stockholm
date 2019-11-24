@@ -345,6 +345,14 @@ class Money:
 
                 output_amount = Money(output).amount
 
+                if thousands_sep and (output_amount >= 1000 or output_amount <= -1000):
+                    integral = int(output.split(".")[0])
+                    try:
+                        decimals = output.split(".")[1]
+                        output = f"{integral:{thousands_sep}.0f}.{decimals}"
+                    except IndexError:
+                        output = f"{integral:{thousands_sep}.0f}"
+
                 if format_dict["align"] == "=":
                     format_dict["align"] = None
                     zeropad = True
@@ -366,12 +374,24 @@ class Money:
                 if not zeropad and not format_dict["align"] and align and fill and minimumwidth:
                     output = f"{output:{fill}{align}{minimumwidth}}"
 
+                zeropad = False
+                sign = None
+                thousands_sep = None
+
                 if format_dict["type"] == "m":
                     output = f"{output} {self._currency}"
                 elif format_dict["type"] == "M":
                     output = f"{self._currency} {output}"
             elif format_dict["type"] in ("s", "", None):
+                format_dict["type"] = "s"
                 output = self.as_string()
+
+        if sign and format_dict["sign"]:
+            raise ValueError("Sign not allowed in string format specifier")
+        if zeropad or format_dict["align"] == "=":
+            raise ValueError("'=' alignment not allowed in string format specifier")
+        if thousands_sep:
+            raise ValueError("Cannot specify ',' in string format specifier")
 
         if format_dict["align"] and align and fill and minimumwidth:
             output = f"{output:{fill}{align}{minimumwidth}}"
