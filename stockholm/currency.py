@@ -138,6 +138,7 @@ class Currency(metaclass=MetaCurrency):
         return bool(self.ticker)
 
 
+# ISO 4217 currency codes
 class AED(Currency):
     pass
 
@@ -906,6 +907,433 @@ class TVD(Currency):
 
 
 class ZWB(Currency):
+    pass
+
+
+# Historical currency codes
+
+
+class ADF(Currency):
+    pass
+
+
+class ADP(Currency):
+    decimal_digits = 0
+
+
+class AFA(Currency):
+    pass
+
+
+class AOK(Currency):
+    decimal_digits = 0
+
+
+class AON(Currency):
+    decimal_digits = 0
+
+
+class AOR(Currency):
+    decimal_digits = 0
+
+
+class ARL(Currency):
+    pass
+
+
+class ARP(Currency):
+    pass
+
+
+class ARA(Currency):
+    pass
+
+
+class ATS(Currency):
+    pass
+
+
+class AZM(Currency):
+    decimal_digits = 0
+
+
+class BAD(Currency):
+    pass
+
+
+class BEF(Currency):
+    pass
+
+
+class BGL(Currency):
+    pass
+
+
+class BOP(Currency):
+    pass
+
+
+class BRB(Currency):
+    pass
+
+
+class BRC(Currency):
+    pass
+
+
+class BRN(Currency):
+    pass
+
+
+class BRE(Currency):
+    pass
+
+
+class BRR(Currency):
+    pass
+
+
+class BYB(Currency):
+    pass
+
+
+class BYR(Currency):
+    decimal_digits = 0
+
+
+class CSD(Currency):
+    pass
+
+
+class CSK(Currency):
+    pass
+
+
+class CYP(Currency):
+    pass
+
+
+class DDM(Currency):
+    pass
+
+
+class DEM(Currency):
+    pass
+
+
+class ECS(Currency):
+    decimal_digits = 0
+
+
+class ECV(Currency):
+    pass
+
+
+class EEK(Currency):
+    pass
+
+
+class ESA(Currency):
+    pass
+
+
+class ESB(Currency):
+    pass
+
+
+class ESP(Currency):
+    decimal_digits = 0
+
+
+class FIM(Currency):
+    pass
+
+
+class FRF(Currency):
+    pass
+
+
+class GNE(Currency):
+    pass
+
+
+class GHC(Currency):
+    decimal_digits = 0
+
+
+class GQE(Currency):
+    pass
+
+
+class GRD(Currency):
+    pass
+
+
+class GWP(Currency):
+    pass
+
+
+class HRD(Currency):
+    pass
+
+
+class IEP(Currency):
+    pass
+
+
+class ILP(Currency):
+    decimal_digits = 3
+
+
+class ILR(Currency):
+    pass
+
+
+class ISJ(Currency):
+    pass
+
+
+class ITL(Currency):
+    decimal_digits = 0
+
+
+class LAJ(Currency):
+    pass
+
+
+class LTL(Currency):
+    pass
+
+
+class LUF(Currency):
+    pass
+
+
+class LVL(Currency):
+    pass
+
+
+class MAF(Currency):
+    pass
+
+
+class MCF(Currency):
+    pass
+
+
+class MGF(Currency):
+    pass
+
+
+class MKN(Currency):
+    pass
+
+
+class MLF(Currency):
+    pass
+
+
+class MVQ(Currency):
+    pass
+
+
+class MRO(Currency):
+    pass
+
+
+class MXP(Currency):
+    pass
+
+
+class MZM(Currency):
+    decimal_digits = 0
+
+
+class MTL(Currency):
+    pass
+
+
+class NIC(Currency):
+    pass
+
+
+class NLG(Currency):
+    pass
+
+
+class PEH(Currency):
+    pass
+
+
+class PEI(Currency):
+    pass
+
+
+class PLZ(Currency):
+    pass
+
+
+class PTE(Currency):
+    decimal_digits = 0
+
+
+class ROL(Currency):
+    pass
+
+
+class RUR(Currency):
+    pass
+
+
+class SDD(Currency):
+    decimal_digits = 0
+
+
+class SDP(Currency):
+    pass
+
+
+class SIT(Currency):
+    pass
+
+
+class SKK(Currency):
+    pass
+
+
+class SML(Currency):
+    decimal_digits = 0
+
+
+class SRG(Currency):
+    pass
+
+
+class STD(Currency):
+    pass
+
+
+class SUR(Currency):
+    pass
+
+
+class TJR(Currency):
+    pass
+
+
+class TMM(Currency):
+    decimal_digits = 0
+
+
+class TPE(Currency):
+    pass
+
+
+class TRL(Currency):
+    decimal_digits = 0
+
+
+class UAK(Currency):
+    pass
+
+
+class UGS(Currency):
+    pass
+
+
+class USS(Currency):
+    pass
+
+
+class UYP(Currency):
+    pass
+
+
+class UYN(Currency):
+    pass
+
+
+class VAL(Currency):
+    decimal_digits = 0
+
+
+class VEB(Currency):
+    pass
+
+
+class VEF(Currency):
+    pass
+
+
+class XEU(Currency):
+    pass
+
+
+class XFO(Currency):
+    pass
+
+
+class XFU(Currency):
+    pass
+
+
+class YDD(Currency):
+    pass
+
+
+class YUD(Currency):
+    pass
+
+
+class YUN(Currency):
+    pass
+
+
+class YUR(Currency):
+    pass
+
+
+class YUO(Currency):
+    pass
+
+
+class YUG(Currency):
+    pass
+
+
+class YUM(Currency):
+    pass
+
+
+class ZAL(Currency):
+    pass
+
+
+class ZMK(Currency):
+    pass
+
+
+class ZRZ(Currency):
+    decimal_digits = 3
+
+
+class ZRN(Currency):
+    pass
+
+
+class ZWC(Currency):
+    pass
+
+
+class ZWD(Currency):
+    pass
+
+
+class ZWN(Currency):
+    pass
+
+
+class ZWR(Currency):
     pass
 
 
