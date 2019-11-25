@@ -14,7 +14,7 @@ At its bone a `Money` class for Python 3.x. This is a library to be used by back
 The `stockholm.Money` object has full arithmetic support together with `int`, `float`, `Decimal`, other `Money` objects as well as `string`. The `stockholm.Money` object also supports complex string formatting functionality for easy debugging and a clean coding pattern.
 
 #### `from stockholm import Currency`
-Currencies to monetary amounts can be specified using either currencies built with the `stockholm.Currency` metaclasses or simply by specifying the currency ticker as a string (for example `"SEK"` or `"EUR"`) when creating a new `Money` object. 
+Currencies to monetary amounts can be specified using either currencies built with the `stockholm.Currency` metaclasses or simply by specifying the currency ticker as a string (for example `"SEK"` or `"EUR"`) when creating a new `Money` object.
 
 Currencies using the `stockholm.Currency` metaclasses can hold additional options, such as default number of decimals in string output. Note that the amounts are usually never behind the scenes and uses the same precision and backend as `Decimal` values and can as well be interchangable with such values.
 
@@ -62,17 +62,46 @@ print(f"The exchange rate is {exchange_rate} ({jpy_money:c} -> {sek_money:c})")
 # I have 1,352,953 JPY which equals around 119,889.58 SEK
 # The exchange rate is 0.08861326 (JPY -> SEK)
 
-print(f"{jpy_money:.0f}")
-# 1352953
+# Standard string format uses default min decimals up to 9 decimals
+print(f"{sek_money}")  # 119889.57595678 SEK
 
-print(f"{sek_money:.2f}")
-# 119889.58
+# Format type "f" works the same way as formatting a float or Decimal
+print(f"{jpy_money:.0f}")  # 1352953
+print(f"{sek_money:.2f}")  # 119889.58
+print(f"{sek_money:.1f}")  # 119889.6
+print(f"{sek_money:.0f}")  # 119890
 
-print(f"{sek_money:.1f}")
-# 119889.6
+# Format type "m" works as "f" but includes the currency in string output
+print(f"{sek_money:.2m}")  # 119889.57 SEK
+print(f"{sek_money:.4m}")  # 119889.5760 SEK
+print(f"{sek_money:+,.4m}")  # +119,889.5760 SEK
 
-print(f"{sek_money:.0f}")
-# 119890
+# An uppercase "M" puts the currency ticker in front of the amount
+print(f"{sek_money:.4M}")  # SEK 119889.5760
+
+# Format type "c" will just output the currency used in the monetary amount
+print(f"{sek_money:c}")  # SEK
+```
+
+*Use `stockholm.Currency` types for proper defaults of minimum number of decimal digits to output in strings, etc. All ISO 4217 currency codes implemented, see https://github.com/kalaspuff/stockholm/blob/master/stockholm/currency.py for the full list.*
+```python
+from stockholm import Money
+from stockholm.currency import JPY, SEK, EUR, IQD, USDCoin, Bitcoin
+
+# Most currencies has a minimum default digits set to 2 in strings
+print(Money(4711, SEK))  # 4711.00 SEK
+print(Money(4711, EUR))  # 4711.00 EUR
+
+# The stockholm.currency.JPY has a minimum default digits set to 0
+print(Money(4711, JPY))  # 4711 JPY
+
+# Some currencies even has a minimum default of 3 or 4 digits
+print(Money(4711, IQD))  # 4711.000 IQD
+
+# Some complex non ISO 4217 currencies, assets or tokens may define
+# their own ticker, for example a "USD Coin" uses the ticker "USDC"
+print(Money(4711, USDCoin))  # 4711.00 USDC
+print(Money(4711, Bitcoin))  # 4711.00 BTC
 ```
 
 #### Input data types

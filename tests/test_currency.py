@@ -1,6 +1,7 @@
 import pytest
 
 from stockholm import Currency, Money
+from stockholm.currency import Bitcoin, CLF, DOGE, DogeCoin, Ethereum, IQD, JPY, USD, XBT
 
 
 def test_currency():
@@ -13,6 +14,7 @@ def test_currency():
     assert isinstance(m.currency, Currency)
     assert str(m.currency) == "EUR"
     assert str(m.currency.ticker) == "EUR"
+    assert EUR.decimal_digits == 2
 
 
 def test_currency_arithmetics():
@@ -52,6 +54,9 @@ def test_metacurrency():
         ticker = "APPL"
 
     EUR2 = Currency("EUR")
+
+    assert f"{AppleStock:c}" == "APPL"
+    assert f"{EUR2:c}" == "EUR"
 
     assert EUR
     assert EUR == "EUR"
@@ -124,6 +129,7 @@ def test_custom_currency():
 
     c1 = Currency("EUR")
     assert c1 != Money(0, EUR)
+    assert c1.decimal_digits == 2
 
     c2 = Currency(c1)
     assert c2.ticker == "EUR"
@@ -154,8 +160,54 @@ def test_currency_hashable() -> None:
     assert hash(SEK)
 
 
+def test_currency_types() -> None:
+    assert JPY == Currency("JPY")
+    assert JPY.decimal_digits == 0
+
+    assert USD.decimal_digits == 2
+
+    m = Money(57167, JPY)
+    assert f"{m}" == "57167 JPY"
+    assert m.as_string(max_decimals=5) == "57167 JPY"
+    assert m.as_string(min_decimals=4, max_decimals=5) == "57167.0000 JPY"
+
+    m = Money(57167, USD)
+    assert f"{m}" == "57167.00 USD"
+    assert m.as_string(max_decimals=5) == "57167.00 USD"
+    assert m.as_string(min_decimals=4, max_decimals=5) == "57167.0000 USD"
+
+    m = Money(57167, IQD)
+    assert f"{m}" == "57167.000 IQD"
+    assert m.as_string(min_decimals=2) == "57167.00 IQD"
+    assert m.as_string(max_decimals=5) == "57167.000 IQD"
+
+    m = Money("0.445", CLF)
+    assert f"{m}" == "0.4450 CLF"
+    assert m.as_string(min_decimals=2) == "0.445 CLF"
+    assert m.as_string(max_decimals=3) == "0.445 CLF"
+    assert m.as_string(max_decimals=2) == "0.45 CLF"
+    assert m.as_string(max_decimals=5) == "0.4450 CLF"
+
+    m1 = Money("0.30285471", Bitcoin)
+    m2 = Money("0.30285471", XBT)
+    m3 = Money("0.30285471", Ethereum)
+    assert m1 == m2
+    assert m1 != m3
+    assert f"{m1}" == "0.30285471 BTC"
+    assert f"{m2}" == "0.30285471 BTC"
+
+
 def test_dogecoin():
-    class DogeCoin(Currency):
+    class CustomDoge(Currency):
         ticker = "DOGE"
 
+    assert Money("1 DOGE") == Money("1 DOGE")
+
     assert Money(1, DogeCoin) == Money(1, DogeCoin)
+    assert Money(1, DOGE) == Money(1, DOGE)
+    assert Money(1, "DOGE") == Money(1, "DOGE")
+    assert Money(1, DOGE) == Money(1, "DOGE")
+    assert Money(1, DogeCoin) == Money(1, DOGE)
+    assert Money(1, DogeCoin) == Money(1, CustomDoge)
+    assert Money(1, "DOGE") == Money(1, CustomDoge)
+    assert Money(1, CustomDoge) == Money(1, DOGE)
