@@ -281,6 +281,7 @@ def test_object_arithmetics() -> None:
     m = Money(0, currency="SEK")
     assert m.add(1).add(2).add(3) == Money(6, currency="SEK")
     assert m.add(10).sub(5) == Money(5, currency="SEK")
+    assert m.add(10).subtract(5) == Money(5, currency="SEK")
 
     with pytest.raises(Exception):
         assert m.add(1).add(2).add(3) == Money(6, currency="EUR")
