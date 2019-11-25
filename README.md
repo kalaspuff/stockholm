@@ -83,7 +83,7 @@ print(f"{sek_money:.4M}")  # SEK 119889.5760
 print(f"{sek_money:c}")  # SEK
 ```
 
-*Use `stockholm.Currency` types for proper defaults of minimum number of decimal digits to output in strings, etc. All ISO 4217 currency codes implemented, see https://github.com/kalaspuff/stockholm/blob/master/stockholm/currency.py for the full list. *
+*Use `stockholm.Currency` types for proper defaults of minimum number of decimal digits to output in strings, etc. All ISO 4217 currency codes implemented, see https://github.com/kalaspuff/stockholm/blob/master/stockholm/currency.py for the full list.*
 ```python
 from stockholm import Money
 from stockholm.currency import JPY, SEK, EUR, IQD, USDCoin, Bitcoin
