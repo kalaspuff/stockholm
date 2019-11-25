@@ -21,7 +21,8 @@ Currencies to monetary amounts can be specified using either currencies built wi
 
 Currencies using the `stockholm.Currency` metaclasses can hold additional options, such as default number of decimals in string output. Note that the amounts are usually never behind the scenes and uses the same precision and backend as `Decimal` values and can as well be interchangable with such values.
 
-### Installation with `pip`
+## Installation with `pip`
+Like you would install any other Python package, use `pip`, `poetry`, `pipenv` or your weapon of choice.
 ```
 $ pip install stockholm
 ```
