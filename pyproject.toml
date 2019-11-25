@@ -33,7 +33,6 @@ pytest = "^5.3.0"
 pytest-cov = "^2.7"
 black = "=19.10b0"
 mypy = "^0.740.0"
-twine = "^3.0.0"
 codecov = "^2.0.15"
 
 [tool.black]
