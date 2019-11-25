@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "stockholm"
-version = "0.0.10"
+version = "0.1.0"
 description = "An up to date human friendly and flexible approach for development with any kind of monetary amounts"
 authors = ["Carl Oscar Aaro <hello@carloscar.com>"]
 homepage = "https://github.com/kalaspuff/stockholm"
@@ -9,7 +9,7 @@ keywords = ["money", "monetary amount", "monetary value", "currency", "formattin
 readme = "README.md"
 license = "MIT"
 classifiers = [
-    "Development Status :: 2 - Pre-Alpha",
+    "Development Status :: 3 - Alpha",
     "Topic :: Software Development :: Libraries",
     "Topic :: Office/Business :: Financial",
     "Programming Language :: Python",
