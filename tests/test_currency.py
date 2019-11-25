@@ -193,6 +193,7 @@ def test_currency_types() -> None:
     assert f"{m1}" == "0.30285471 BTC"
     assert f"{m2}" == "0.30285471 BTC"
 
+
 def test_dogecoin():
     class CustomDoge(Currency):
         ticker = "DOGE"
