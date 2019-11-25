@@ -113,6 +113,8 @@ class Currency(metaclass=MetaCurrency):
 
     def __format__(self, format_spec: str) -> str:
         output = str(self)
+        if format_spec.endswith("c"):
+            format_spec = f"{format_spec[:-1]}s"
         return f"{output:{format_spec}}"
 
     def __eq__(self, other: Any) -> bool:

@@ -55,6 +55,9 @@ def test_metacurrency():
 
     EUR2 = Currency("EUR")
 
+    assert f"{AppleStock:c}" == "APPL"
+    assert f"{EUR2:c}" == "EUR"
+
     assert EUR
     assert EUR == "EUR"
     assert EUR != "EUR2"
@@ -73,7 +76,6 @@ def test_metacurrency():
     assert stock < 10
     assert str(stock) == "5.00 APPL"
     assert f"{stock:c}" == "APPL"
-    assert f"{AppleStock:c}" == "APPL"
 
     assert str(EUR) == "EUR"
     assert str(SEK) == "SEK"
