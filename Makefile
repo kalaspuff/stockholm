@@ -11,26 +11,31 @@ default:
 	@echo "- make release      | upload dist and push tag"
 
 pytest:
-	PYTHONPATH=. pytest --cov-report term-missing --cov=stockholm tests/
+	poetry run pytest --cov-report term-missing --cov=stockholm tests/
 
 flake8:
-	flake8 stockholm/ tests/
+	poetry run flake8 stockholm/ tests/
 
 mypy:
-	PYTHONPATH=. mypy stockholm/
+	poetry run mypy stockholm/
 
 version:
 	poetry version `python stockholm/__version__.py`
 
 black:
-	black -l 120 stockholm/ tests/
+	poetry run black -l 120 stockholm/ tests/
 
 build:
 	rm -rf dist/
 	poetry build
 
 release:
-	twine upload dist/stockholm-`python stockholm/__version__.py`.tar.gz dist/stockholm-`python stockholm/__version__.py`-py*.whl
+	make pytest
+	make flake8
+	make mypy
+	make version
+	make build
+	poetry publish
 	git add pyproject.toml stockholm/__version__.py
 	git commit -m "Bumped version" --allow-empty
 	git tag -a `python stockholm/__version__.py` -m `python stockholm/__version__.py`
