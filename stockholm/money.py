@@ -287,8 +287,11 @@ class Money:
     def add(self, other: Any, is_cents: Optional[bool] = None) -> "Money":
         return self + Money(other, is_cents=is_cents)
 
-    def sub(self, other: Any, is_cents: Optional[bool] = None) -> "Money":
+    def subtract(self, other: Any, is_cents: Optional[bool] = None) -> "Money":
         return self - Money(other, is_cents=is_cents)
+
+    def sub(self, other: Any, is_cents: Optional[bool] = None) -> "Money":
+        return self.subtract(other, is_cents=is_cents)
 
     def __setattr__(self, *args: Any) -> None:
         raise AttributeError("Attributes of monetary amounts cannot be changed")
