@@ -62,17 +62,25 @@ print(f"The exchange rate is {exchange_rate} ({jpy_money:c} -> {sek_money:c})")
 # I have 1,352,953 JPY which equals around 119,889.58 SEK
 # The exchange rate is 0.08861326 (JPY -> SEK)
 
-print(f"{jpy_money:.0f}")
-# 1352953
+# Standard string format uses default min decimals up to 9 decimals
+print(f"{sek_money}")  # 119889.57595678 SEK
 
-print(f"{sek_money:.2f}")
-# 119889.58
+# Format specifier "f" works the same way as formatting a float or Decimal
+print(f"{jpy_money:.0f}")  # 1352953
+print(f"{sek_money:.2f}")  # 119889.58
+print(f"{sek_money:.1f}")  # 119889.6
+print(f"{sek_money:.0f}")  # 119890
 
-print(f"{sek_money:.1f}")
-# 119889.6
+# Format specifier "m" works as "f" but includes the currency in string output
+print(f"{sek_money:.2m}")  # 119889.57 SEK
+print(f"{sek_money:.4m}")  # 119889.5760 SEK
+print(f"{sek_money:+,.4m}")  # +119,889.5760 SEK
 
-print(f"{sek_money:.0f}")
-# 119890
+# An uppercase "M" puts the currency ticker in front of the amount
+print(f"{sek_money:.4M}")  # SEK 119889.5760
+
+# Format specifier "c" will just output the currency used in the monetary amount
+print(f"{sek_money:c}")  # SEK
 ```
 
 *Use `stockholm.Currency` types for proper defaults of minimum number of decimal digits to output in strings, etc. All ISO 4217 currency codes implemented, see https://github.com/kalaspuff/stockholm/blob/master/stockholm/currency.py for the full list. *
@@ -80,23 +88,20 @@ print(f"{sek_money:.0f}")
 from stockholm import Money
 from stockholm.currency import JPY, SEK, EUR, IQD, USDCoin, Bitcoin
 
-print(Money(4711, JPY))
-# 4711 JPY
+# Most currencies has a minimum default digits set to 2 in strings
+print(Money(4711, SEK))  # 4711.00 SEK
+print(Money(4711, EUR))  # 4711.00 EUR
 
-print(Money(4711, SEK))
-# 4711.00 SEK
+# The stockholm.currency.JPY has a minimum default digits set to 0
+print(Money(4711, JPY))  # 4711 JPY
 
-print(Money(4711, EUR))
-# 4711.00 EUR
+# Some currencies even has a minimum default of 3 or 4 digits
+print(Money(4711, IQD))  # 4711.000 IQD
 
-print(Money(4711, IQD))
-# 4711.000 IQD
-
-print(Money(4711, USDCoin))
-# 4711.00 USDC
-
-print(Money(4711, Bitcoin))
-# 4711.00 BTC
+# Some complex non ISO 4217 currencies, assets or tokens may define
+# their own ticker, for example a "USD Coin" uses the ticker "USDC"
+print(Money(4711, USDCoin))  # 4711.00 USDC
+print(Money(4711, Bitcoin))  # 4711.00 BTC
 ```
 
 #### Input data types
