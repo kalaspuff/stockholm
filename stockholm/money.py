@@ -298,10 +298,15 @@ class Money:
 
     def amount_as_string(self, min_decimals: Optional[int] = None, max_decimals: Optional[int] = None) -> str:
         if min_decimals is None and max_decimals is None:
-            min_decimals = DEFAULT_MIN_DECIMALS
-            max_decimals = DEFAULT_MAX_DECIMALS
+            if self._currency and isinstance(self._currency, Currency):
+                min_decimals = self._currency.decimal_digits
+            min_decimals = DEFAULT_MIN_DECIMALS if min_decimals is None else min_decimals
+            max_decimals = max(min_decimals, DEFAULT_MAX_DECIMALS)
         elif min_decimals is None:
-            min_decimals = min(DEFAULT_MIN_DECIMALS, max_decimals)
+            if self._currency and isinstance(self._currency, Currency):
+                min_decimals = self._currency.decimal_digits
+            min_decimals = DEFAULT_MIN_DECIMALS if min_decimals is None else min_decimals
+            min_decimals = min(min_decimals, max_decimals)
         elif max_decimals is None:
             max_decimals = max(min_decimals, DEFAULT_MAX_DECIMALS)
 

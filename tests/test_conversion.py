@@ -3,6 +3,7 @@ import pytest
 from decimal import Decimal
 
 from stockholm import Money
+import stockholm.currency
 
 
 def test_conversion_extensions() -> None:
@@ -259,5 +260,19 @@ def test_string_formatting_sentence() -> None:
     )
     assert (
         f"I have {m1:,.0m} which equals around {m2:,.2m} if the exchange rate is {exchange_rate} ({m1:c} -> {m2:c})."
+        == expected
+    )
+
+
+def test_string_formatting_sentence_currency_types() -> None:
+    m1 = Money(1352953, stockholm.currency.JPY)
+    exchange_rate = Decimal("0.08861326")
+    m2 = round(Money(m1 * exchange_rate, stockholm.currency.SEK), 2)
+
+    expected = (
+        "I have 1,352,953 JPY which equals around 119,889.58 SEK if the exchange rate is 0.08861326 (JPY -> SEK)."
+    )
+    assert (
+        f"I have {m1:,m} which equals around {m2:,m} if the exchange rate is {exchange_rate} ({m1:c} -> {m2:c})."
         == expected
     )
