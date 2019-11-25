@@ -65,13 +65,13 @@ print(f"The exchange rate is {exchange_rate} ({jpy_money:c} -> {sek_money:c})")
 # Standard string format uses default min decimals up to 9 decimals
 print(f"{sek_money}")  # 119889.57595678 SEK
 
-# Format specifier "f" works the same way as formatting a float or Decimal
+# Format type "f" works the same way as formatting a float or Decimal
 print(f"{jpy_money:.0f}")  # 1352953
 print(f"{sek_money:.2f}")  # 119889.58
 print(f"{sek_money:.1f}")  # 119889.6
 print(f"{sek_money:.0f}")  # 119890
 
-# Format specifier "m" works as "f" but includes the currency in string output
+# Format type "m" works as "f" but includes the currency in string output
 print(f"{sek_money:.2m}")  # 119889.57 SEK
 print(f"{sek_money:.4m}")  # 119889.5760 SEK
 print(f"{sek_money:+,.4m}")  # +119,889.5760 SEK
@@ -79,7 +79,7 @@ print(f"{sek_money:+,.4m}")  # +119,889.5760 SEK
 # An uppercase "M" puts the currency ticker in front of the amount
 print(f"{sek_money:.4M}")  # SEK 119889.5760
 
-# Format specifier "c" will just output the currency used in the monetary amount
+# Format type "c" will just output the currency used in the monetary amount
 print(f"{sek_money:c}")  # SEK
 ```
 
