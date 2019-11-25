@@ -4,16 +4,23 @@ version = "0.0.9"
 description = "An up to date human friendly and flexible approach for development with any kind of monetary amounts"
 authors = ["Carl Oscar Aaro <hello@carloscar.com>"]
 homepage = "https://github.com/kalaspuff/stockholm"
+repository = "https://github.com/kalaspuff/stockholm"
 keywords = ["money", "monetary amount", "monetary value", "currency", "formatting"]
 readme = "README.md"
 license = "MIT"
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
     "Topic :: Software Development :: Libraries",
+    "Topic :: Office/Business :: Financial",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
     "Intended Audience :: Developers",
-    "Intended Audience :: Financial and Insurance Industry"
+    "Intended Audience :: Financial and Insurance Industry",
+    "Typing :: Typed",
+    "License :: OSI Approved :: MIT License"
 ]
 
 [tool.poetry.dependencies]
