@@ -14,7 +14,7 @@ At its bone a `Money` class for Python 3.x. This is a library to be used by back
 The `stockholm.Money` object has full arithmetic support together with `int`, `float`, `Decimal`, other `Money` objects as well as `string`. The `stockholm.Money` object also supports complex string formatting functionality for easy debugging and a clean coding pattern.
 
 #### `from stockholm import Currency`
-Currencies to monetary amounts can be specified using either currencies built with the `stockholm.Currency` metaclasses or simply by specifying the currency ticker as a string (for example `"SEK"` or `"EUR"`) when creating a new `Money` object. 
+Currencies to monetary amounts can be specified using either currencies built with the `stockholm.Currency` metaclasses or simply by specifying the currency ticker as a string (for example `"SEK"` or `"EUR"`) when creating a new `Money` object.
 
 Currencies using the `stockholm.Currency` metaclasses can hold additional options, such as default number of decimals in string output. Note that the amounts are usually never behind the scenes and uses the same precision and backend as `Decimal` values and can as well be interchangable with such values.
 
@@ -73,6 +73,30 @@ print(f"{sek_money:.1f}")
 
 print(f"{sek_money:.0f}")
 # 119890
+```
+
+*Use `stockholm.Currency` types for proper defaults of minimum number of decimal digits to output in strings, etc. All ISO 4217 currency codes implemented, see https://github.com/kalaspuff/stockholm/blob/master/stockholm/currency.py for the full list. *
+```python
+from stockholm import Money
+from stockholm.currency import JPY, SEK, EUR, IQD, USDCoin, Bitcoin
+
+print(Money(4711, JPY))
+# 4711 JPY
+
+print(Money(4711, SEK))
+# 4711.00 SEK
+
+print(Money(4711, EUR))
+# 4711.00 EUR
+
+print(Money(4711, IQD))
+# 4711.000 IQD
+
+print(Money(4711, USDCoin))
+# 4711.00 USDC
+
+print(Money(4711, Bitcoin))
+# 4711.00 BTC
 ```
 
 #### Input data types
