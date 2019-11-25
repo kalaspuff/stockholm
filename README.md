@@ -11,6 +11,8 @@ An up to date human friendly and flexible approach for development with any kind
 
 At its bone a `Money` class for Python 3.x. This is a library to be used by backend and frontend API coders of fintech companies, web merchants and subscription services. A simple, yet powerful way of coding with money.
 
+---
+
 #### `from stockholm import Money`
 The `stockholm.Money` object has full arithmetic support together with `int`, `float`, `Decimal`, other `Money` objects as well as `string`. The `stockholm.Money` object also supports complex string formatting functionality for easy debugging and a clean coding pattern.
 
