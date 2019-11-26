@@ -6,8 +6,7 @@ endif
 default:
 	@echo "Usage:"
 	@echo "- make test         | run tests"
-	@echo "- make version      | update versions"
-	@echo "- make build        | build package"
+	@echo "- make black        | run black -l 120"
 	@echo "- make release      | upload dist and push tag"
 
 pytest:
@@ -45,4 +44,5 @@ release:
 test: pytest flake8 mypy
 tests: test
 dist: build
-
+lint: flake8 mypy
+pylint: flake8 mypy
