@@ -11,7 +11,7 @@ default:
 	@echo "- make release      | upload dist and push tag"
 
 pytest:
-	poetry run pytest --cov-report term-missing --cov=stockholm tests/
+	PYTHONPATH=. poetry run pytest --cov-report term-missing --cov=stockholm tests/
 
 flake8:
 	poetry run flake8 stockholm/ tests/
