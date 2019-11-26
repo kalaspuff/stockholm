@@ -1,6 +1,6 @@
 import pytest
 
-from stockholm import Currency, Money
+from stockholm import BaseCurrency, Currency, Money
 from stockholm.currency import Bitcoin, CLF, DOGE, DogeCoin, Ethereum, IQD, JPY, USD, XBT, get_currency
 
 
@@ -9,9 +9,14 @@ def test_currency():
     assert str(EUR) == "EUR"
     assert repr(EUR) == '<stockholm.Currency: "EUR">'
 
+    assert repr(type(EUR)) == "<class 'stockholm.currency.Currency'>"
+    assert str(type(EUR)) == "<class 'stockholm.currency.Currency'>"
+    assert repr(Currency) == "<class 'stockholm.currency.Currency'>"
+    assert str(Currency) == "<class 'stockholm.currency.Currency'>"
+
     m = Money(100, EUR)
     assert str(m) == "100.00 EUR"
-    assert isinstance(m.currency, Currency)
+    assert isinstance(m.currency, BaseCurrency)
     assert str(m.currency) == "EUR"
     assert str(m.currency.ticker) == "EUR"
     assert EUR.decimal_digits == 2
@@ -41,16 +46,16 @@ def test_currency_arithmetics():
 
 
 def test_metacurrency():
-    class EUR(Currency):
+    class EUR(BaseCurrency):
         pass
 
-    class SEK(Currency):
+    class SEK(BaseCurrency):
         pass
 
-    class DogeCoin(Currency):
+    class DogeCoin(BaseCurrency):
         ticker = "DOGE"
 
-    class AppleStock(Currency):
+    class AppleStock(BaseCurrency):
         ticker = "APPL"
 
     EUR2 = Currency("EUR")
@@ -89,7 +94,7 @@ def test_metacurrency():
     assert EUR != 0
     assert EUR != Money(0, EUR)
 
-    class CurrencyConcept(Currency):
+    class CurrencyConcept(BaseCurrency):
         ticker = None
 
     assert not bool(CurrencyConcept)
@@ -105,7 +110,7 @@ def test_metacurrency():
 
 
 def test_immutability():
-    class EUR(Currency):
+    class EUR(BaseCurrency):
         pass
 
     BTC = Currency("BTC")
@@ -124,7 +129,7 @@ def test_immutability():
 
 
 def test_custom_currency():
-    class EUR(Currency):
+    class EUR(BaseCurrency):
         pass
 
     c1 = Currency("EUR")
@@ -153,7 +158,7 @@ def test_custom_currency():
 def test_currency_hashable() -> None:
     EUR = Currency("EUR")
 
-    class SEK(Currency):
+    class SEK(BaseCurrency):
         pass
 
     assert hash(EUR)
@@ -163,6 +168,7 @@ def test_currency_hashable() -> None:
 def test_currency_types() -> None:
     assert JPY == Currency("JPY")
     assert JPY.decimal_digits == 0
+    assert Currency.JPY.decimal_digits == 0
 
     JPY2 = get_currency("JPY")
     assert JPY2 == "JPY"
@@ -177,6 +183,15 @@ def test_currency_types() -> None:
     assert BABA.decimal_digits == 2
 
     assert USD.decimal_digits == 2
+    assert Currency.USD.decimal_digits == 2
+
+    assert USD is Currency.USD
+    assert USD is not Currency.SEK
+    assert USD is not Currency("USD")
+    assert Currency("USD") is not Currency("USD")
+    assert USD == Currency.USD
+    assert USD != Currency.SEK
+    assert Currency.USD == "USD"
 
     m = Money(57167, JPY)
     assert f"{m}" == "57167 JPY"
@@ -210,7 +225,7 @@ def test_currency_types() -> None:
 
 
 def test_dogecoin():
-    class CustomDoge(Currency):
+    class CustomDoge(BaseCurrency):
         ticker = "DOGE"
 
     assert Money("1 DOGE") == Money("1 DOGE")

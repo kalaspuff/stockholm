@@ -5,7 +5,7 @@ from typing import Any, Iterable, Optional, Tuple, Type, Union, cast
 import decimal
 from decimal import Decimal, ROUND_HALF_UP
 
-from .currency import Currency
+from .currency import BaseCurrency
 from .exceptions import CurrencyMismatchError, ConversionError, InvalidOperandError
 
 
@@ -46,7 +46,7 @@ class DefaultCurrency:
 class Money:
     __slots__ = ("_amount", "_currency")
     _amount: Decimal
-    _currency: Optional[Union[Currency, str]]
+    _currency: Optional[Union[BaseCurrency, str]]
 
     @classmethod
     def sort(cls, iterable: Iterable, reverse: bool = False) -> Iterable:
@@ -56,7 +56,7 @@ class Money:
     def sum(
         cls,
         iterable: Iterable,
-        currency: Optional[Union[Type[DefaultCurrency], Currency, str]] = DefaultCurrency,
+        currency: Optional[Union[Type[DefaultCurrency], BaseCurrency, str]] = DefaultCurrency,
         is_cents: Optional[bool] = None,
     ) -> "Money":
         return reduce(
@@ -72,7 +72,7 @@ class Money:
     def __init__(
         self,
         amount: Optional[Union["Money", Decimal, int, float, str, object]] = None,
-        currency: Optional[Union[Type[DefaultCurrency], Currency, str]] = DefaultCurrency,
+        currency: Optional[Union[Type[DefaultCurrency], BaseCurrency, str]] = DefaultCurrency,
         is_cents: Optional[bool] = None,
         units: Optional[int] = None,
         nanos: Optional[int] = None,
@@ -118,15 +118,15 @@ class Money:
         if (
             currency is not DefaultCurrency
             and not isinstance(currency, str)
-            and not isinstance(currency, Currency)
+            and not isinstance(currency, BaseCurrency)
             and currency is not None
         ):
             raise ConversionError("Invalid currency value")
 
         output_amount = None
-        output_currency: Optional[Union[Currency, str]] = None
+        output_currency: Optional[Union[BaseCurrency, str]] = None
         if currency is not DefaultCurrency:
-            if isinstance(currency, Currency):
+            if isinstance(currency, BaseCurrency):
                 output_currency = currency
             else:
                 output_currency = str(currency or "").strip().upper() or None
@@ -157,7 +157,7 @@ class Money:
                     match_currency = str(match_currency).strip().upper()
                     if output_currency is not None and match_currency != output_currency:
                         raise ConversionError("Mismatching currency in input value and currency argument")
-                    output_currency = output_currency if isinstance(output_currency, Currency) else match_currency
+                    output_currency = output_currency if isinstance(output_currency, BaseCurrency) else match_currency
 
                 amount = match_amount
             except AttributeError:
@@ -181,7 +181,7 @@ class Money:
             if match_currency is not None:
                 if output_currency is not None and match_currency != output_currency:
                     raise ConversionError("Mismatching currency in input value and currency argument")
-                output_currency = output_currency if isinstance(output_currency, Currency) else match_currency
+                output_currency = output_currency if isinstance(output_currency, BaseCurrency) else match_currency
 
             try:
                 output_amount = Decimal(amount)
@@ -230,7 +230,7 @@ class Money:
         return self._amount
 
     @property
-    def currency(self) -> Optional[Union[Currency, str]]:
+    def currency(self) -> Optional[Union[BaseCurrency, str]]:
         return self._currency
 
     @property
@@ -301,12 +301,12 @@ class Money:
 
     def amount_as_string(self, min_decimals: Optional[int] = None, max_decimals: Optional[int] = None) -> str:
         if min_decimals is None and max_decimals is None:
-            if self._currency and isinstance(self._currency, Currency):
+            if self._currency and isinstance(self._currency, BaseCurrency):
                 min_decimals = self._currency.decimal_digits
             min_decimals = DEFAULT_MIN_DECIMALS if min_decimals is None else min_decimals
             max_decimals = max(min_decimals, DEFAULT_MAX_DECIMALS)
         elif min_decimals is None:
-            if self._currency and isinstance(self._currency, Currency):
+            if self._currency and isinstance(self._currency, BaseCurrency):
                 min_decimals = self._currency.decimal_digits
             min_decimals = DEFAULT_MIN_DECIMALS if min_decimals is None else min_decimals
             min_decimals = min(min_decimals, max_decimals)
@@ -465,9 +465,9 @@ class Money:
 
         return converted_other
 
-    def _preferred_currency(self, other: "Money") -> Optional[Union[Currency, str]]:
-        currency = self._currency if self._currency and isinstance(self._currency, Currency) else None
-        currency = other._currency if not currency and other._currency and isinstance(other, Currency) else None
+    def _preferred_currency(self, other: "Money") -> Optional[Union[BaseCurrency, str]]:
+        currency = self._currency if self._currency and isinstance(self._currency, BaseCurrency) else None
+        currency = other._currency if not currency and other._currency and isinstance(other, BaseCurrency) else None
         return currency or self._currency or other._currency
 
     def __eq__(self, other: Any) -> bool:
