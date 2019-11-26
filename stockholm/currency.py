@@ -1,4 +1,5 @@
-from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union
+import sys
+from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union, cast
 
 
 class MetaCurrency(type):
@@ -1423,3 +1424,7 @@ class DogeCoin(Currency):
 
 
 DOGE = DogeCoin
+
+
+def get_currency(ticker: str) -> Currency:
+    return cast(Currency, getattr(sys.modules[__name__], ticker, Currency(ticker)))

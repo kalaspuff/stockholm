@@ -1,7 +1,7 @@
 import pytest
 
 from stockholm import Currency, Money
-from stockholm.currency import Bitcoin, CLF, DOGE, DogeCoin, Ethereum, IQD, JPY, USD, XBT
+from stockholm.currency import Bitcoin, CLF, DOGE, DogeCoin, Ethereum, IQD, JPY, USD, XBT, get_currency
 
 
 def test_currency():
@@ -163,6 +163,18 @@ def test_currency_hashable() -> None:
 def test_currency_types() -> None:
     assert JPY == Currency("JPY")
     assert JPY.decimal_digits == 0
+
+    JPY2 = get_currency("JPY")
+    assert JPY2 == "JPY"
+    assert JPY == JPY2
+    assert JPY2.decimal_digits == 0
+
+    IQD2 = get_currency("IQD")
+    assert IQD2.decimal_digits == 3
+
+    BABA = get_currency("BABA")
+    assert BABA.ticker == "BABA"
+    assert BABA.decimal_digits == 2
 
     assert USD.decimal_digits == 2
 
