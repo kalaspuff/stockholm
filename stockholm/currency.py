@@ -17,8 +17,8 @@ class MetaCurrency(type):
         attributedict["ticker"] = ticker.split(".")[-1] if ticker else ""
         attributedict["currency"] = attributedict["ticker"]
         attributedict["decimal_digits"] = decimal_digits
-        attributedict["interchangeable_with"] = interchangeable_with
-        attributedict["preferred_ticker"] = preferred_ticker
+        attributedict["interchangeable_with"] = sorted(interchangeable_with) if interchangeable_with else None
+        attributedict["preferred_ticker"] = preferred_ticker if preferred_ticker else None
 
         result: Type[Currency] = type.__new__(cls, name, bases, attributedict)
         return result
@@ -64,7 +64,15 @@ class MetaCurrency(type):
         return Currency
 
     def __hash__(self) -> int:
-        return hash(("stockholm.MetaCurrency", self.ticker))
+        return hash(
+            (
+                "stockholm.MetaCurrency",
+                self.ticker,
+                self.decimal_digits,
+                self.interchangeable_with,
+                self.preferred_ticker,
+            )
+        )
 
     def __bool__(self) -> bool:
         return bool(self.ticker)
@@ -97,8 +105,8 @@ class Currency(metaclass=MetaCurrency):
 
         object.__setattr__(self, "currency", self.ticker)
         object.__setattr__(self, "decimal_digits", 2 if decimal_digits is None else decimal_digits)
-        object.__setattr__(self, "interchangeable_with", interchangeable_with)
-        object.__setattr__(self, "preferred_ticker", preferred_ticker)
+        object.__setattr__(self, "interchangeable_with", sorted(interchangeable_with) if interchangeable_with else None)
+        object.__setattr__(self, "preferred_ticker", preferred_ticker if preferred_ticker else None)
 
     def __setattr__(self, *args: Any) -> None:
         raise AttributeError("Attributes of currencies cannot be changed")
@@ -137,7 +145,9 @@ class Currency(metaclass=MetaCurrency):
         return not self == other
 
     def __hash__(self) -> int:
-        return hash(("stockholm.Currency", self.ticker))
+        return hash(
+            ("stockholm.Currency", self.ticker, self.decimal_digits, self.interchangeable_with, self.preferred_ticker)
+        )
 
     def __bool__(self) -> bool:
         return bool(self.ticker)
