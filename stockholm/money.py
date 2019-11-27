@@ -315,6 +315,9 @@ class Money:
     def as_int(self) -> int:
         return int(self)
 
+    def to_integral(self) -> "Money":
+        return self.__round__(0)
+
     def as_float(self) -> float:
         return float(self)
 

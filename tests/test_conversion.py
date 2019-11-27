@@ -36,6 +36,8 @@ def test_rounding() -> None:
     assert round(Money("2.5")) == Money(3)
     assert round(Money("2.5"), 0) == Money(3)
     assert round(Money("2.5"), 1) == Money("2.5")
+    assert Money("2.5").to_integral() == Money(3)
+    assert Money("2.4").to_integral() == Money(2)
 
     m = m1 / 3
     assert isinstance(m, Money)
