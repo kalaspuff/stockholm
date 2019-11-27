@@ -274,6 +274,12 @@ def test_currency_types() -> None:
     assert Money("0.01").sub_units == 1
     assert Money("0.001").sub_units == Decimal("0.1")
 
+    assert str(Money("0.01").sub_units) == "1"
+    assert str(Money("0.01", currency="SEK").sub_units) == "1"
+    assert str(Money("100.50", currency="SEK").sub_units) == "10050"
+    assert "." in str(Money("100.10", Currency.JPY).sub_units)
+    assert str(round(Money("100.10", Currency.JPY).sub_units)) == "100"
+
     assert Money("1", Currency.JPY).sub_units == 1
     assert Money("0.1", Currency.JPY).sub_units == Decimal("0.1")
     assert Money("0.01", Currency.JPY).sub_units == Decimal("0.01")
