@@ -173,13 +173,13 @@ sum(amounts)
 ```python
 from stockholm import Money
 
-money = Money("22583.75", "SEK")
+money = Money("22583.75382", "SEK")
 money.units, money.nanos, str(money.currency)
-# (22583, 750000000, 'SEK')
+# (22583, 753820000, 'SEK')
 
 # or vice versa
-Money(units=22583, nanos=750000000, currency="SEK")
-# <stockholm.Money: "22583.75 SEK">
+Money(units=22583, nanos=753820000, currency="SEK")
+# <stockholm.Money: "22583.75382 SEK">
 ```
 
 
