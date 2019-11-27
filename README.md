@@ -174,7 +174,7 @@ sum(amounts)
 from stockholm import Money
 
 money = Money("22583.75382", "SEK")
-money.units, money.nanos, str(money.currency)
+money.units, money.nanos, money.currency_code
 # (22583, 753820000, 'SEK')
 
 # or vice versa

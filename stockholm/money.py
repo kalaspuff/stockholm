@@ -57,13 +57,14 @@ class Money:
         cls,
         iterable: Iterable,
         currency: Optional[Union[Type[DefaultCurrency], BaseCurrency, str]] = DefaultCurrency,
+        currency_code: Optional[str] = None,
         from_sub_units: Optional[bool] = None,
         **kwargs: Any,
     ) -> "Money":
         return reduce(
             lambda v, e: v + (e if isinstance(e, Money) else Money(e, from_sub_units=from_sub_units)),
             iterable,
-            Money(0, currency=currency, from_sub_units=from_sub_units),
+            Money(0, currency=currency, currency_code=currency_code, from_sub_units=from_sub_units),
         )
 
     @classmethod
@@ -75,6 +76,7 @@ class Money:
         cls,
         amount: Optional[Union["Money", Decimal, int, float, str, object]],
         currency: Optional[Union[Type[DefaultCurrency], BaseCurrency, str]] = DefaultCurrency,
+        currency_code: Optional[str] = None,
     ) -> "Money":
         return Money(amount=amount, currency=currency, from_sub_units=True)
 
@@ -85,6 +87,7 @@ class Money:
         from_sub_units: Optional[bool] = None,
         units: Optional[int] = None,
         nanos: Optional[int] = None,
+        currency_code: Optional[str] = None,
         **kwargs: Any,
     ) -> None:
         validate_amounts = []
@@ -112,6 +115,13 @@ class Money:
 
         if amount is None:
             raise ConversionError("Missing input values for monetary amount")
+
+        if currency is DefaultCurrency and currency_code:
+            if not isinstance(currency_code, str):
+                raise ConversionError("Invalid currency value")
+            currency = str(currency_code)
+        elif currency is not DefaultCurrency and currency_code and str(currency) != str(currency_code):
+            raise ConversionError("Invalid currency value")
 
         if (
             isinstance(amount, Money)
@@ -258,6 +268,10 @@ class Money:
     @property
     def currency(self) -> Optional[Union[BaseCurrency, str]]:
         return self._currency
+
+    @property
+    def currency_code(self) -> Optional[str]:
+        return str(self._currency) if self._currency else None
 
     @property
     def _amount_tuple(self) -> Tuple[str, str]:

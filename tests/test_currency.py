@@ -22,6 +22,7 @@ def test_currency():
     assert isinstance(m.currency, BaseCurrency)
     assert str(m.currency) == "EUR"
     assert str(m.currency.ticker) == "EUR"
+    assert m.currency_code == "EUR"
     assert EUR.decimal_digits == 2
 
 

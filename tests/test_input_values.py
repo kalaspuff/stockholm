@@ -278,3 +278,20 @@ def test_units_input() -> None:
 
     with pytest.raises(ConversionError):
         Money(units=1338, nanos=250000000, amount="1338")
+
+
+def test_currency_code_input() -> None:
+    assert str(Money(1, currency_code="SEK")) == "1.00 SEK"
+    assert str(Money(1, currency=Currency.SEK, currency_code="SEK")) == "1.00 SEK"
+    assert str(Money(1, currency="SEK", currency_code="SEK")) == "1.00 SEK"
+
+    with pytest.raises(ConversionError):
+        Money(1, currency=Currency.JPY, currency_code="SEK")
+
+    with pytest.raises(ConversionError):
+        Money(1, currency_code=Currency.JPY)
+
+    with pytest.raises(ConversionError):
+        Money(1, currency=None, currency_code=Currency.JPY)
+
+    assert str(Money(1, currency=None, currency_code="")) == "1.00"

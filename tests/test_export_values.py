@@ -62,6 +62,7 @@ def test_info_methods() -> None:
 
     assert m.amount == Decimal("4711.75")
     assert m.currency == "EUR"
+    assert m.currency_code == "EUR"
     assert m.units == 4711
     assert m.nanos == 750000000
 
