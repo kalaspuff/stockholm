@@ -2,7 +2,7 @@ import pytest
 
 from decimal import Decimal
 
-from stockholm import Money
+from stockholm import Currency, Money
 import stockholm.currency
 
 
@@ -80,6 +80,39 @@ def test_rounding() -> None:
     m = round(m2 / 3)  # type: ignore
     assert isinstance(m, Money)
     assert m == Money("-17", currency="USD")
+
+
+def test_currency_change() -> None:
+    m = Money("123456.50", currency="GBP")
+    assert m == "123456.50 GBP"
+    assert m.to("SEK") == "123456.50 SEK"
+    assert m.to_currency("SEK") == "123456.50 SEK"
+    assert m.to_currency(Currency.SEK) == "123456.50 SEK"
+    assert m.to_currency(Currency.JPY) == "123456.50 JPY"
+    assert str(m.to_currency(Currency.JPY)) == "123456.5 JPY"
+    assert str(m.to_currency(None)) == "123456.50"
+    assert str(Money(m)) == "123456.50 GBP"
+    assert str(Money(m, units=123456, nanos=500000000)) == "123456.50 GBP"
+    assert str(Money(m, currency=None, units=123456, nanos=500000000)) == "123456.50"
+
+
+def test_sub_units() -> None:
+    assert str(Money(471100, from_sub_units=True)) == "4711.00"
+    assert Money(471100, from_sub_units=False) == 471100
+    assert Money(471100, from_sub_units=True).to_sub_units() == 471100
+
+    assert str(Money(471100, currency=Currency.SEK, from_sub_units=True)) == "4711.00 SEK"
+    assert str(Money(471100, currency=Currency.SEK, from_sub_units=False)) == "471100.00 SEK"
+    assert Money(471100, currency=Currency.SEK, from_sub_units=True).to_sub_units() == 471100
+
+    assert str(Money(471100, Currency.JPY, from_sub_units=True)) == "471100 JPY"
+    assert Money(471100, Currency.JPY, from_sub_units=False) == 471100
+    assert Money(471100, Currency.JPY, from_sub_units=True).to_sub_units() == 471100
+    assert str(Money(471100, Currency.JPY, from_sub_units=True).to_sub_units()) == "471100 JPY"
+
+    assert str(Money(471100, Currency.IQD, from_sub_units=True)) == "471.100 IQD"
+    assert Money(471100, Currency.IQD, from_sub_units=False) == 471100
+    assert round(Money(471100, Currency.IQD, from_sub_units=True).to_sub_units()) == 471100
 
 
 def test_string_formatting() -> None:

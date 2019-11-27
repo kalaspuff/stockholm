@@ -77,7 +77,7 @@ class ThirdPartyMoney:
         (Money(0), None, False, "0.00"),
         (Money(1), None, False, "1.00"),
         (Money(1), "USD", False, "1.00 USD"),
-        (Money(1, currency="USD"), None, False, "1.00 USD"),
+        (Money(1, currency="USD"), None, False, "1.00"),
         (Money(1, currency="USD"), "USD", False, "1.00 USD"),
         (Money("4711.00 USD", currency="USD"), "USD", False, "4711.00 USD"),
         (Money("4711.00"), "USD", False, "4711.00 USD"),
