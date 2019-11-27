@@ -31,7 +31,7 @@ $ pip install stockholm
 
 ## Examples
 
-#### Arithmetics
+#### Arithmetics - fully supported
 *Full arithmetic support with different types, backed by `Decimal` for dealing with rounding errors, while also keeping the monetary amount fully currency aware.*
 ```python
 from stockholm import Money
@@ -54,7 +54,7 @@ print(round(output / 3, 1))
 # 4828.20 SEK
 ```
 
-#### Formatting
+#### Formatting / Advanced string formatting
 *Advanced string formatting functionality.*
 ```python
 from stockholm import Money
@@ -110,7 +110,7 @@ print(Money(4711, USDCoin))  # 4711.00 USDC
 print(Money(4711, Bitcoin))  # 4711.00 BTC
 ```
 
-#### Input data types
+#### Input data types in flexible variants
 *Flexible ways for assigning values to a monetary amount using many different input data types and methods.*
 ```python
 from decimal import Decimal
@@ -138,7 +138,7 @@ Money(cents_as_str, currency="USD", from_sub_units=True)
 # <stockholm.Money: "4711.00 USD">
 ```
 
-#### List arithmetics
+#### List arithmetics - summary of monetary amounts in list
 *Adding several monetary amounts from a list.*
 ```python
 from stockholm import Money
@@ -158,8 +158,8 @@ sum(amounts)
 # <stockholm.Money: "1002.50">
 ```
 
-#### Conversion for other transport medium
-*Easily splittable into `units` and `nanos` for transport in network medium, for example using the `google.type.Money` [protobuf definition](https://github.com/googleapis/googleapis/blob/master/google/type/money.proto) when using Protocol Buffers.*
+#### Conversion for other transport medium (for example Protocol Buffers)
+*Easily splittable into `units` and `nanos` for transport in network medium, for example using the [`google.type.Money` protobuf definition](https://github.com/googleapis/googleapis/blob/master/google/type/money.proto) when using Protocol Buffers.*
 ```python
 from stockholm import Currency, Money
 
