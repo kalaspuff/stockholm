@@ -91,7 +91,7 @@ print(f"{sek_money:c}")  # SEK
 
 *Use `stockholm.Currency` types for proper defaults of minimum number of decimal digits to output in strings, etc. All ISO 4217 currency codes implemented, see https://github.com/kalaspuff/stockholm/blob/master/stockholm/currency.py for the full list.*
 ```python
-from stockholm import Money
+from stockholm import Currency, Money, get_currency
 from stockholm.currency import JPY, SEK, EUR, IQD, USDCoin, Bitcoin
 
 # Most currencies has a minimum default digits set to 2 in strings
@@ -108,6 +108,14 @@ print(Money(4711, IQD))  # 4711.000 IQD
 # their own ticker, for example a "USD Coin" uses the ticker "USDC"
 print(Money(4711, USDCoin))  # 4711.00 USDC
 print(Money(4711, Bitcoin))  # 4711.00 BTC
+
+# You can also use the shorthand stockholm.Currency object which
+# holds all ISO 4217 three character codes as objects.
+print(Money(1338, Currency.JPY))  # 1338 JPY
+
+# or call the get_currency function
+print(Money(1338, get_currency("JPY")))  # 1338 JPY
+
 ```
 
 #### Input data types in flexible variants
@@ -163,9 +171,13 @@ sum(amounts)
 ```python
 from stockholm import Currency, Money
 
-money = Money("22583.75", Currency.SEK)
+money = Money("22583.75", "SEK")
 money.units, money.nanos, str(money.currency)
 # (22583, 750000000, 'SEK')
+
+# or vice versa
+Money(units=22583, nanos=750000000, currency="SEK")
+# <stockholm.Money: "22583.75 SEK">
 ```
 
 
