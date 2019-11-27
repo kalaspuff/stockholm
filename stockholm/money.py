@@ -129,7 +129,10 @@ class Money:
             if isinstance(currency, BaseCurrency):
                 output_currency = currency
             else:
-                output_currency = str(currency or "").strip().upper() or None
+                output_currency = str(currency or "").strip() or None
+                output_currency = (
+                    output_currency.upper() if output_currency and len(output_currency) == 3 else output_currency
+                )
 
         if Money._is_unknown_amount_type(amount):
             try:
@@ -154,7 +157,12 @@ class Money:
                         match_currency = matches.group(1)
 
                 if match_currency is not None:
-                    match_currency = str(match_currency).strip().upper()
+                    match_currency = str(match_currency).strip()
+                    match_currency = (
+                        match_currency.upper()
+                        if match_currency and isinstance(match_currency, str) and len(match_currency) == 3
+                        else match_currency
+                    )
                     if output_currency is not None and match_currency != output_currency:
                         raise ConversionError("Mismatching currency in input value and currency argument")
                     output_currency = output_currency if isinstance(output_currency, BaseCurrency) else match_currency
@@ -176,7 +184,12 @@ class Money:
                 matches = re.match(r"^(?P<currency>[a-zA-Z]+)[ ]+(?P<amount>[-+]?[0-9.]+)$", amount)
             if matches:
                 amount = matches.group("amount").strip()
-                match_currency = matches.group("currency").strip().upper()
+                match_currency = matches.group("currency").strip()
+                match_currency = (
+                    match_currency.upper()
+                    if match_currency and isinstance(match_currency, str) and len(match_currency) == 3
+                    else match_currency
+                )
 
             if match_currency is not None:
                 if output_currency is not None and match_currency != output_currency:
@@ -213,7 +226,7 @@ class Money:
         if output_amount < Decimal(LOWEST_SUPPORTED_AMOUNT):
             raise ConversionError(f"Input amount is too low, min value is {LOWEST_SUPPORTED_AMOUNT}")
 
-        if output_currency and not re.match(r"^[A-Z]+$", str(output_currency)):
+        if output_currency and not re.match(r"^[A-Za-z]+$", str(output_currency)):
             raise ConversionError("Invalid currency")
 
         if output_amount == 0 and output_amount.is_signed():
