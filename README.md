@@ -169,7 +169,7 @@ sum(amounts)
 #### Conversion for other transport medium (for example Protocol Buffers)
 *Easily splittable into `units` and `nanos` for transport in network medium, for example using the [`google.type.Money` protobuf definition](https://github.com/googleapis/googleapis/blob/master/google/type/money.proto) when using Protocol Buffers.*
 ```python
-from stockholm import Currency, Money
+from stockholm import Money
 
 money = Money("22583.75", "SEK")
 money.units, money.nanos, str(money.currency)
