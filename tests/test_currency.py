@@ -1,3 +1,4 @@
+from decimal import Decimal
 import pytest
 
 from stockholm import BaseCurrency, Currency, Money
@@ -234,30 +235,54 @@ def test_currency_types() -> None:
 
     m = Money(4711, Currency.SEK, from_sub_units=True)
     assert m == "47.11"
+    assert m.sub_units == 4711
     m = Money(4711, Currency.SEK, from_sub_units=False)
     assert m == 4711
+    assert m.sub_units == 471100
     assert str(Money.from_sub_units(1000, Currency.SEK)) == "10.00 SEK"
 
     m = Money(1000, Currency.JPY, from_sub_units=True)
     assert m == 1000
+    assert m.sub_units == 1000
     m = Money(1000, Currency.JPY, from_sub_units=False)
     assert m == 1000
+    assert m.sub_units == 1000
     assert str(Money.from_sub_units(1000, Currency.JPY)) == "1000 JPY"
 
     m = Money(1000, Currency.IQD, from_sub_units=True)
     assert m == 1
+    assert m.sub_units == 1000
     m = Money(1000, Currency.IQD, from_sub_units=False)
     assert m == 1000
+    assert m.sub_units == 1000000
 
     m = Money(1000, Currency.CLF, from_sub_units=True)
     assert m == Money("0.1")
+    assert m.sub_units == 1000
     m = Money(1000, Currency.CLF, from_sub_units=False)
     assert m == 1000
+    assert m.sub_units == 10000000
     assert str(Money.from_sub_units(4711, Currency.CLF)) == "0.4711 CLF"
 
     assert str(Money.from_sub_units(471100)) == "4711.00"
     assert str(Money.from_sub_units(4711)) == "47.11"
     assert str(Money.from_sub_units(4711, "XXX")) == "47.11 XXX"
+    assert Money.from_sub_units(4711).sub_units == 4711
+    assert Money.from_sub_units(4711, "XXX").sub_units == 4711
+    assert Money("1").sub_units == 100
+    assert Money("0.1").sub_units == 10
+    assert Money("0.01").sub_units == 1
+    assert Money("0.001").sub_units == Decimal("0.1")
+
+    assert Money("1", Currency.JPY).sub_units == 1
+    assert Money("0.1", Currency.JPY).sub_units == Decimal("0.1")
+    assert Money("0.01", Currency.JPY).sub_units == Decimal("0.01")
+    assert Money("0.001", Currency.JPY).sub_units == Decimal("0.001")
+
+    assert Money("1", Currency.SEK, from_sub_units=True).sub_units == 1
+    assert Money("133742", Currency.SEK, from_sub_units=True).sub_units == 133742
+
+    assert str(Money.from_sub_units(Money("133742", Currency.SEK, from_sub_units=True).to_sub_units())) == "1337.42 SEK"
 
 
 def test_dogecoin():
