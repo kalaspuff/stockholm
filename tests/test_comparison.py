@@ -2,7 +2,7 @@ from typing import Any
 
 import pytest
 
-from stockholm import Money, CurrencyMismatchError
+from stockholm import CurrencyMismatchError, Money
 
 
 @pytest.mark.parametrize(
@@ -31,16 +31,16 @@ from stockholm import Money, CurrencyMismatchError
         (Money(4711, currency="EUR"), Money("4711.000000"), True),
         (Money(4711, currency="EUR"), 4711, True),
         (Money(4711, currency="EUR"), 1338, False),
-        (Money(100, is_cents=True), 1, True),
-        (Money(100, currency="SEK", is_cents=True), 1, True),
-        (Money(1, currency="SEK", is_cents=True), 1, False),
-        (Money(100, currency="SEK", is_cents=True), "1", True),
-        (Money(1, currency="SEK", is_cents=True), 0.01, True),
-        (Money(1, currency="SEK", is_cents=True), "0.01", True),
-        (Money(100, currency="SEK", is_cents=True), "1.00", True),
-        (Money(100, currency="SEK", is_cents=True), "1.00000", True),
-        (Money(100, currency="SEK", is_cents=True), "1.0001", False),
-        (Money(1, currency="SEK", is_cents=True), "1.0001", False),
+        (Money(100, from_sub_units=True), 1, True),
+        (Money(100, currency="SEK", from_sub_units=True), 1, True),
+        (Money(1, currency="SEK", from_sub_units=True), 1, False),
+        (Money(100, currency="SEK", from_sub_units=True), "1", True),
+        (Money(1, currency="SEK", from_sub_units=True), 0.01, True),
+        (Money(1, currency="SEK", from_sub_units=True), "0.01", True),
+        (Money(100, currency="SEK", from_sub_units=True), "1.00", True),
+        (Money(100, currency="SEK", from_sub_units=True), "1.00000", True),
+        (Money(100, currency="SEK", from_sub_units=True), "1.0001", False),
+        (Money(1, currency="SEK", from_sub_units=True), "1.0001", False),
         (Money(3.14), "3.1400", True),
         (Money(3.14), "3.1400 USD", True),
         (Money(3.14, currency="USD"), "3.1400 USD", True),
@@ -65,14 +65,14 @@ from stockholm import Money, CurrencyMismatchError
         (Money("1e5"), "1e5", True),
         (Money("1e5", currency="SEK"), "1e5", True),
         (Money("1e6", currency="SEK"), "1e5", False),
-        (Money("1e-2", currency="SEK"), Money(1, is_cents=True), True),
+        (Money("1e-2", currency="SEK"), Money(1, from_sub_units=True), True),
         (Money("-1e-2", currency="SEK"), -0.01, True),
-        (Money("1", currency="SEK"), Money("1e2", is_cents=True), True),
-        (Money(100, currency="SEK", is_cents=True), "SEK", False),
-        (Money(100, currency="SEK", is_cents=True), "SEK SEK", False),
-        (Money(100, currency="SEK", is_cents=True), "5,0 SEK", False),
-        (Money(100, currency="SEK", is_cents=True), "500 ;;;", False),
-        (Money(100, currency="SEK", is_cents=True), "1 USD", False),
+        (Money("1", currency="SEK"), Money("1e2", from_sub_units=True), True),
+        (Money(100, currency="SEK", from_sub_units=True), "SEK", False),
+        (Money(100, currency="SEK", from_sub_units=True), "SEK SEK", False),
+        (Money(100, currency="SEK", from_sub_units=True), "5,0 SEK", False),
+        (Money(100, currency="SEK", from_sub_units=True), "500 ;;;", False),
+        (Money(100, currency="SEK", from_sub_units=True), "1 USD", False),
     ],
 )
 def test_equal_comparison(money: Money, other: Any, expected: bool) -> None:

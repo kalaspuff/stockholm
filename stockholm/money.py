@@ -57,12 +57,13 @@ class Money:
         cls,
         iterable: Iterable,
         currency: Optional[Union[Type[DefaultCurrency], BaseCurrency, str]] = DefaultCurrency,
-        is_cents: Optional[bool] = None,
+        from_sub_units: Optional[bool] = None,
+        **kwargs: Any,
     ) -> "Money":
         return reduce(
-            lambda v, e: v + (e if isinstance(e, Money) else Money(e, is_cents=is_cents)),
+            lambda v, e: v + (e if isinstance(e, Money) else Money(e, from_sub_units=from_sub_units)),
             iterable,
-            Money(0, currency=currency, is_cents=is_cents),
+            Money(0, currency=currency, from_sub_units=from_sub_units),
         )
 
     @classmethod
@@ -73,7 +74,7 @@ class Money:
         self,
         amount: Optional[Union["Money", Decimal, int, float, str, object]] = None,
         currency: Optional[Union[Type[DefaultCurrency], BaseCurrency, str]] = DefaultCurrency,
-        is_cents: Optional[bool] = None,
+        from_sub_units: Optional[bool] = None,
         units: Optional[int] = None,
         nanos: Optional[int] = None,
         **kwargs: Any,
@@ -107,7 +108,7 @@ class Money:
         if (
             isinstance(amount, Money)
             and currency is DefaultCurrency
-            and is_cents is None
+            and from_sub_units is None
             and units is None
             and nanos is None
         ):
@@ -217,8 +218,12 @@ class Money:
         if output_amount.is_nan():
             raise ConversionError("Input amount is not a number")
 
-        if is_cents:
-            output_amount = output_amount / 100
+        if from_sub_units:
+            if output_currency and isinstance(output_currency, BaseCurrency):
+                if output_currency.decimal_digits != 0:
+                    output_amount = output_amount / Decimal(pow(10, output_currency.decimal_digits))
+            else:
+                output_amount = output_amount / 100
 
         if output_amount > Decimal(HIGHEST_SUPPORTED_AMOUNT):
             raise ConversionError(f"Input amount is too high, max value is {HIGHEST_SUPPORTED_AMOUNT}")
@@ -297,14 +302,14 @@ class Money:
     def is_zero(self) -> bool:
         return self._amount == 0
 
-    def add(self, other: Any, is_cents: Optional[bool] = None) -> "Money":
-        return self + Money(other, is_cents=is_cents)
+    def add(self, other: Any, from_sub_units: Optional[bool] = None) -> "Money":
+        return self + Money(other, from_sub_units=from_sub_units)
 
-    def subtract(self, other: Any, is_cents: Optional[bool] = None) -> "Money":
-        return self - Money(other, is_cents=is_cents)
+    def subtract(self, other: Any, from_sub_units: Optional[bool] = None) -> "Money":
+        return self - Money(other, from_sub_units=from_sub_units)
 
-    def sub(self, other: Any, is_cents: Optional[bool] = None) -> "Money":
-        return self.subtract(other, is_cents=is_cents)
+    def sub(self, other: Any, from_sub_units: Optional[bool] = None) -> "Money":
+        return self.subtract(other, from_sub_units=from_sub_units)
 
     def __setattr__(self, *args: Any) -> None:
         raise AttributeError("Attributes of monetary amounts cannot be changed")

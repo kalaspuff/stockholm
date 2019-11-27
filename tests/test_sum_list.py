@@ -2,7 +2,7 @@ from typing import Any, Optional
 
 import pytest
 
-from stockholm import Money, CurrencyMismatchError, ConversionError
+from stockholm import ConversionError, CurrencyMismatchError, Money
 
 
 @pytest.mark.parametrize(
@@ -37,10 +37,10 @@ def test_sum_list(values: Any, expected: Any, exception_expected: Optional[Excep
 
 def test_sum_list_cent_values() -> None:
     values = [471100, 10000, 509000, 350200, "313450", "900400", "1000", "100", 13999]
-    m = Money.sum(values, currency="SEK", is_cents=True)
+    m = Money.sum(values, currency="SEK", from_sub_units=True)
 
     assert isinstance(m, Money)
-    assert m == Money(2569249, currency="SEK", is_cents=True)
+    assert m == Money(2569249, currency="SEK", from_sub_units=True)
     assert m == Money("25692.49 SEK")
     assert str(m) == "25692.49 SEK"
 

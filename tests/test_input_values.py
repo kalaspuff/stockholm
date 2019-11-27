@@ -3,7 +3,7 @@ from typing import Any, Optional
 from decimal import Decimal
 import pytest
 
-from stockholm import Money, ConversionError
+from stockholm import ConversionError, Currency, Money
 
 
 @pytest.mark.parametrize(
@@ -88,11 +88,12 @@ from stockholm import Money, ConversionError
         (1, ";;;", ConversionError),
         ("1 ;;;", None, ConversionError),
         (";;; 1", None, ConversionError),
-        (Money(1, is_cents=True), None, None),
-        (Money(1.50, is_cents=True), None, None),
-        (Money("1.50", is_cents=True), None, None),
-        (Money(Decimal("150"), is_cents=True), None, None),
-        (Money(Money("150"), is_cents=True), None, None),
+        (Money(1, from_sub_units=True), None, None),
+        (Money(1.50, from_sub_units=True), None, None),
+        (Money("1.50", from_sub_units=True), None, None),
+        (Money(Decimal("150"), from_sub_units=True), None, None),
+        (Money(Money("150"), from_sub_units=True), None, None),
+        (Money(100), Currency.JPY, None),
         ("999999999999999999.999999999", None, None),
         ("-999999999999999999.999999999", None, None),
         ("999999999999999999.9999999999", None, ConversionError),
