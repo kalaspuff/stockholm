@@ -70,6 +70,14 @@ class Money:
     def _is_unknown_amount_type(cls, amount: Optional[Union["Money", Decimal, int, float, str, object]]) -> bool:
         return not any(map(lambda type_: isinstance(amount, type_), (Money, Decimal, int, bool, float, str)))
 
+    @classmethod
+    def from_sub_units(
+        cls,
+        amount: Optional[Union["Money", Decimal, int, float, str, object]],
+        currency: Optional[Union[Type[DefaultCurrency], BaseCurrency, str]] = DefaultCurrency,
+    ) -> "Money":
+        return Money(amount=amount, currency=currency, from_sub_units=True)
+
     def __init__(
         self,
         amount: Optional[Union["Money", Decimal, int, float, str, object]] = None,

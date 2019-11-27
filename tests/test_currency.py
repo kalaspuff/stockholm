@@ -232,11 +232,13 @@ def test_currency_types() -> None:
     assert m == "47.11"
     m = Money(4711, Currency.SEK, from_sub_units=False)
     assert m == 4711
+    assert str(Money.from_sub_units(1000, Currency.SEK)) == "10.00 SEK"
 
     m = Money(1000, Currency.JPY, from_sub_units=True)
     assert m == 1000
     m = Money(1000, Currency.JPY, from_sub_units=False)
     assert m == 1000
+    assert str(Money.from_sub_units(1000, Currency.JPY)) == "1000 JPY"
 
     m = Money(1000, Currency.IQD, from_sub_units=True)
     assert m == 1
@@ -247,6 +249,11 @@ def test_currency_types() -> None:
     assert m == Money("0.1")
     m = Money(1000, Currency.CLF, from_sub_units=False)
     assert m == 1000
+    assert str(Money.from_sub_units(4711, Currency.CLF)) == "0.4711 CLF"
+
+    assert str(Money.from_sub_units(471100)) == "4711.00"
+    assert str(Money.from_sub_units(4711)) == "47.11"
+    assert str(Money.from_sub_units(4711, "XXX")) == "47.11 XXX"
 
 
 def test_dogecoin():
