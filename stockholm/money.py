@@ -285,6 +285,20 @@ class Money:
         _, nanos = self._amount_tuple
         return int(nanos)
 
+    @property
+    def sub_units(self) -> Decimal:
+        if self._currency and isinstance(self._currency, BaseCurrency):
+            if self._currency.decimal_digits == 0:
+                output = self._amount
+            else:
+                output = self._amount * Decimal(pow(10, self._currency.decimal_digits))
+        else:
+            output = self._amount * 100
+
+        if output == output.to_integral():
+            return output.to_integral()
+        return output
+
     def as_string(self, *args: Any, **kwargs: Any) -> str:
         amount = self.amount_as_string(*args, **kwargs)
 
