@@ -21,11 +21,13 @@ Currencies to monetary amounts can be specified using either currencies built wi
 
 Currencies using the `stockholm.Currency` metaclasses can hold additional options, such as default number of decimals in string output. Note that the amounts are usually never behind the scenes and uses the same precision and backend as `Decimal` values and can as well be interchangable with such values.
 
+
 ## Installation with `pip`
 Like you would install any other Python package, use `pip`, `poetry`, `pipenv` or your weapon of choice.
 ```
 $ pip install stockholm
 ```
+
 
 ## Examples
 
@@ -155,6 +157,17 @@ Money.sum(amounts)
 sum(amounts)
 # <stockholm.Money: "1002.50">
 ```
+
+#### Conversion for other transport medium
+*Easily splittable into `units` and `nanos` for transport in network medium, for example using the `google.type.Money` [protobuf definition](https://github.com/googleapis/googleapis/blob/master/google/type/money.proto) when using Protocol Buffers.*
+```python
+from stockholm import Currency, Money
+
+money = Money("22583.75", Currency.SEK)
+money.units, money.nanos, str(money.currency)
+# (22583, 750000000, 'SEK')
+```
+
 
 ## Acknowledgements
 Built with inspiration from https://github.com/carlospalol/money and https://github.com/vimeo/py-money
