@@ -1,7 +1,7 @@
 from decimal import Decimal
 import pytest
 
-from stockholm import Money, InvalidOperandError
+from stockholm import InvalidOperandError, Money
 
 
 def test_simple_addition() -> None:
@@ -286,6 +286,6 @@ def test_object_arithmetics() -> None:
     with pytest.raises(Exception):
         assert m.add(1).add(2).add(3) == Money(6, currency="EUR")
 
-    m2 = Money(471100, is_cents=True)
-    assert m2.add(133800, is_cents=True) == Money(604900, is_cents=True)
-    assert m2.add(133800, is_cents=True) == Money("6049.00")
+    m2 = Money(471100, from_sub_units=True)
+    assert m2.add(133800, from_sub_units=True) == Money(604900, from_sub_units=True)
+    assert m2.add(133800, from_sub_units=True) == Money("6049.00")

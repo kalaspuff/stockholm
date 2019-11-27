@@ -3,7 +3,7 @@ from typing import Any, Optional
 from decimal import Decimal
 import pytest
 
-from stockholm import Money
+from stockholm import Currency, Money
 
 
 class ThirdPartyMoney:
@@ -20,7 +20,7 @@ class ThirdPartyMoney:
 
 
 @pytest.mark.parametrize(
-    "amount, currency, is_cents, expected",
+    "amount, currency, from_sub_units, expected",
     [
         ("0", None, False, "0.00"),
         ("1", None, False, "1.00"),
@@ -69,6 +69,10 @@ class ThirdPartyMoney:
         ("4711.999101000", "USD", False, "4711.999101 USD"),
         ("-0", None, False, "0.00"),
         (-0, None, False, "0.00"),
+        (100, Currency.SEK, True, "1.00 SEK"),
+        (100, Currency.IQD, True, "0.100 IQD"),
+        (100, Currency.SEK, False, "100.00 SEK"),
+        (100, Currency.IQD, False, "100.000 IQD"),
         (Money("-0.00"), None, False, "0.00"),
         (Money(0), None, False, "0.00"),
         (Money(1), None, False, "1.00"),
@@ -86,8 +90,8 @@ class ThirdPartyMoney:
         (ThirdPartyMoney(471150, "EUR"), "EUR", False, "4711.50 EUR"),
     ],
 )
-def test_basic_str_output(amount: Any, currency: Any, is_cents: Optional[bool], expected: str) -> None:
-    m = Money(amount, currency=currency, is_cents=is_cents)
+def test_basic_str_output(amount: Any, currency: Any, from_sub_units: Optional[bool], expected: str) -> None:
+    m = Money(amount, currency=currency, from_sub_units=from_sub_units)
     assert str(m) == expected
 
 

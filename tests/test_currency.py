@@ -228,6 +228,26 @@ def test_currency_types() -> None:
     assert f"{m1}" == "0.30285471 BTC"
     assert f"{m2}" == "0.30285471 BTC"
 
+    m = Money(4711, Currency.SEK, from_sub_units=True)
+    assert m == "47.11"
+    m = Money(4711, Currency.SEK, from_sub_units=False)
+    assert m == 4711
+
+    m = Money(1000, Currency.JPY, from_sub_units=True)
+    assert m == 1000
+    m = Money(1000, Currency.JPY, from_sub_units=False)
+    assert m == 1000
+
+    m = Money(1000, Currency.IQD, from_sub_units=True)
+    assert m == 1
+    m = Money(1000, Currency.IQD, from_sub_units=False)
+    assert m == 1000
+
+    m = Money(1000, Currency.CLF, from_sub_units=True)
+    assert m == Money("0.1")
+    m = Money(1000, Currency.CLF, from_sub_units=False)
+    assert m == 1000
+
 
 def test_dogecoin():
     class CustomDoge(BaseCurrency):

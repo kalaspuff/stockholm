@@ -1,6 +1,6 @@
 import pytest
 
-from stockholm import Money, CurrencyMismatchError
+from stockholm import CurrencyMismatchError, Money
 
 
 def test_sort_numbers() -> None:
@@ -15,7 +15,7 @@ def test_sort_numbers() -> None:
         Money("4711"),
         Money("0 SEK"),
         3.14,
-        Money("1e-2", currency="SEK", is_cents=True),
+        Money("1e-2", currency="SEK", from_sub_units=True),
         Money("-0.5 SEK"),
         -55,
         Money(0.4),
@@ -27,7 +27,7 @@ def test_sort_numbers() -> None:
         Money("-0.5 SEK"),
         Money("0"),
         Money("0 SEK"),
-        Money("1e-2", currency="SEK", is_cents=True),
+        Money("1e-2", currency="SEK", from_sub_units=True),
         Money(0.4),
         Money("1"),
         3.14,
@@ -58,7 +58,7 @@ def test_sort_with_strings() -> None:
         Money("0 SEK"),
         "1338",
         3.14,
-        Money("1e-2", currency="SEK", is_cents=True),
+        Money("1e-2", currency="SEK", from_sub_units=True),
         "0.3351 SEK",
         Money("-0.5 SEK"),
         -55,
@@ -71,7 +71,7 @@ def test_sort_with_strings() -> None:
         Money("-0.5 SEK"),
         Money("0"),
         Money("0 SEK"),
-        Money("1e-2", currency="SEK", is_cents=True),
+        Money("1e-2", currency="SEK", from_sub_units=True),
         "0.3351 SEK",
         Money(0.4),
         Money("1"),
@@ -109,7 +109,7 @@ def test_sorted_with_strings() -> None:
         Money("0 SEK"),
         "1338",
         3.14,
-        Money("1e-2", currency="SEK", is_cents=True),
+        Money("1e-2", currency="SEK", from_sub_units=True),
         "0.3351 SEK",
         Money("-0.5 SEK"),
         -55,
@@ -122,7 +122,7 @@ def test_sorted_with_strings() -> None:
         Money("-0.5 SEK"),
         Money("0"),
         Money("0 SEK"),
-        Money("1e-2", currency="SEK", is_cents=True),
+        Money("1e-2", currency="SEK", from_sub_units=True),
         "0.3351 SEK",
         Money(0.4),
         Money("1"),
