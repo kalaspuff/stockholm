@@ -333,6 +333,9 @@ class Money:
     def sub(self, other: Any, from_sub_units: Optional[bool] = None) -> "Money":
         return self.subtract(other, from_sub_units=from_sub_units)
 
+    def to_integral(self) -> "Money":
+        return self.__round__(0)
+
     def to_currency(self, currency: Optional[Union[BaseCurrency, str]]) -> "Money":
         return Money(self, currency=currency)
 
