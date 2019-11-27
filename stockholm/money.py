@@ -210,7 +210,7 @@ class Money:
             except Exception:
                 raise ConversionError("Value cannot be used as monetary amount")
         elif amount is not None and isinstance(amount, Money):
-            if amount.currency and not output_currency and currency is not DefaultCurrency:
+            if amount.currency and not output_currency and currency is DefaultCurrency:
                 output_currency = amount.currency
 
             output_amount = amount._amount
@@ -318,6 +318,19 @@ class Money:
 
     def sub(self, other: Any, from_sub_units: Optional[bool] = None) -> "Money":
         return self.subtract(other, from_sub_units=from_sub_units)
+
+    def to_currency(self, currency: Optional[Union[BaseCurrency, str]]) -> "Money":
+        return Money(self, currency=currency)
+
+    def to(self, currency: Optional[Union[BaseCurrency, str]]) -> "Money":
+        return self.to_currency(currency)
+
+    def to_sub_units(self) -> "Money":
+        if self._currency and isinstance(self._currency, BaseCurrency):
+            if self._currency.decimal_digits == 0:
+                return self
+            return self * Decimal(pow(10, self._currency.decimal_digits))
+        return self * 100
 
     def __setattr__(self, *args: Any) -> None:
         raise AttributeError("Attributes of monetary amounts cannot be changed")
