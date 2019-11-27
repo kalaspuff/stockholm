@@ -142,8 +142,10 @@ Money(money, currency="BTC")
 # <stockholm.Money: "0.30285471 BTC">
 
 cents_as_str = "471100"
-Money(cents_as_str, currency="USD", from_sub_units=True)
+money = Money(cents_as_str, currency="USD", from_sub_units=True)
 # <stockholm.Money: "4711.00 USD">
+money.sub_units
+# Decimal(471100)
 ```
 
 #### List arithmetics - summary of monetary amounts in list
