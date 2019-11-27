@@ -22,6 +22,8 @@ class MetaCurrency(type):
         attributedict["preferred_ticker"] = preferred_ticker if preferred_ticker else None
 
         attributedict["_meta"] = bool(not bases)
+        attributedict["as_string"] = lambda: str(attributedict["ticker"])
+        attributedict["as_str"] = lambda: str(attributedict["ticker"])
 
         result: Type[BaseCurrency] = type.__new__(cls, name, bases, attributedict)
         return result
@@ -117,6 +119,8 @@ class BaseCurrency(metaclass=MetaCurrency):
         object.__setattr__(self, "preferred_ticker", preferred_ticker if preferred_ticker else None)
 
         object.__setattr__(self, "_meta", False)
+        object.__setattr__(self, "as_string", lambda: str(self))
+        object.__setattr__(self, "as_str", lambda: str(self))
 
     def __setattr__(self, *args: Any) -> None:
         raise AttributeError("Attributes of currencies cannot be changed")

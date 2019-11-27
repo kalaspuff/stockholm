@@ -7,6 +7,8 @@ from stockholm.currency import Bitcoin, CLF, DOGE, DogeCoin, Ethereum, IQD, JPY,
 def test_currency():
     EUR = Currency("EUR")
     assert str(EUR) == "EUR"
+    assert EUR.as_string() == "EUR"
+    assert EUR.as_str() == "EUR"
     assert repr(EUR) == '<stockholm.Currency: "EUR">'
 
     assert repr(type(EUR)) == "<class 'stockholm.currency.Currency'>"
@@ -197,6 +199,8 @@ def test_currency_types() -> None:
     assert USD == Currency.USD
     assert USD != Currency.SEK
     assert Currency.USD == "USD"
+    assert Currency.USD.as_string() == "USD"
+    assert Currency.USD.as_str() == "USD"
 
     m = Money(57167, JPY)
     assert f"{m}" == "57167 JPY"
