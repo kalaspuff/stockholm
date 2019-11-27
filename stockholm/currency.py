@@ -7,6 +7,7 @@ class MetaCurrency(type):
     decimal_digits: int
     interchangeable_with: Optional[Union[Tuple[str, ...], List[str], Set[str]]]
     preferred_ticker: Optional[str]
+    _meta: bool
 
     def __new__(cls, name: str, bases: Tuple[type, ...], attributedict: Dict) -> "MetaCurrency":
         ticker = attributedict.get("ticker", attributedict.get("__qualname__"))
@@ -20,7 +21,9 @@ class MetaCurrency(type):
         attributedict["interchangeable_with"] = sorted(interchangeable_with) if interchangeable_with else None
         attributedict["preferred_ticker"] = preferred_ticker if preferred_ticker else None
 
-        result: Type[Currency] = type.__new__(cls, name, bases, attributedict)
+        attributedict["_meta"] = bool(not bases)
+
+        result: Type[BaseCurrency] = type.__new__(cls, name, bases, attributedict)
         return result
 
     def __setattr__(self, *args: Any) -> None:
@@ -30,9 +33,13 @@ class MetaCurrency(type):
         raise AttributeError("Attributes of currencies cannot be deleted")
 
     def __repr__(self) -> str:
+        if self._meta:
+            return "<class 'stockholm.currency.Currency'>"
         return f'<stockholm.Currency: "{self}">'
 
     def __str__(self) -> str:
+        if self._meta:
+            return "<class 'stockholm.currency.Currency'>"
         return self.ticker or ""
 
     def __format__(self, format_spec: str) -> str:
@@ -45,12 +52,12 @@ class MetaCurrency(type):
         if self.ticker:
             if not other:
                 return False
-            elif isinstance(other, Currency):
+            elif isinstance(other, BaseCurrency):
                 return bool(self.ticker == other.ticker)
             elif isinstance(other, str):
                 return bool(self.ticker == other)
         else:
-            if isinstance(other, Currency):
+            if isinstance(other, BaseCurrency):
                 return not other.ticker
             elif isinstance(other, str):
                 return bool(other == "")
@@ -61,7 +68,7 @@ class MetaCurrency(type):
 
     @property  # type: ignore
     def __class__(self) -> Any:
-        return Currency
+        return BaseCurrency
 
     def __hash__(self) -> int:
         return hash(
@@ -78,11 +85,12 @@ class MetaCurrency(type):
         return bool(self.ticker)
 
 
-class Currency(metaclass=MetaCurrency):
+class BaseCurrency(metaclass=MetaCurrency):
     ticker: str
     decimal_digits: int
     interchangeable_with: Optional[Union[Tuple[str, ...], List[str], Set[str]]]
     preferred_ticker: Optional[str]
+    _meta: bool
 
     def __init__(
         self,
@@ -91,7 +99,7 @@ class Currency(metaclass=MetaCurrency):
         interchangeable_with: Optional[Union[Tuple[str, ...], List[str], Set[str]]] = None,
         preferred_ticker: Optional[str] = None,
     ) -> None:
-        if currency and isinstance(currency, Currency):
+        if currency and isinstance(currency, BaseCurrency):
             object.__setattr__(self, "ticker", currency.ticker)
             decimal_digits = currency.decimal_digits if decimal_digits is None else decimal_digits
             interchangeable_with = (
@@ -107,6 +115,8 @@ class Currency(metaclass=MetaCurrency):
         object.__setattr__(self, "decimal_digits", 2 if decimal_digits is None else decimal_digits)
         object.__setattr__(self, "interchangeable_with", sorted(interchangeable_with) if interchangeable_with else None)
         object.__setattr__(self, "preferred_ticker", preferred_ticker if preferred_ticker else None)
+
+        object.__setattr__(self, "_meta", False)
 
     def __setattr__(self, *args: Any) -> None:
         raise AttributeError("Attributes of currencies cannot be changed")
@@ -130,12 +140,12 @@ class Currency(metaclass=MetaCurrency):
         if self.ticker:
             if not other:
                 return False
-            elif isinstance(other, Currency):
+            elif isinstance(other, BaseCurrency):
                 return bool(self.ticker == other.ticker)
             elif isinstance(other, str):
                 return bool(self.ticker == other)
         else:
-            if isinstance(other, Currency):
+            if isinstance(other, BaseCurrency):
                 return not other.ticker
             elif isinstance(other, str):
                 return bool(other == "")
@@ -154,1208 +164,1208 @@ class Currency(metaclass=MetaCurrency):
 
 
 # ISO 4217 currency codes
-class AED(Currency):
+class AED(BaseCurrency):
     pass
 
 
-class AFN(Currency):
+class AFN(BaseCurrency):
     pass
 
 
-class ALL(Currency):
+class ALL(BaseCurrency):
     pass
 
 
-class AMD(Currency):
+class AMD(BaseCurrency):
     pass
 
 
-class ANG(Currency):
+class ANG(BaseCurrency):
     pass
 
 
-class AOA(Currency):
+class AOA(BaseCurrency):
     pass
 
 
-class ARS(Currency):
+class ARS(BaseCurrency):
     pass
 
 
-class AUD(Currency):
+class AUD(BaseCurrency):
     pass
 
 
-class AWG(Currency):
+class AWG(BaseCurrency):
     pass
 
 
-class AZN(Currency):
+class AZN(BaseCurrency):
     pass
 
 
-class BAM(Currency):
+class BAM(BaseCurrency):
     pass
 
 
-class BBD(Currency):
+class BBD(BaseCurrency):
     pass
 
 
-class BDT(Currency):
+class BDT(BaseCurrency):
     pass
 
 
-class BGN(Currency):
+class BGN(BaseCurrency):
     pass
 
 
-class BHD(Currency):
+class BHD(BaseCurrency):
     pass
 
 
-class BIF(Currency):
+class BIF(BaseCurrency):
     decimal_digits = 2
 
 
-class BMD(Currency):
+class BMD(BaseCurrency):
     pass
 
 
-class BND(Currency):
+class BND(BaseCurrency):
     pass
 
 
-class BOB(Currency):
+class BOB(BaseCurrency):
     pass
 
 
-class BOV(Currency):
+class BOV(BaseCurrency):
     pass
 
 
-class BRL(Currency):
+class BRL(BaseCurrency):
     pass
 
 
-class BSD(Currency):
+class BSD(BaseCurrency):
     pass
 
 
-class BTN(Currency):
+class BTN(BaseCurrency):
     pass
 
 
-class BWP(Currency):
+class BWP(BaseCurrency):
     pass
 
 
-class BYN(Currency):
+class BYN(BaseCurrency):
     pass
 
 
-class BZD(Currency):
+class BZD(BaseCurrency):
     pass
 
 
-class CAD(Currency):
+class CAD(BaseCurrency):
     pass
 
 
-class CDF(Currency):
+class CDF(BaseCurrency):
     pass
 
 
-class CHE(Currency):
+class CHE(BaseCurrency):
     pass
 
 
-class CHF(Currency):
+class CHF(BaseCurrency):
     pass
 
 
-class CHW(Currency):
+class CHW(BaseCurrency):
     pass
 
 
-class CLF(Currency):
+class CLF(BaseCurrency):
     decimal_digits = 4
 
 
-class CLP(Currency):
+class CLP(BaseCurrency):
     decimal_digits = 0
 
 
-class CNY(Currency):
+class CNY(BaseCurrency):
     interchangeable_with = ("CNH", "RMB")
 
 
-class COP(Currency):
+class COP(BaseCurrency):
     pass
 
 
-class COU(Currency):
+class COU(BaseCurrency):
     pass
 
 
-class CRC(Currency):
+class CRC(BaseCurrency):
     pass
 
 
-class CUC(Currency):
+class CUC(BaseCurrency):
     pass
 
 
-class CUP(Currency):
+class CUP(BaseCurrency):
     pass
 
 
-class CVE(Currency):
+class CVE(BaseCurrency):
     pass
 
 
-class CZK(Currency):
+class CZK(BaseCurrency):
     pass
 
 
-class DJF(Currency):
+class DJF(BaseCurrency):
     decimal_digits = 0
 
 
-class DKK(Currency):
+class DKK(BaseCurrency):
     pass
 
 
-class DOP(Currency):
+class DOP(BaseCurrency):
     pass
 
 
-class DZD(Currency):
+class DZD(BaseCurrency):
     pass
 
 
-class EGP(Currency):
+class EGP(BaseCurrency):
     pass
 
 
-class ERN(Currency):
+class ERN(BaseCurrency):
     pass
 
 
-class ETB(Currency):
+class ETB(BaseCurrency):
     pass
 
 
-class EUR(Currency):
+class EUR(BaseCurrency):
     pass
 
 
-class FJD(Currency):
+class FJD(BaseCurrency):
     pass
 
 
-class FKP(Currency):
+class FKP(BaseCurrency):
     pass
 
 
-class GBP(Currency):
+class GBP(BaseCurrency):
     pass
 
 
-class GEL(Currency):
+class GEL(BaseCurrency):
     pass
 
 
-class GHS(Currency):
+class GHS(BaseCurrency):
     pass
 
 
-class GIP(Currency):
+class GIP(BaseCurrency):
     pass
 
 
-class GMD(Currency):
+class GMD(BaseCurrency):
     pass
 
 
-class GNF(Currency):
+class GNF(BaseCurrency):
     decimal_digits = 0
 
 
-class GTQ(Currency):
+class GTQ(BaseCurrency):
     pass
 
 
-class GYD(Currency):
+class GYD(BaseCurrency):
     pass
 
 
-class HKD(Currency):
+class HKD(BaseCurrency):
     pass
 
 
-class HNL(Currency):
+class HNL(BaseCurrency):
     pass
 
 
-class HRK(Currency):
+class HRK(BaseCurrency):
     pass
 
 
-class HTG(Currency):
+class HTG(BaseCurrency):
     pass
 
 
-class HUF(Currency):
+class HUF(BaseCurrency):
     pass
 
 
-class IDR(Currency):
+class IDR(BaseCurrency):
     pass
 
 
-class ILS(Currency):
+class ILS(BaseCurrency):
     interchangeable_with = ("NIS",)
 
 
-class INR(Currency):
+class INR(BaseCurrency):
     pass
 
 
-class IQD(Currency):
+class IQD(BaseCurrency):
     decimal_digits = 3
 
 
-class IRR(Currency):
+class IRR(BaseCurrency):
     pass
 
 
-class ISK(Currency):
+class ISK(BaseCurrency):
     decimal_digits = 0
 
 
-class JMD(Currency):
+class JMD(BaseCurrency):
     pass
 
 
-class JOD(Currency):
+class JOD(BaseCurrency):
     decimal_digits = 3
 
 
-class JPY(Currency):
+class JPY(BaseCurrency):
     decimal_digits = 0
 
 
-class KES(Currency):
+class KES(BaseCurrency):
     pass
 
 
-class KGS(Currency):
+class KGS(BaseCurrency):
     pass
 
 
-class KHR(Currency):
+class KHR(BaseCurrency):
     pass
 
 
-class KMF(Currency):
+class KMF(BaseCurrency):
     decimal_digits = 0
 
 
-class KPW(Currency):
+class KPW(BaseCurrency):
     pass
 
 
-class KRW(Currency):
+class KRW(BaseCurrency):
     decimal_digits = 0
 
 
-class KWD(Currency):
+class KWD(BaseCurrency):
     decimal_digits = 3
 
 
-class KYD(Currency):
+class KYD(BaseCurrency):
     pass
 
 
-class KZT(Currency):
+class KZT(BaseCurrency):
     pass
 
 
-class LAK(Currency):
+class LAK(BaseCurrency):
     pass
 
 
-class LBP(Currency):
+class LBP(BaseCurrency):
     pass
 
 
-class LKR(Currency):
+class LKR(BaseCurrency):
     pass
 
 
-class LRD(Currency):
+class LRD(BaseCurrency):
     pass
 
 
-class LSL(Currency):
+class LSL(BaseCurrency):
     pass
 
 
-class LYD(Currency):
+class LYD(BaseCurrency):
     decimal_digits = 3
 
 
-class MAD(Currency):
+class MAD(BaseCurrency):
     pass
 
 
-class MDL(Currency):
+class MDL(BaseCurrency):
     pass
 
 
-class MGA(Currency):
+class MGA(BaseCurrency):
     pass
 
 
-class MKD(Currency):
+class MKD(BaseCurrency):
     pass
 
 
-class MMK(Currency):
+class MMK(BaseCurrency):
     pass
 
 
-class MNT(Currency):
+class MNT(BaseCurrency):
     pass
 
 
-class MOP(Currency):
+class MOP(BaseCurrency):
     pass
 
 
-class MRU(Currency):
+class MRU(BaseCurrency):
     pass
 
 
-class MUR(Currency):
+class MUR(BaseCurrency):
     pass
 
 
-class MVR(Currency):
+class MVR(BaseCurrency):
     pass
 
 
-class MWK(Currency):
+class MWK(BaseCurrency):
     pass
 
 
-class MXN(Currency):
+class MXN(BaseCurrency):
     pass
 
 
-class MXV(Currency):
+class MXV(BaseCurrency):
     pass
 
 
-class MYR(Currency):
+class MYR(BaseCurrency):
     pass
 
 
-class MZN(Currency):
+class MZN(BaseCurrency):
     pass
 
 
-class NAD(Currency):
+class NAD(BaseCurrency):
     pass
 
 
-class NGN(Currency):
+class NGN(BaseCurrency):
     pass
 
 
-class NIO(Currency):
+class NIO(BaseCurrency):
     pass
 
 
-class NOK(Currency):
+class NOK(BaseCurrency):
     pass
 
 
-class NPR(Currency):
+class NPR(BaseCurrency):
     pass
 
 
-class NZD(Currency):
+class NZD(BaseCurrency):
     pass
 
 
-class OMR(Currency):
+class OMR(BaseCurrency):
     decimal_digits = 3
 
 
-class PAB(Currency):
+class PAB(BaseCurrency):
     pass
 
 
-class PEN(Currency):
+class PEN(BaseCurrency):
     pass
 
 
-class PGK(Currency):
+class PGK(BaseCurrency):
     pass
 
 
-class PHP(Currency):
+class PHP(BaseCurrency):
     pass
 
 
-class PKR(Currency):
+class PKR(BaseCurrency):
     pass
 
 
-class PLN(Currency):
+class PLN(BaseCurrency):
     pass
 
 
-class PYG(Currency):
+class PYG(BaseCurrency):
     decimal_digits = 0
 
 
-class QAR(Currency):
+class QAR(BaseCurrency):
     pass
 
 
-class RON(Currency):
+class RON(BaseCurrency):
     pass
 
 
-class RSD(Currency):
+class RSD(BaseCurrency):
     pass
 
 
-class RUB(Currency):
+class RUB(BaseCurrency):
     pass
 
 
-class RWF(Currency):
+class RWF(BaseCurrency):
     decimal_digits = 0
 
 
-class SAR(Currency):
+class SAR(BaseCurrency):
     pass
 
 
-class SBD(Currency):
+class SBD(BaseCurrency):
     pass
 
 
-class SCR(Currency):
+class SCR(BaseCurrency):
     pass
 
 
-class SDG(Currency):
+class SDG(BaseCurrency):
     pass
 
 
-class SEK(Currency):
+class SEK(BaseCurrency):
     pass
 
 
-class SGD(Currency):
+class SGD(BaseCurrency):
     pass
 
 
-class SHP(Currency):
+class SHP(BaseCurrency):
     pass
 
 
-class SLL(Currency):
+class SLL(BaseCurrency):
     pass
 
 
-class SOS(Currency):
+class SOS(BaseCurrency):
     pass
 
 
-class SRD(Currency):
+class SRD(BaseCurrency):
     pass
 
 
-class SSP(Currency):
+class SSP(BaseCurrency):
     pass
 
 
-class STN(Currency):
+class STN(BaseCurrency):
     pass
 
 
-class SVC(Currency):
+class SVC(BaseCurrency):
     pass
 
 
-class SYP(Currency):
+class SYP(BaseCurrency):
     pass
 
 
-class SZL(Currency):
+class SZL(BaseCurrency):
     pass
 
 
-class THB(Currency):
+class THB(BaseCurrency):
     pass
 
 
-class TJS(Currency):
+class TJS(BaseCurrency):
     pass
 
 
-class TMT(Currency):
+class TMT(BaseCurrency):
     pass
 
 
-class TND(Currency):
+class TND(BaseCurrency):
     decimal_digits = 3
 
 
-class TOP(Currency):
+class TOP(BaseCurrency):
     pass
 
 
-class TRY(Currency):
+class TRY(BaseCurrency):
     pass
 
 
-class TTD(Currency):
+class TTD(BaseCurrency):
     pass
 
 
-class TWD(Currency):
+class TWD(BaseCurrency):
     interchangeable_with = ("NTD",)
 
 
-class TZS(Currency):
+class TZS(BaseCurrency):
     pass
 
 
-class UAH(Currency):
+class UAH(BaseCurrency):
     pass
 
 
-class UGX(Currency):
+class UGX(BaseCurrency):
     decimal_digit = 0
 
 
-class USD(Currency):
+class USD(BaseCurrency):
     pass
 
 
-class USN(Currency):
+class USN(BaseCurrency):
     pass
 
 
-class UYI(Currency):
+class UYI(BaseCurrency):
     decimal_digits = 0
 
 
-class UYU(Currency):
+class UYU(BaseCurrency):
     pass
 
 
-class UYW(Currency):
+class UYW(BaseCurrency):
     decimal_digits = 4
 
 
-class UZS(Currency):
+class UZS(BaseCurrency):
     pass
 
 
-class VES(Currency):
+class VES(BaseCurrency):
     pass
 
 
-class VND(Currency):
+class VND(BaseCurrency):
     decimal_digits = 0
 
 
-class VUV(Currency):
+class VUV(BaseCurrency):
     decimal_digits = 0
 
 
-class WST(Currency):
+class WST(BaseCurrency):
     pass
 
 
-class XAF(Currency):
+class XAF(BaseCurrency):
     decimal_digits = 0
 
 
-class XAG(Currency):
+class XAG(BaseCurrency):
     pass
 
 
-class XAU(Currency):
+class XAU(BaseCurrency):
     pass
 
 
-class XBA(Currency):
+class XBA(BaseCurrency):
     pass
 
 
-class XBB(Currency):
+class XBB(BaseCurrency):
     pass
 
 
-class XBC(Currency):
+class XBC(BaseCurrency):
     pass
 
 
-class XBD(Currency):
+class XBD(BaseCurrency):
     pass
 
 
-class XCD(Currency):
+class XCD(BaseCurrency):
     pass
 
 
-class XDR(Currency):
+class XDR(BaseCurrency):
     pass
 
 
-class XOF(Currency):
+class XOF(BaseCurrency):
     decimal_digits = 0
 
 
-class XPD(Currency):
+class XPD(BaseCurrency):
     pass
 
 
-class XPF(Currency):
+class XPF(BaseCurrency):
     decimal_digits = 0
 
 
-class XPT(Currency):
+class XPT(BaseCurrency):
     pass
 
 
-class XSU(Currency):
+class XSU(BaseCurrency):
     pass
 
 
-class XTS(Currency):
+class XTS(BaseCurrency):
     pass
 
 
-class XUA(Currency):
+class XUA(BaseCurrency):
     pass
 
 
-class XXX(Currency):
+class XXX(BaseCurrency):
     pass
 
 
-class YER(Currency):
+class YER(BaseCurrency):
     pass
 
 
-class ZAR(Currency):
+class ZAR(BaseCurrency):
     pass
 
 
-class ZMW(Currency):
+class ZMW(BaseCurrency):
     pass
 
 
-class ZWL(Currency):
+class ZWL(BaseCurrency):
     pass
 
 
 # Unofficial currency codes
 
 
-class CNH(Currency):
+class CNH(BaseCurrency):
     interchangeable_with = ("CNY", "RMB")
     preferred_ticker = "CNY"
 
 
-class GGP(Currency):
+class GGP(BaseCurrency):
     pass
 
 
-class IMP(Currency):
+class IMP(BaseCurrency):
     pass
 
 
-class JED(Currency):
+class JED(BaseCurrency):
     pass
 
 
-class KID(Currency):
+class KID(BaseCurrency):
     pass
 
 
-class NIS(Currency):
+class NIS(BaseCurrency):
     interchangeable_with = ("ILS",)
     preferred_ticker = "ILS"
 
 
-class NTD(Currency):
+class NTD(BaseCurrency):
     interchangeable_with = ("TWD",)
     preferred_ticker = "TWD"
 
 
-class PRB(Currency):
+class PRB(BaseCurrency):
     pass
 
 
-class SLS(Currency):
+class SLS(BaseCurrency):
     pass
 
 
-class RMB(Currency):
+class RMB(BaseCurrency):
     interchangeable_with = ("CNH", "RMB")
     preferred_ticker = "CNY"
 
 
-class TVD(Currency):
+class TVD(BaseCurrency):
     pass
 
 
-class ZWB(Currency):
+class ZWB(BaseCurrency):
     pass
 
 
 # Historical currency codes
 
 
-class ADF(Currency):
+class ADF(BaseCurrency):
     pass
 
 
-class ADP(Currency):
+class ADP(BaseCurrency):
     decimal_digits = 0
 
 
-class AFA(Currency):
+class AFA(BaseCurrency):
     pass
 
 
-class AOK(Currency):
+class AOK(BaseCurrency):
     decimal_digits = 0
 
 
-class AON(Currency):
+class AON(BaseCurrency):
     decimal_digits = 0
 
 
-class AOR(Currency):
+class AOR(BaseCurrency):
     decimal_digits = 0
 
 
-class ARL(Currency):
+class ARL(BaseCurrency):
     pass
 
 
-class ARP(Currency):
+class ARP(BaseCurrency):
     pass
 
 
-class ARA(Currency):
+class ARA(BaseCurrency):
     pass
 
 
-class ATS(Currency):
+class ATS(BaseCurrency):
     pass
 
 
-class AZM(Currency):
+class AZM(BaseCurrency):
     decimal_digits = 0
 
 
-class BAD(Currency):
+class BAD(BaseCurrency):
     pass
 
 
-class BEF(Currency):
+class BEF(BaseCurrency):
     pass
 
 
-class BGL(Currency):
+class BGL(BaseCurrency):
     pass
 
 
-class BOP(Currency):
+class BOP(BaseCurrency):
     pass
 
 
-class BRB(Currency):
+class BRB(BaseCurrency):
     pass
 
 
-class BRC(Currency):
+class BRC(BaseCurrency):
     pass
 
 
-class BRN(Currency):
+class BRN(BaseCurrency):
     pass
 
 
-class BRE(Currency):
+class BRE(BaseCurrency):
     pass
 
 
-class BRR(Currency):
+class BRR(BaseCurrency):
     pass
 
 
-class BYB(Currency):
+class BYB(BaseCurrency):
     pass
 
 
-class BYR(Currency):
+class BYR(BaseCurrency):
     decimal_digits = 0
 
 
-class CSD(Currency):
+class CSD(BaseCurrency):
     pass
 
 
-class CSK(Currency):
+class CSK(BaseCurrency):
     pass
 
 
-class CYP(Currency):
+class CYP(BaseCurrency):
     pass
 
 
-class DDM(Currency):
+class DDM(BaseCurrency):
     pass
 
 
-class DEM(Currency):
+class DEM(BaseCurrency):
     pass
 
 
-class ECS(Currency):
+class ECS(BaseCurrency):
     decimal_digits = 0
 
 
-class ECV(Currency):
+class ECV(BaseCurrency):
     pass
 
 
-class EEK(Currency):
+class EEK(BaseCurrency):
     pass
 
 
-class ESA(Currency):
+class ESA(BaseCurrency):
     pass
 
 
-class ESB(Currency):
+class ESB(BaseCurrency):
     pass
 
 
-class ESP(Currency):
+class ESP(BaseCurrency):
     decimal_digits = 0
 
 
-class FIM(Currency):
+class FIM(BaseCurrency):
     pass
 
 
-class FRF(Currency):
+class FRF(BaseCurrency):
     pass
 
 
-class GNE(Currency):
+class GNE(BaseCurrency):
     pass
 
 
-class GHC(Currency):
+class GHC(BaseCurrency):
     decimal_digits = 0
 
 
-class GQE(Currency):
+class GQE(BaseCurrency):
     pass
 
 
-class GRD(Currency):
+class GRD(BaseCurrency):
     pass
 
 
-class GWP(Currency):
+class GWP(BaseCurrency):
     pass
 
 
-class HRD(Currency):
+class HRD(BaseCurrency):
     pass
 
 
-class IEP(Currency):
+class IEP(BaseCurrency):
     pass
 
 
-class ILP(Currency):
+class ILP(BaseCurrency):
     decimal_digits = 3
 
 
-class ILR(Currency):
+class ILR(BaseCurrency):
     pass
 
 
-class ISJ(Currency):
+class ISJ(BaseCurrency):
     pass
 
 
-class ITL(Currency):
+class ITL(BaseCurrency):
     decimal_digits = 0
 
 
-class LAJ(Currency):
+class LAJ(BaseCurrency):
     pass
 
 
-class LTL(Currency):
+class LTL(BaseCurrency):
     pass
 
 
-class LUF(Currency):
+class LUF(BaseCurrency):
     pass
 
 
-class LVL(Currency):
+class LVL(BaseCurrency):
     pass
 
 
-class MAF(Currency):
+class MAF(BaseCurrency):
     pass
 
 
-class MCF(Currency):
+class MCF(BaseCurrency):
     pass
 
 
-class MGF(Currency):
+class MGF(BaseCurrency):
     pass
 
 
-class MKN(Currency):
+class MKN(BaseCurrency):
     pass
 
 
-class MLF(Currency):
+class MLF(BaseCurrency):
     pass
 
 
-class MVQ(Currency):
+class MVQ(BaseCurrency):
     pass
 
 
-class MRO(Currency):
+class MRO(BaseCurrency):
     pass
 
 
-class MXP(Currency):
+class MXP(BaseCurrency):
     pass
 
 
-class MZM(Currency):
+class MZM(BaseCurrency):
     decimal_digits = 0
 
 
-class MTL(Currency):
+class MTL(BaseCurrency):
     pass
 
 
-class NIC(Currency):
+class NIC(BaseCurrency):
     pass
 
 
-class NLG(Currency):
+class NLG(BaseCurrency):
     pass
 
 
-class PEH(Currency):
+class PEH(BaseCurrency):
     pass
 
 
-class PEI(Currency):
+class PEI(BaseCurrency):
     pass
 
 
-class PLZ(Currency):
+class PLZ(BaseCurrency):
     pass
 
 
-class PTE(Currency):
+class PTE(BaseCurrency):
     decimal_digits = 0
 
 
-class ROL(Currency):
+class ROL(BaseCurrency):
     pass
 
 
-class RUR(Currency):
+class RUR(BaseCurrency):
     pass
 
 
-class SDD(Currency):
+class SDD(BaseCurrency):
     decimal_digits = 0
 
 
-class SDP(Currency):
+class SDP(BaseCurrency):
     pass
 
 
-class SIT(Currency):
+class SIT(BaseCurrency):
     pass
 
 
-class SKK(Currency):
+class SKK(BaseCurrency):
     pass
 
 
-class SML(Currency):
+class SML(BaseCurrency):
     decimal_digits = 0
 
 
-class SRG(Currency):
+class SRG(BaseCurrency):
     pass
 
 
-class STD(Currency):
+class STD(BaseCurrency):
     pass
 
 
-class SUR(Currency):
+class SUR(BaseCurrency):
     pass
 
 
-class TJR(Currency):
+class TJR(BaseCurrency):
     pass
 
 
-class TMM(Currency):
+class TMM(BaseCurrency):
     decimal_digits = 0
 
 
-class TPE(Currency):
+class TPE(BaseCurrency):
     pass
 
 
-class TRL(Currency):
+class TRL(BaseCurrency):
     decimal_digits = 0
 
 
-class UAK(Currency):
+class UAK(BaseCurrency):
     pass
 
 
-class UGS(Currency):
+class UGS(BaseCurrency):
     pass
 
 
-class USS(Currency):
+class USS(BaseCurrency):
     pass
 
 
-class UYP(Currency):
+class UYP(BaseCurrency):
     pass
 
 
-class UYN(Currency):
+class UYN(BaseCurrency):
     pass
 
 
-class VAL(Currency):
+class VAL(BaseCurrency):
     decimal_digits = 0
 
 
-class VEB(Currency):
+class VEB(BaseCurrency):
     pass
 
 
-class VEF(Currency):
+class VEF(BaseCurrency):
     pass
 
 
-class XEU(Currency):
+class XEU(BaseCurrency):
     pass
 
 
-class XFO(Currency):
+class XFO(BaseCurrency):
     pass
 
 
-class XFU(Currency):
+class XFU(BaseCurrency):
     pass
 
 
-class YDD(Currency):
+class YDD(BaseCurrency):
     pass
 
 
-class YUD(Currency):
+class YUD(BaseCurrency):
     pass
 
 
-class YUN(Currency):
+class YUN(BaseCurrency):
     pass
 
 
-class YUR(Currency):
+class YUR(BaseCurrency):
     pass
 
 
-class YUO(Currency):
+class YUO(BaseCurrency):
     pass
 
 
-class YUG(Currency):
+class YUG(BaseCurrency):
     pass
 
 
-class YUM(Currency):
+class YUM(BaseCurrency):
     pass
 
 
-class ZAL(Currency):
+class ZAL(BaseCurrency):
     pass
 
 
-class ZMK(Currency):
+class ZMK(BaseCurrency):
     pass
 
 
-class ZRZ(Currency):
+class ZRZ(BaseCurrency):
     decimal_digits = 3
 
 
-class ZRN(Currency):
+class ZRN(BaseCurrency):
     pass
 
 
-class ZWC(Currency):
+class ZWC(BaseCurrency):
     pass
 
 
-class ZWD(Currency):
+class ZWD(BaseCurrency):
     pass
 
 
-class ZWN(Currency):
+class ZWN(BaseCurrency):
     pass
 
 
-class ZWR(Currency):
+class ZWR(BaseCurrency):
     pass
 
 
 # Cryptocurrencies
 
 
-class Bitcoin(Currency):
+class Bitcoin(BaseCurrency):
     ticker = "BTC"
 
 
@@ -1363,25 +1373,25 @@ BTC = Bitcoin
 XBT = Bitcoin
 
 
-class Ethereum(Currency):
+class Ethereum(BaseCurrency):
     ticker = "ETH"
 
 
 ETH = Ethereum
 
 
-class XRP(Currency):
+class XRP(BaseCurrency):
     ticker = "XRP"
 
 
-class Tether(Currency):
+class Tether(BaseCurrency):
     ticker = "USDT"
 
 
 USDT = Tether
 
 
-class USDCoin(Currency):
+class USDCoin(BaseCurrency):
     ticker = "USDC"
 
 
@@ -1389,7 +1399,7 @@ CoinbaseUSDC = USDCoin
 USDC = USDCoin
 
 
-class BitcoinCash(Currency):
+class BitcoinCash(BaseCurrency):
     ticker = "BCH"
 
 
@@ -1397,44 +1407,62 @@ BCH = BitcoinCash
 XCH = BitcoinCash
 
 
-class LiteCoin(Currency):
+class LiteCoin(BaseCurrency):
     ticker = "LTC"
 
 
 LTC = LiteCoin
 
 
-class EOS(Currency):
+class EOS(BaseCurrency):
     ticker = "EOS"
 
 
-class BinanceCoin(Currency):
+class BinanceCoin(BaseCurrency):
     ticker = "BNB"
 
 
 BNB = BinanceCoin
 
 
-class StellarLumen(Currency):
+class StellarLumen(BaseCurrency):
     ticker = "XLM"
 
 
 XLM = StellarLumen
 
 
-class Monero(Currency):
+class Monero(BaseCurrency):
     ticker = "XMR"
 
 
 XMR = Monero
 
 
-class DogeCoin(Currency):
+class DogeCoin(BaseCurrency):
     ticker = "DOGE"
 
 
 DOGE = DogeCoin
 
 
-def get_currency(ticker: str) -> Currency:
-    return cast(Currency, getattr(sys.modules[__name__], ticker, Currency(ticker)))
+def get_currency(ticker: str) -> BaseCurrency:
+    return cast(BaseCurrency, getattr(sys.modules[__name__], ticker, BaseCurrency(ticker)))
+
+
+def all_currencies() -> List[str]:
+    return [ticker for ticker in dir(sys.modules[__name__]) if ticker and ticker == ticker.upper()]
+
+
+class Currency(type):
+    def __new__(cls, *args: Any, **kwargs: Any) -> BaseCurrency:  # type: ignore
+        result: BaseCurrency = BaseCurrency(*args, **kwargs)
+        return result
+
+    @staticmethod
+    def _load_currencies(currencies: List[str]) -> None:
+        for ticker in currencies:
+            setattr(Currency, ticker, getattr(sys.modules[__name__], ticker))
+
+
+Currency._load_currencies(all_currencies())
