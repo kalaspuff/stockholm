@@ -154,6 +154,11 @@ def test_custom_currency():
     assert c4 == c1
     assert c4 == "EUR"
 
+    CARLOS = Currency("CarlosCoin", decimal_digits=0)
+    assert CARLOS.ticker == "CarlosCoin"
+    m = Money(100, CARLOS)
+    assert str(m) == "100 CarlosCoin"
+
 
 def test_currency_hashable() -> None:
     EUR = Currency("EUR")
