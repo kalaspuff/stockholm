@@ -295,3 +295,19 @@ def test_currency_code_input() -> None:
         Money(1, currency=None, currency_code=Currency.JPY)
 
     assert str(Money(1, currency=None, currency_code="")) == "1.00"
+
+
+def test_value_input() -> None:
+    assert str(Money(value="4711.00 SEK")) == "4711.00 SEK"
+    assert str(Money(value="4711.00 SEK", currency_code="SEK")) == "4711.00 SEK"
+    assert str(Money(value="4711.00 SEK", currency=Currency.SEK)) == "4711.00 SEK"
+    assert str(Money(value="4711.00 SEK", currency=Currency.SEK, currency_code="SEK")) == "4711.00 SEK"
+    assert str(Money(value="4711.00", currency_code="SEK")) == "4711.00 SEK"
+    assert str(Money(value="4711.00", currency=Currency.SEK)) == "4711.00 SEK"
+    assert str(Money(value="4711.00")) == "4711.00"
+
+    with pytest.raises(ConversionError):
+        assert Money(value="4711.00 SEK", currency_code="JPY")
+
+    with pytest.raises(ConversionError):
+        assert Money(value="4711.00 SEK", currency=Currency.JPY)
