@@ -31,12 +31,7 @@ def test_asdict():
         "currency_code": "SEK",
     }
 
-    assert Money(1338, currency=Currency.SEK).keys() == [
-        "value",
-        "units",
-        "nanos",
-        "currency_code"
-    ]
+    assert Money(1338, currency=Currency.SEK).keys() == ["value", "units", "nanos", "currency_code"]
 
     assert Money(1338, currency=Currency.SEK)["units"] == 1338
     assert Money(1338, currency=Currency.SEK)["value"] == "1338.00 SEK"
