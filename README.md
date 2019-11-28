@@ -9,7 +9,9 @@
 
 An up to date human friendly and flexible approach for development with any kind of monetary amounts. No more working with floats or having to deal with having to think about values in subunits.
 
-At its bone a `Money` class for Python 3.x. This is a library to be used by backend and frontend API coders of fintech companies, web merchants and subscription services. It's great for calculations of amounts while keeping a great level of precision or producing output for transport layers. A simple, yet powerful way of coding with money.
+Basically a high-end `Money` class for Python 3.x. This is a library to be used by backend and frontend API coders of fintech companies, web merchants or subscription services. It's great for calculations of amounts while keeping a great level of precision or producing output for transport layers as well as having a robust and easy way to import/export values in JSON or Protocol Buffers and the alike. 
+
+*A simple, yet powerful way of coding with money.*
 
 ---
 
