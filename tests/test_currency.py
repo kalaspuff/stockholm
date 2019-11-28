@@ -292,6 +292,21 @@ def test_currency_types() -> None:
     assert str(Money.from_sub_units(Money("133742", Currency.SEK, from_sub_units=True).to_sub_units())) == "1337.42 SEK"
 
 
+def test_currency_constructors():
+    currency = Currency("NEW")
+    assert currency
+    assert currency.ticker == "NEW"
+
+    with pytest.raises(TypeError):
+        currency("NEW")
+
+    with pytest.raises(TypeError):
+        Currency.SEK("NEW")
+
+    with pytest.raises(TypeError):
+        JPY("NEW")
+
+
 def test_dogecoin():
     class CustomDoge(BaseCurrency):
         ticker = "DOGE"

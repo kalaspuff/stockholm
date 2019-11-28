@@ -9,6 +9,9 @@ class MetaCurrency(type):
     preferred_ticker: Optional[str]
     _meta: bool
 
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        print("test")
+
     def __new__(cls, name: str, bases: Tuple[type, ...], attributedict: Dict) -> "MetaCurrency":
         ticker = attributedict.get("ticker", attributedict.get("__qualname__"))
         decimal_digits = attributedict.get("decimal_digits", 2)
@@ -101,6 +104,9 @@ class BaseCurrency(metaclass=MetaCurrency):
         interchangeable_with: Optional[Union[Tuple[str, ...], List[str], Set[str]]] = None,
         preferred_ticker: Optional[str] = None,
     ) -> None:
+        if not self._meta:
+            raise TypeError("'BaseCurrency' object is not callable")
+
         if currency and isinstance(currency, BaseCurrency):
             object.__setattr__(self, "ticker", currency.ticker)
             decimal_digits = currency.decimal_digits if decimal_digits is None else decimal_digits
