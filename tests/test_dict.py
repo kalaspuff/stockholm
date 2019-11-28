@@ -1,3 +1,5 @@
+import json
+
 from stockholm import Money, Currency, get_currency
 
 
@@ -34,3 +36,10 @@ def test_from_dict():
     assert str(Money.from_dict(d).to_currency(get_currency(d.get("currency_code")))) == "13384711 JPY"
     assert str(Money(d)) == "13384711.00 JPY"
     assert str(Money(d, currency=get_currency(d.get("currency_code")))) == "13384711 JPY"
+
+
+def test_json():
+    money = Money("-999999999999999999.999999999")
+    json_string = json.dumps({"available": money.asdict()})
+
+    str(Money(json.loads(json_string).get("available"))) == "-999999999999999999.999999999"
