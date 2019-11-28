@@ -1,6 +1,6 @@
 from functools import reduce
 import re
-from typing import Any, Dict, Iterable, Optional, Tuple, Type, Union, cast
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Type, Union, cast
 
 import decimal
 from decimal import Decimal, ROUND_HALF_UP
@@ -111,11 +111,11 @@ class Money:
                 if len(nanos_str) != NANOS_LENGTH:
                     raise ValueError
                 sign = "-" if nanos < 0 or units < 0 else ""
-                new_amount = Decimal(f"{sign}{units_str}.{nanos_str}")
+                new_decimal = Decimal(f"{sign}{units_str}.{nanos_str}")
                 if amount is None:
-                    amount = new_amount
+                    amount = new_decimal
                 else:
-                    validate_amounts.append(new_amount)
+                    validate_amounts.append(new_decimal)
             except Exception:
                 raise ConversionError("Invalid values for 'units' and 'nanos'")
 
@@ -323,7 +323,7 @@ class Money:
         return int(nanos)
 
     @property
-    def value(self) -> int:
+    def value(self) -> str:
         return str(self)
 
     @property
@@ -346,11 +346,11 @@ class Money:
     def as_dict(self) -> Dict:
         return self.asdict()
 
-    def keys(self):
+    def keys(self) -> List:
         return list(self.asdict())
 
-    def __getitem__(self, key):
-        return self.asdict()[key]
+    def __getitem__(self, key: Any) -> Optional[Union[str, int]]:
+        return cast(Optional[Union[str, int]], self.asdict()[key])
 
     def as_string(self, *args: Any, **kwargs: Any) -> str:
         amount = self.amount_as_string(*args, **kwargs)
