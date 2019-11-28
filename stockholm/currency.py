@@ -11,9 +11,6 @@ class MetaCurrency(type):
     preferred_ticker: Optional[str]
     _meta: bool
 
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        print("test")
-
     def __new__(cls, name: str, bases: Tuple[type, ...], attributedict: Dict) -> "MetaCurrency":
         ticker = attributedict.get("ticker", attributedict.get("__qualname__"))
         decimal_digits = attributedict.get("decimal_digits", 2)
