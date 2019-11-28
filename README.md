@@ -7,9 +7,9 @@
 
 *Library for formatting and performing arithmetic and comparison operations on monetary amounts. Also with support for currency handling, exchange and network transport structure generation as well as parsing.*
 
-An up to date human friendly and flexible approach for development with any kind of monetary amounts.
+An up to date human friendly and flexible approach for development with any kind of monetary amounts. No more working with floats or having to deal with having to think about values in subunits.
 
-At its bone a `Money` class for Python 3.x. This is a library to be used by backend and frontend API coders of fintech companies, web merchants and subscription services. A simple, yet powerful way of coding with money.
+At its bone a `Money` class for Python 3.x. This is a library to be used by backend and frontend API coders of fintech companies, web merchants and subscription services. It's great for calculations of amounts while keeping a great level of precision or producing output for transport layers. A simple, yet powerful way of coding with money.
 
 ---
 
@@ -19,7 +19,7 @@ The `stockholm.Money` object has full arithmetic support together with `int`, `f
 #### `from stockholm import Currency`
 Currencies to monetary amounts can be specified using either currencies built with the `stockholm.Currency` metaclasses or simply by specifying the currency ticker as a string (for example `"SEK"` or `"EUR"`) when creating a new `Money` object.
 
-Currencies using the `stockholm.Currency` metaclasses can hold additional options, such as default number of decimals in string output. Note that the amounts are usually never behind the scenes and uses the same precision and backend as `Decimal` values and can as well be interchangable with such values.
+Currencies using the `stockholm.Currency` metaclasses can hold additional options, such as default number of decimals in string output. Note that the amounts behind the scenes actually uses the same precision and backend as `Decimal` values and can as well be interchangable with such values, as such they are way more exact to do calculations with than floating point values.
 
 
 ## Installation with `pip`
