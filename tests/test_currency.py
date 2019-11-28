@@ -303,6 +303,21 @@ def test_currency_to_money():
     assert str(stockholm.currency.Bitcoin.money("1.523")) == "1.523 BTC"
 
 
+def test_currency_constructors():
+    currency = Currency("NEW")
+    assert currency
+    assert currency.ticker == "NEW"
+
+    with pytest.raises(TypeError):
+        currency("NEW")
+
+    with pytest.raises(TypeError):
+        Currency.SEK("NEW")
+
+    with pytest.raises(TypeError):
+        JPY("NEW")
+
+
 def test_dogecoin():
     class CustomDoge(BaseCurrency):
         ticker = "DOGE"
