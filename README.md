@@ -170,7 +170,7 @@ sum(amounts)
 # <stockholm.Money: "1002.50">
 ```
 
-#### Conversion for other transport medium (for example Protocol Buffers)
+#### Conversion for other transport medium (for example Protocol Buffers or JSON)
 *Easily splittable into `units` and `nanos` for transport in network medium, for example using the [`google.type.Money` protobuf definition](https://github.com/googleapis/googleapis/blob/master/google/type/money.proto) when using Protocol Buffers.*
 ```python
 from stockholm import Money
