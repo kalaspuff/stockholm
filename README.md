@@ -191,7 +191,10 @@ dict(money)  # or by using: money.asdict()
 # {'value': '4711.75 SEK', 'units': 4711, 'nanos': 750000000, 'currency_code': 'SEK'}
 
 # A monetary amount object can be created from a dict either by passing dict directly
-# to the Money() constructor or by using Money.from_dict(dict_input).
+# to the Money() constructor or by using Money.from_dict(dict_input). Not all values
+# needs to be available in the input dict, either "units", "nanos", "value" or "amount"
+# should be specified or any combination of them, as long as values would result in the
+# same output monetary value.
 money = Money.from_dict({
     "value": "4711.75 SEK",
     "units": 4711,
