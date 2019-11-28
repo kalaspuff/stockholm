@@ -36,6 +36,7 @@ class MetaCurrency(type):
         from_sub_units: Optional[bool] = None,
         units: Optional[int] = None,
         nanos: Optional[int] = None,
+        value: Optional[Union["Money", Decimal, int, float, str]] = None,
         currency_code: Optional[str] = None,
         **kwargs: Any,
     ) -> "Money":
@@ -47,6 +48,7 @@ class MetaCurrency(type):
             from_sub_units=from_sub_units,
             units=units,
             nanos=nanos,
+            value=value,
             currency_code=currency_code,
             **kwargs,
         )
@@ -155,6 +157,7 @@ class BaseCurrency(metaclass=MetaCurrency):
         from_sub_units: Optional[bool] = None,
         units: Optional[int] = None,
         nanos: Optional[int] = None,
+        value: Optional[Union["Money", Decimal, int, float, str]] = None,
         currency_code: Optional[str] = None,
         **kwargs: Any,
     ) -> "Money":
@@ -166,6 +169,7 @@ class BaseCurrency(metaclass=MetaCurrency):
             from_sub_units=from_sub_units,
             units=units,
             nanos=nanos,
+            value=value,
             currency_code=currency_code,
             **kwargs,
         )

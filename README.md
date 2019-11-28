@@ -182,6 +182,25 @@ Money(units=22583, nanos=753820000, currency="SEK")
 # <stockholm.Money: "22583.75382 SEK">
 ```
 
+*Monetary amounts can also be exported to `dict` as well as created with `dict` value input, which can be great to for example transport a monetary value in JSON.*
+```python
+from stockholm import Money
+
+money = Money("4711.75", "SEK")
+dict(money)  # or by using: money.asdict()
+# {'value': '4711.75 SEK', 'units': 4711, 'nanos': 750000000, 'currency_code': 'SEK'}
+
+# A monetary amount object can be created from a dict either by passing dict directly
+# to the Money() constructor or by using Money.from_dict(dict_input).
+money = Money.from_dict({
+    "value": "4711.75 SEK",
+    "units": 4711,
+    "nanos": 750000000,
+    "currency_code': "SEK"
+})
+# <stockholm.Money: "4711.75 SEK">
+```
+
 
 ## Acknowledgements
 Built with inspiration from https://github.com/carlospalol/money and https://github.com/vimeo/py-money

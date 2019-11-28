@@ -1,6 +1,6 @@
 from functools import reduce
 import re
-from typing import Any, Iterable, Optional, Tuple, Type, Union, cast
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Type, Union, cast
 
 import decimal
 from decimal import Decimal, ROUND_HALF_UP
@@ -76,17 +76,23 @@ class Money:
         cls,
         amount: Optional[Union["Money", Decimal, int, float, str, object]],
         currency: Optional[Union[Type[DefaultCurrency], BaseCurrency, str]] = DefaultCurrency,
+        value: Optional[Union["Money", Decimal, int, float, str]] = None,
         currency_code: Optional[str] = None,
     ) -> "Money":
-        return Money(amount=amount, currency=currency, from_sub_units=True)
+        return Money(amount=amount, currency=currency, from_sub_units=True, value=value)
+
+    @classmethod
+    def from_dict(self, input_dict: Dict) -> "Money":
+        return Money(**input_dict)
 
     def __init__(
         self,
-        amount: Optional[Union["Money", Decimal, int, float, str, object]] = None,
+        amount: Optional[Union["Money", Decimal, Dict, int, float, str, object]] = None,
         currency: Optional[Union[Type[DefaultCurrency], BaseCurrency, str]] = DefaultCurrency,
         from_sub_units: Optional[bool] = None,
         units: Optional[int] = None,
         nanos: Optional[int] = None,
+        value: Optional[Union["Money", Decimal, int, float, str]] = None,
         currency_code: Optional[str] = None,
         **kwargs: Any,
     ) -> None:
@@ -105,23 +111,40 @@ class Money:
                 if len(nanos_str) != NANOS_LENGTH:
                     raise ValueError
                 sign = "-" if nanos < 0 or units < 0 else ""
-                new_amount = Decimal(f"{sign}{units_str}.{nanos_str}")
+                new_decimal = Decimal(f"{sign}{units_str}.{nanos_str}")
+                if amount is None:
+                    amount = new_decimal
+                else:
+                    validate_amounts.append(new_decimal)
+            except Exception:
+                raise ConversionError("Invalid values for 'units' and 'nanos'")
+
+        if value is not None:
+            try:
+                new_amount = Money(value)
+                if currency_code is None:
+                    currency_code = new_amount.currency_code
+                elif new_amount.currency_code and new_amount.currency_code != currency_code:
+                    raise ConversionError("Invalid value for 'value'")
                 if amount is None:
                     amount = new_amount
                 else:
-                    validate_amounts.append(new_amount)
+                    validate_amounts.append(new_amount.amount)
             except Exception:
-                raise ConversionError("Invalid values for units and nanos")
+                raise ConversionError("Invalid value for 'value'")
+
+        if amount is not None and isinstance(amount, Dict):
+            amount = Money.from_dict(amount)
 
         if amount is None:
             raise ConversionError("Missing input values for monetary amount")
 
         if currency is DefaultCurrency and currency_code:
             if not isinstance(currency_code, str):
-                raise ConversionError("Invalid currency value")
+                raise ConversionError("Invalid 'currency_code' value, must be string")
             currency = str(currency_code)
         elif currency is not DefaultCurrency and currency_code and str(currency) != str(currency_code):
-            raise ConversionError("Invalid currency value")
+            raise ConversionError("Invalid 'currency' value, does not match 'currency_code'")
 
         if (
             isinstance(amount, Money)
@@ -140,7 +163,7 @@ class Money:
             and not isinstance(currency, BaseCurrency)
             and currency is not None
         ):
-            raise ConversionError("Invalid currency value")
+            raise ConversionError("Invalid 'currency' value")
 
         output_amount = None
         output_currency: Optional[Union[BaseCurrency, str]] = None
@@ -183,7 +206,7 @@ class Money:
                         else match_currency
                     )
                     if output_currency is not None and match_currency != output_currency:
-                        raise ConversionError("Mismatching currency in input value and currency argument")
+                        raise ConversionError("Mismatching currency in input value and 'currency' argument")
                     output_currency = output_currency if isinstance(output_currency, BaseCurrency) else match_currency
 
                 amount = match_amount
@@ -212,13 +235,13 @@ class Money:
 
             if match_currency is not None:
                 if output_currency is not None and match_currency != output_currency:
-                    raise ConversionError("Mismatching currency in input value and currency argument")
+                    raise ConversionError("Mismatching currency in input value and 'currency' argument")
                 output_currency = output_currency if isinstance(output_currency, BaseCurrency) else match_currency
 
             try:
                 output_amount = Decimal(amount)
             except Exception:
-                raise ConversionError("Value cannot be used as monetary amount")
+                raise ConversionError("Input value cannot be used as monetary amount")
         elif amount is not None and isinstance(amount, Money):
             if amount.currency and not output_currency and currency is DefaultCurrency:
                 output_currency = amount.currency
@@ -250,13 +273,13 @@ class Money:
             raise ConversionError(f"Input amount is too low, min value is {LOWEST_SUPPORTED_AMOUNT}")
 
         if output_currency and not re.match(r"^[A-Za-z]+$", str(output_currency)):
-            raise ConversionError("Invalid currency")
+            raise ConversionError("Invalid 'currency' or 'currency_code'")
 
         if output_amount == 0 and output_amount.is_signed():
             output_amount = Decimal(0)
 
         if any([output_amount != a for a in validate_amounts]):
-            raise ConversionError("Input arguments does not match")
+            raise ConversionError("Values in input arguments does not match")
 
         object.__setattr__(self, "_amount", output_amount)
         object.__setattr__(self, "_currency", output_currency)
@@ -300,6 +323,10 @@ class Money:
         return int(nanos)
 
     @property
+    def value(self) -> str:
+        return str(self)
+
+    @property
     def sub_units(self) -> Decimal:
         if self._currency and isinstance(self._currency, BaseCurrency):
             if self._currency.decimal_digits == 0:
@@ -312,6 +339,18 @@ class Money:
         if output == output.to_integral():
             return output.to_integral()
         return output
+
+    def asdict(self) -> Dict:
+        return {"value": self.value, "units": self.units, "nanos": self.nanos, "currency_code": self.currency_code}
+
+    def as_dict(self) -> Dict:
+        return self.asdict()
+
+    def keys(self) -> List:
+        return list(self.asdict())
+
+    def __getitem__(self, key: Any) -> Optional[Union[str, int]]:
+        return cast(Optional[Union[str, int]], self.asdict()[key])
 
     def as_string(self, *args: Any, **kwargs: Any) -> str:
         amount = self.amount_as_string(*args, **kwargs)
