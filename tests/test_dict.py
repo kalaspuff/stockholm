@@ -1,5 +1,7 @@
 import json
 
+import pytest
+
 from stockholm import Money, Currency, get_currency
 
 
@@ -28,6 +30,19 @@ def test_asdict():
         "nanos": 100000000,
         "currency_code": "SEK",
     }
+
+    assert Money(1338, currency=Currency.SEK).keys() == [
+        "value",
+        "units",
+        "nanos",
+        "currency_code"
+    ]
+
+    assert Money(1338, currency=Currency.SEK)["units"] == 1338
+    assert Money(1338, currency=Currency.SEK)["value"] == "1338.00 SEK"
+
+    with pytest.raises(KeyError):
+        Money(1338, currency=Currency.SEK)["does_not_exist"]
 
 
 def test_from_dict():
