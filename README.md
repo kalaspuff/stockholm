@@ -137,7 +137,7 @@ Money("0.5")
 
 amount = Decimal(5000) / 3
 Money(amount, currency="XDR")
-# <stockholm.Money: "1666.666666667">
+# <stockholm.Money: "1666.666666667 XDR">
 
 money = Money("0.30285471")
 Money(money, currency="BTC")
@@ -147,7 +147,7 @@ cents_as_str = "471100"
 money = Money(cents_as_str, currency="USD", from_sub_units=True)
 # <stockholm.Money: "4711.00 USD">
 money.sub_units
-# Decimal(471100)
+# Decimal('471100')
 ```
 
 #### List arithmetics - summary of monetary amounts in list
@@ -201,7 +201,7 @@ money = Money.from_dict({
     "value": "4711.75 SEK",
     "units": 4711,
     "nanos": 750000000,
-    "currency_code': "SEK"
+    "currency_code": "SEK"
 })
 # <stockholm.Money: "4711.75 SEK">
 ```
