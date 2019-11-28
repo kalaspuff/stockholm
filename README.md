@@ -29,7 +29,7 @@ $ pip install stockholm
 ```
 
 
-## Examples
+## Usage and examples
 
 #### Arithmetics - fully supported
 *Full arithmetic support with different types, backed by `Decimal` for dealing with rounding errors, while also keeping the monetary amount fully currency aware.*
