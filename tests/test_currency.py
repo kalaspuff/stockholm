@@ -1,6 +1,7 @@
 from decimal import Decimal
 import pytest
 
+import stockholm
 from stockholm import BaseCurrency, Currency, Money
 from stockholm.currency import Bitcoin, CLF, DOGE, DogeCoin, Ethereum, IQD, JPY, USD, XBT, get_currency
 
@@ -290,6 +291,16 @@ def test_currency_types() -> None:
     assert Money("133742", Currency.SEK, from_sub_units=True).sub_units == 133742
 
     assert str(Money.from_sub_units(Money("133742", Currency.SEK, from_sub_units=True).to_sub_units())) == "1337.42 SEK"
+
+
+def test_currency_to_money():
+    currency = Currency("NEW")
+
+    assert str(currency.money(100)) == "100.00 NEW"
+    assert str(Currency.SEK.money(100)) == "100.00 SEK"
+    assert str(Currency.JPY.money(100)) == "100 JPY"
+    assert str(JPY.money(100)) == "100 JPY"
+    assert str(stockholm.currency.Bitcoin.money("1.523")) == "1.523 BTC"
 
 
 def test_currency_constructors():

@@ -1,6 +1,8 @@
 import sys
 from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union, cast
 
+from decimal import Decimal
+
 
 class MetaCurrency(type):
     ticker: str
@@ -30,6 +32,27 @@ class MetaCurrency(type):
 
         result: Type[BaseCurrency] = type.__new__(cls, name, bases, attributedict)
         return result
+
+    def money(
+        self,
+        amount: Optional[Union["Money", Decimal, int, float, str, object]] = None,
+        from_sub_units: Optional[bool] = None,
+        units: Optional[int] = None,
+        nanos: Optional[int] = None,
+        currency_code: Optional[str] = None,
+        **kwargs: Any,
+    ) -> "Money":
+        kwargs.pop("currency", None)
+
+        return Money(
+            amount,
+            currency=cast(BaseCurrency, self),
+            from_sub_units=from_sub_units,
+            units=units,
+            nanos=nanos,
+            currency_code=currency_code,
+            **kwargs,
+        )
 
     def __setattr__(self, *args: Any) -> None:
         raise AttributeError("Attributes of currencies cannot be changed")
@@ -127,6 +150,28 @@ class BaseCurrency(metaclass=MetaCurrency):
         object.__setattr__(self, "_meta", False)
         object.__setattr__(self, "as_string", lambda: str(self))
         object.__setattr__(self, "as_str", lambda: str(self))
+        object.__setattr__(self, "money", lambda *args, **kwargs: self._money(*args, **kwargs))
+
+    def _money(
+        self,
+        amount: Optional[Union["Money", Decimal, int, float, str, object]] = None,
+        from_sub_units: Optional[bool] = None,
+        units: Optional[int] = None,
+        nanos: Optional[int] = None,
+        currency_code: Optional[str] = None,
+        **kwargs: Any,
+    ) -> "Money":
+        kwargs.pop("currency", None)
+
+        return Money(
+            amount,
+            currency=self,
+            from_sub_units=from_sub_units,
+            units=units,
+            nanos=nanos,
+            currency_code=currency_code,
+            **kwargs,
+        )
 
     def __setattr__(self, *args: Any) -> None:
         raise AttributeError("Attributes of currencies cannot be changed")
@@ -1476,3 +1521,6 @@ class Currency(type):
 
 
 Currency._load_currencies(all_currencies())
+
+
+from stockholm.money import Money  # noqa
