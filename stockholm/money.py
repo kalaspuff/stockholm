@@ -38,14 +38,14 @@ _parse_format_specifier_regex = re.compile(
     re.VERBOSE,
 )
 
-M = TypeVar("M", bound="MoneyModel")
+MoneyType = TypeVar("MoneyType", bound="MoneyModel")
 
 
 class DefaultCurrency:
     pass
 
 
-class MoneyModel(Generic[M]):
+class MoneyModel(Generic[MoneyType]):
     __slots__ = ("_amount", "_currency")
     _amount: Decimal
     _currency: Optional[Union[BaseCurrency, str]]
@@ -62,9 +62,9 @@ class MoneyModel(Generic[M]):
         currency_code: Optional[str] = None,
         from_sub_units: Optional[bool] = None,
         **kwargs: Any,
-    ) -> M:
+    ) -> MoneyType:
         return cast(
-            M,
+            MoneyType,
             reduce(
                 lambda v, e: v + (e if isinstance(e, cls) else cls(e, from_sub_units=from_sub_units)),
                 iterable,
@@ -73,32 +73,32 @@ class MoneyModel(Generic[M]):
         )
 
     @classmethod
-    def _is_unknown_amount_type(cls, amount: Optional[Union[M, Decimal, int, float, str, object]]) -> bool:
+    def _is_unknown_amount_type(cls, amount: Optional[Union[MoneyType, Decimal, int, float, str, object]]) -> bool:
         return not any(map(lambda type_: isinstance(amount, type_), (Money, Decimal, int, bool, float, str)))
 
     @classmethod
     def from_sub_units(
-        cls: Type[M],
-        amount: Optional[Union[M, Decimal, int, float, str, object]],
+        cls: Type[MoneyType],
+        amount: Optional[Union[MoneyType, Decimal, int, float, str, object]],
         currency: Optional[Union[Type[DefaultCurrency], BaseCurrency, str]] = DefaultCurrency,
-        value: Optional[Union[M, Decimal, int, float, str]] = None,
+        value: Optional[Union[MoneyType, Decimal, int, float, str]] = None,
         currency_code: Optional[str] = None,
         **kwargs: Any,
-    ) -> M:
+    ) -> MoneyType:
         return cls(amount=amount, currency=currency, from_sub_units=True, value=value, **kwargs)
 
     @classmethod
-    def from_dict(cls: Type[M], input_dict: Dict) -> M:
+    def from_dict(cls: Type[MoneyType], input_dict: Dict) -> MoneyType:
         return cls(**input_dict)
 
     def __init__(
         self,
-        amount: Optional[Union[M, Decimal, Dict, int, float, str, object]] = None,
+        amount: Optional[Union[MoneyType, Decimal, Dict, int, float, str, object]] = None,
         currency: Optional[Union[Type[DefaultCurrency], BaseCurrency, str]] = DefaultCurrency,
         from_sub_units: Optional[bool] = None,
         units: Optional[int] = None,
         nanos: Optional[int] = None,
-        value: Optional[Union[M, Decimal, int, float, str]] = None,
+        value: Optional[Union[MoneyType, Decimal, int, float, str]] = None,
         currency_code: Optional[str] = None,
         **kwargs: Any,
     ) -> None:
@@ -127,7 +127,7 @@ class MoneyModel(Generic[M]):
 
         if value is not None:
             try:
-                new_amount = cast(M, self.__class__(value))
+                new_amount = cast(MoneyType, self.__class__(value))
                 if currency_code is None:
                     currency_code = new_amount.currency_code
                 elif new_amount.currency_code and new_amount.currency_code != currency_code:
@@ -140,7 +140,7 @@ class MoneyModel(Generic[M]):
                 raise ConversionError("Invalid value for 'value'")
 
         if amount is not None and isinstance(amount, Dict):
-            amount = cast(M, self.__class__.from_dict(amount))
+            amount = cast(MoneyType, self.__class__.from_dict(amount))
 
         if amount is None:
             raise ConversionError("Missing input values for monetary amount")
@@ -383,28 +383,28 @@ class MoneyModel(Generic[M]):
     def is_zero(self) -> bool:
         return self._amount == 0
 
-    def add(self, other: Any, from_sub_units: Optional[bool] = None) -> M:
+    def add(self, other: Any, from_sub_units: Optional[bool] = None) -> MoneyType:
         return self + self.__class__(other, from_sub_units=from_sub_units)
 
-    def subtract(self, other: Any, from_sub_units: Optional[bool] = None) -> M:
+    def subtract(self, other: Any, from_sub_units: Optional[bool] = None) -> MoneyType:
         return self - self.__class__(other, from_sub_units=from_sub_units)
 
-    def sub(self, other: Any, from_sub_units: Optional[bool] = None) -> M:
+    def sub(self, other: Any, from_sub_units: Optional[bool] = None) -> MoneyType:
         return self.subtract(other, from_sub_units=from_sub_units)
 
-    def to_integral(self) -> M:
+    def to_integral(self) -> MoneyType:
         return self.__round__(0)
 
-    def to_currency(self, currency: Optional[Union[BaseCurrency, str]]) -> M:
-        return cast(M, self.__class__(self, currency=currency))
+    def to_currency(self, currency: Optional[Union[BaseCurrency, str]]) -> MoneyType:
+        return cast(MoneyType, self.__class__(self, currency=currency))
 
-    def to(self, currency: Optional[Union[BaseCurrency, str]]) -> M:
+    def to(self, currency: Optional[Union[BaseCurrency, str]]) -> MoneyType:
         return self.to_currency(currency)
 
-    def to_sub_units(self) -> M:
+    def to_sub_units(self) -> MoneyType:
         if self._currency and isinstance(self._currency, BaseCurrency):
             if self._currency.decimal_digits == 0:
-                return cast(M, self)
+                return cast(MoneyType, self)
             return self * Decimal(pow(10, self._currency.decimal_digits))
         return self * 100
 
@@ -559,16 +559,16 @@ class MoneyModel(Generic[M]):
     def __bool__(self) -> bool:
         return bool(self._amount)
 
-    def _convert_other(self, other: Any, allow_currency_mismatch: bool = False) -> M:
+    def _convert_other(self, other: Any, allow_currency_mismatch: bool = False) -> MoneyType:
         if not isinstance(other, Money):
             try:
-                converted_other: M = cast(M, self.__class__(other))
+                converted_other: MoneyType = cast(MoneyType, self.__class__(other))
             except ConversionError as ex:
                 other_repr = repr(other)
                 self_repr = repr(self)
                 raise InvalidOperandError(f"Unable to perform operations on {self_repr} with {other_repr}") from ex
         else:
-            converted_other = cast(M, other)
+            converted_other = cast(MoneyType, other)
 
         if (
             not allow_currency_mismatch
@@ -580,7 +580,7 @@ class MoneyModel(Generic[M]):
 
         return converted_other
 
-    def _preferred_currency(self, other: M) -> Optional[Union[BaseCurrency, str]]:
+    def _preferred_currency(self, other: MoneyType) -> Optional[Union[BaseCurrency, str]]:
         currency = self._currency if self._currency and isinstance(self._currency, BaseCurrency) else None
         currency = other._currency if not currency and other._currency and isinstance(other, BaseCurrency) else None
         return currency or self._currency or other._currency
@@ -617,8 +617,8 @@ class MoneyModel(Generic[M]):
         converted_other = self._convert_other(other)
         return self._amount >= converted_other._amount
 
-    def __add__(self, other: Any) -> M:
-        cls: Type[M] = self.__class__ if self.__class__ == other.__class__ else Money
+    def __add__(self, other: Any) -> MoneyType:
+        cls: Type[MoneyType] = self.__class__ if self.__class__ == other.__class__ else Money
 
         converted_other = self._convert_other(other)
         amount = self._amount + converted_other._amount
@@ -626,11 +626,11 @@ class MoneyModel(Generic[M]):
 
         return cls(amount, currency=currency)
 
-    def __radd__(self, other: Any) -> M:
+    def __radd__(self, other: Any) -> MoneyType:
         return self.__add__(other)
 
-    def __sub__(self, other: Any) -> M:
-        cls: Type[M] = self.__class__ if self.__class__ == other.__class__ else Money
+    def __sub__(self, other: Any) -> MoneyType:
+        cls: Type[MoneyType] = self.__class__ if self.__class__ == other.__class__ else Money
 
         converted_other = self._convert_other(other)
         amount = self._amount - converted_other._amount
@@ -638,8 +638,8 @@ class MoneyModel(Generic[M]):
 
         return cls(amount, currency=currency)
 
-    def __rsub__(self, other: Any) -> M:
-        cls: Type[M] = self.__class__ if self.__class__ == other.__class__ else Money
+    def __rsub__(self, other: Any) -> MoneyType:
+        cls: Type[MoneyType] = self.__class__ if self.__class__ == other.__class__ else Money
 
         converted_other = self._convert_other(other)
         amount = converted_other._amount - self._amount
@@ -647,13 +647,13 @@ class MoneyModel(Generic[M]):
 
         return cls(amount, currency=currency)
 
-    def __mul__(self, other: Any) -> M:
-        cls: Type[M] = self.__class__ if self.__class__ == other.__class__ else Money
+    def __mul__(self, other: Any) -> MoneyType:
+        cls: Type[MoneyType] = self.__class__ if self.__class__ == other.__class__ else Money
 
         if not isinstance(other, Money):
             converted_other = self._convert_other(other)
         else:
-            converted_other = cast(M, other)
+            converted_other = cast(MoneyType, other)
 
         if converted_other._currency is not None and self._currency is not None:
             raise InvalidOperandError("Unable to multiply two monetary amounts with each other")
@@ -662,11 +662,11 @@ class MoneyModel(Generic[M]):
         currency = self._preferred_currency(converted_other)
         return cls(amount, currency=currency)
 
-    def __rmul__(self, other: Any) -> M:
+    def __rmul__(self, other: Any) -> MoneyType:
         return self.__mul__(other)
 
-    def __truediv__(self, other: Any) -> M:
-        cls: Type[M] = self.__class__ if self.__class__ == other.__class__ else Money
+    def __truediv__(self, other: Any) -> MoneyType:
+        cls: Type[MoneyType] = self.__class__ if self.__class__ == other.__class__ else Money
 
         converted_other = self._convert_other(other, allow_currency_mismatch=True)
 
@@ -680,8 +680,8 @@ class MoneyModel(Generic[M]):
 
         return cls(amount, currency=self._currency)
 
-    def __floordiv__(self, other: Any) -> M:
-        cls: Type[M] = self.__class__ if self.__class__ == other.__class__ else Money
+    def __floordiv__(self, other: Any) -> MoneyType:
+        cls: Type[MoneyType] = self.__class__ if self.__class__ == other.__class__ else Money
 
         converted_other = self._convert_other(other, allow_currency_mismatch=True)
 
@@ -695,8 +695,8 @@ class MoneyModel(Generic[M]):
 
         return cls(amount, currency=self._currency)
 
-    def __mod__(self, other: Any) -> M:
-        cls: Type[M] = self.__class__ if self.__class__ == other.__class__ else Money
+    def __mod__(self, other: Any) -> MoneyType:
+        cls: Type[MoneyType] = self.__class__ if self.__class__ == other.__class__ else Money
 
         converted_other = self._convert_other(other, allow_currency_mismatch=True)
         amount = self._amount % converted_other._amount
@@ -708,8 +708,8 @@ class MoneyModel(Generic[M]):
 
         return cls(amount, currency=currency)
 
-    def __divmod__(self, other: Any) -> Tuple[M, M]:
-        cls: Type[M] = self.__class__ if self.__class__ == other.__class__ else Money
+    def __divmod__(self, other: Any) -> Tuple[MoneyType, MoneyType]:
+        cls: Type[MoneyType] = self.__class__ if self.__class__ == other.__class__ else Money
 
         converted_other = self._convert_other(other, allow_currency_mismatch=True)
         quotient, remainder = divmod(self._amount, converted_other._amount)
@@ -724,13 +724,13 @@ class MoneyModel(Generic[M]):
 
         return cls(quotient, currency=currency), cls(remainder, currency=currency)
 
-    def __pow__(self, other: Any) -> M:
-        cls: Type[M] = self.__class__ if self.__class__ == other.__class__ else Money
+    def __pow__(self, other: Any) -> MoneyType:
+        cls: Type[MoneyType] = self.__class__ if self.__class__ == other.__class__ else Money
 
         if not isinstance(other, Money):
             converted_other = self._convert_other(other)
         else:
-            converted_other = cast(M, other)
+            converted_other = cast(MoneyType, other)
 
         if converted_other._currency is not None:
             raise InvalidOperandError("Unable to use a monetary amount as an exponent")
@@ -738,14 +738,14 @@ class MoneyModel(Generic[M]):
         amount = self._amount ** converted_other._amount
         return cls(amount, currency=self._currency)
 
-    def __neg__(self) -> M:
-        return cast(M, self.__class__(-self._amount, currency=self._currency))
+    def __neg__(self) -> MoneyType:
+        return cast(MoneyType, self.__class__(-self._amount, currency=self._currency))
 
-    def __pos__(self) -> M:
-        return cast(M, self.__class__(+self._amount, currency=self._currency))
+    def __pos__(self) -> MoneyType:
+        return cast(MoneyType, self.__class__(+self._amount, currency=self._currency))
 
-    def __abs__(self) -> M:
-        return cast(M, self.__class__(abs(self._amount), currency=self._currency))
+    def __abs__(self) -> MoneyType:
+        return cast(MoneyType, self.__class__(abs(self._amount), currency=self._currency))
 
     def __int__(self) -> int:
         return int(self._amount)
@@ -753,20 +753,20 @@ class MoneyModel(Generic[M]):
     def __float__(self) -> float:
         return float(self._amount)
 
-    def __round__(self, ndigits: int = 0) -> M:
+    def __round__(self, ndigits: int = 0) -> MoneyType:
         with decimal.localcontext(RoundingContext):
             amount = round(self._amount, ndigits)
 
-        return cast(M, self.__class__(amount, currency=self._currency))
+        return cast(MoneyType, self.__class__(amount, currency=self._currency))
 
 
 class Money(MoneyModel):
     @classmethod
     def from_sub_units(
         cls,
-        amount: Optional[Union[M, Decimal, int, float, str, object]],
+        amount: Optional[Union[MoneyType, Decimal, int, float, str, object]],
         currency: Optional[Union[Type[DefaultCurrency], BaseCurrency, str]] = DefaultCurrency,
-        value: Optional[Union[M, Decimal, int, float, str]] = None,
+        value: Optional[Union[MoneyType, Decimal, int, float, str]] = None,
         currency_code: Optional[str] = None,
         **kwargs: Any,
     ) -> "Money":

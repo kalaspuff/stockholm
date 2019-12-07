@@ -1,11 +1,11 @@
-from typing import Any, Dict, Optional, Type, Union
+from typing import Any, Dict, Optional, Type, Union, cast
 
 import decimal
 from decimal import Decimal, ROUND_HALF_UP
 
 from .currency import BaseCurrency
 from .exceptions import ConversionError
-from .money import DefaultCurrency, M, Money
+from .money import DefaultCurrency, Money, MoneyType
 
 RoundingContext = decimal.Context(rounding=ROUND_HALF_UP)
 
@@ -16,9 +16,9 @@ class Rate(Money):
     @classmethod
     def from_sub_units(
         cls,
-        amount: Optional[Union[M, Decimal, int, float, str, object]],
+        amount: Optional[Union[MoneyType, Decimal, int, float, str, object]],
         currency: Optional[Union[Type[DefaultCurrency], BaseCurrency, str]] = DefaultCurrency,
-        value: Optional[Union[M, Decimal, int, float, str]] = None,
+        value: Optional[Union[MoneyType, Decimal, int, float, str]] = None,
         currency_code: Optional[str] = None,
         **kwargs: Any,
     ) -> "Rate":
@@ -30,12 +30,12 @@ class Rate(Money):
 
     def __init__(
         self,
-        amount: Optional[Union[M, Decimal, Dict, int, float, str, object]] = None,
+        amount: Optional[Union[MoneyType, Decimal, Dict, int, float, str, object]] = None,
         currency: Optional[Union[Type[DefaultCurrency], BaseCurrency, str]] = DefaultCurrency,
         from_sub_units: Optional[bool] = None,
         units: Optional[int] = None,
         nanos: Optional[int] = None,
-        value: Optional[Union[M, Decimal, int, float, str]] = None,
+        value: Optional[Union[MoneyType, Decimal, int, float, str]] = None,
         currency_code: Optional[str] = None,
         **kwargs: Any,
     ) -> None:
@@ -45,7 +45,7 @@ class Rate(Money):
             raise ConversionError("Rates cannot be created from sub units")
 
         cls = self.__class__.__bases__[0]
-        money = cls(amount=amount, units=units, nanos=nanos, value=value, **kwargs)
+        money = cast(MoneyType, cls(amount=amount, units=units, nanos=nanos, value=value, **kwargs))
 
         if money._currency:
             raise ConversionError("Rates does not have a currency")
@@ -68,10 +68,10 @@ class Rate(Money):
     def asdict(self) -> Dict:
         return {"value": self.value, "units": self.units, "nanos": self.nanos}
 
-    def to_currency(self, currency: Optional[Union[BaseCurrency, str]]) -> M:
+    def to_currency(self, currency: Optional[Union[BaseCurrency, str]]) -> MoneyType:
         raise ConversionError("Rates does not have a currency")
 
-    def to_sub_units(self) -> M:
+    def to_sub_units(self) -> MoneyType:
         raise ConversionError("Rates cannot be measured in sub units")
 
     def __repr__(self) -> str:
