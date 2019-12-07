@@ -1,6 +1,6 @@
 from functools import reduce
 import re
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Type, Union, cast
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Type, TypeVar, Union, cast
 
 import decimal
 from decimal import Decimal, ROUND_HALF_UP
@@ -38,6 +38,8 @@ _parse_format_specifier_regex = re.compile(
     re.VERBOSE,
 )
 
+M = TypeVar('T', bound="Money")
+
 
 class DefaultCurrency:
     pass
@@ -50,7 +52,7 @@ class Money:
 
     @classmethod
     def sort(cls, iterable: Iterable, reverse: bool = False) -> Iterable:
-        return sorted(iterable, key=lambda x: x if isinstance(x, Money) else Money(x), reverse=reverse)
+        return sorted(iterable, key=lambda x: x if isinstance(x, cls) else cls(x), reverse=reverse)
 
     @classmethod
     def sum(
@@ -62,9 +64,9 @@ class Money:
         **kwargs: Any,
     ) -> "Money":
         return reduce(
-            lambda v, e: v + (e if isinstance(e, Money) else Money(e, from_sub_units=from_sub_units)),
+            lambda v, e: v + (e if isinstance(e, cls) else cls(e, from_sub_units=from_sub_units)),
             iterable,
-            Money(0, currency=currency, currency_code=currency_code, from_sub_units=from_sub_units),
+            cls(0, currency=currency, currency_code=currency_code, from_sub_units=from_sub_units),
         )
 
     @classmethod
@@ -78,11 +80,12 @@ class Money:
         currency: Optional[Union[Type[DefaultCurrency], BaseCurrency, str]] = DefaultCurrency,
         value: Optional[Union["Money", Decimal, int, float, str]] = None,
         currency_code: Optional[str] = None,
+        **kwargs: Any,
     ) -> "Money":
-        return Money(amount=amount, currency=currency, from_sub_units=True, value=value)
+        return cls(amount=amount, currency=currency, from_sub_units=True, value=value, **kwargs)
 
     @classmethod
-    def from_dict(self, input_dict: Dict) -> "Money":
+    def from_dict(cls, input_dict: Dict) -> "Money":
         return Money(**input_dict)
 
     def __init__(
@@ -612,27 +615,38 @@ class Money:
         return self._amount >= converted_other._amount
 
     def __add__(self, other: Any) -> "Money":
+        cls = self.__class__ if self.__class__ == other.__class__ else Money
+
         converted_other = self._convert_other(other)
         amount = self._amount + converted_other._amount
         currency = self._preferred_currency(converted_other)
-        return Money(amount, currency=currency)
+
+        return cls(amount, currency=currency)
 
     def __radd__(self, other: Any) -> "Money":
         return self.__add__(other)
 
     def __sub__(self, other: Any) -> "Money":
+        cls = self.__class__ if self.__class__ == other.__class__ else Money
+
         converted_other = self._convert_other(other)
         amount = self._amount - converted_other._amount
         currency = self._preferred_currency(converted_other)
-        return Money(amount, currency=currency)
+
+        return cls(amount, currency=currency)
 
     def __rsub__(self, other: Any) -> "Money":
+        cls = self.__class__ if self.__class__ == other.__class__ else Money
+
         converted_other = self._convert_other(other)
         amount = converted_other._amount - self._amount
         currency = self._preferred_currency(converted_other)
-        return Money(amount, currency=currency)
+
+        return cls(amount, currency=currency)
 
     def __mul__(self, other: Any) -> "Money":
+        cls = self.__class__ if self.__class__ == other.__class__ else Money
+
         if not isinstance(other, Money):
             converted_other = self._convert_other(other)
         else:
@@ -643,12 +657,14 @@ class Money:
 
         amount = self._amount * converted_other._amount
         currency = self._preferred_currency(converted_other)
-        return Money(amount, currency=currency)
+        return cls(amount, currency=currency)
 
     def __rmul__(self, other: Any) -> "Money":
         return self.__mul__(other)
 
     def __truediv__(self, other: Any) -> "Money":
+        cls = self.__class__ if self.__class__ == other.__class__ else Money
+
         converted_other = self._convert_other(other, allow_currency_mismatch=True)
 
         if converted_other.amount == 0:
@@ -657,11 +673,13 @@ class Money:
         amount = self._amount / converted_other._amount
 
         if converted_other._currency is not None:
-            return Money(amount, currency=None)
+            return cls(amount, currency=None)
 
-        return Money(amount, currency=self._currency)
+        return cls(amount, currency=self._currency)
 
     def __floordiv__(self, other: Any) -> "Money":
+        cls = self.__class__ if self.__class__ == other.__class__ else Money
+
         converted_other = self._convert_other(other, allow_currency_mismatch=True)
 
         if converted_other.amount == 0:
@@ -670,11 +688,13 @@ class Money:
         amount = self._amount // converted_other._amount
 
         if converted_other._currency is not None:
-            return Money(amount, currency=None)
+            return cls(amount, currency=None)
 
-        return Money(amount, currency=self._currency)
+        return cls(amount, currency=self._currency)
 
     def __mod__(self, other: Any) -> "Money":
+        cls = self.__class__ if self.__class__ == other.__class__ else Money
+
         converted_other = self._convert_other(other, allow_currency_mismatch=True)
         amount = self._amount % converted_other._amount
 
@@ -683,9 +703,11 @@ class Money:
         else:
             currency = self._currency
 
-        return Money(amount, currency=currency)
+        return cls(amount, currency=currency)
 
     def __divmod__(self, other: Any) -> Tuple["Money", "Money"]:
+        cls = self.__class__ if self.__class__ == other.__class__ else Money
+
         converted_other = self._convert_other(other, allow_currency_mismatch=True)
         quotient, remainder = divmod(self._amount, converted_other._amount)
 
@@ -695,11 +717,13 @@ class Money:
             currency = self._currency
 
         if converted_other._currency is not None:
-            return Money(quotient), Money(remainder, currency=currency)
+            return cls(quotient), cls(remainder, currency=currency)
 
-        return Money(quotient, currency=currency), Money(remainder, currency=currency)
+        return cls(quotient, currency=currency), cls(remainder, currency=currency)
 
     def __pow__(self, other: Any) -> "Money":
+        cls = self.__class__ if self.__class__ == other.__class__ else Money
+
         if not isinstance(other, Money):
             converted_other = self._convert_other(other)
         else:
@@ -709,16 +733,16 @@ class Money:
             raise InvalidOperandError("Unable to use a monetary amount as an exponent")
 
         amount = self._amount ** converted_other._amount
-        return Money(amount, currency=self._currency)
+        return cls(amount, currency=self._currency)
 
     def __neg__(self) -> "Money":
-        return Money(-self._amount, currency=self._currency)
+        return self.__class__(-self._amount, currency=self._currency)
 
     def __pos__(self) -> "Money":
-        return Money(+self._amount, currency=self._currency)
+        return self.__class__(+self._amount, currency=self._currency)
 
     def __abs__(self) -> "Money":
-        return Money(abs(self._amount), currency=self._currency)
+        return self.__class__(abs(self._amount), currency=self._currency)
 
     def __int__(self) -> int:
         return int(self._amount)
@@ -730,4 +754,4 @@ class Money:
         with decimal.localcontext(RoundingContext):
             amount = round(self._amount, ndigits)
 
-        return Money(amount, currency=self._currency)
+        return self.__class__(amount, currency=self._currency)
