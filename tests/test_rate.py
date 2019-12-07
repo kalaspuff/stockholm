@@ -44,6 +44,9 @@ def test_bad_rates():
         Rate(100, from_sub_units=True)
 
     with pytest.raises(ConversionError):
+        Rate.from_sub_units(100)
+
+    with pytest.raises(ConversionError):
         Rate(1).to_currency("SEK")
 
     with pytest.raises(ConversionError):
