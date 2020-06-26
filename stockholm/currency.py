@@ -1,7 +1,8 @@
 import sys
+from decimal import Decimal
 from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union, cast
 
-from decimal import Decimal
+from stockholm.money import Money  # noqa
 
 
 class MetaCurrency(type):
@@ -809,7 +810,7 @@ class UAH(BaseCurrency):
 
 
 class UGX(BaseCurrency):
-    decimal_digit = 0
+    decimal_digits = 0
 
 
 class USD(BaseCurrency):
@@ -1522,6 +1523,3 @@ class Currency(type):
 
 
 Currency._load_currencies(all_currencies())
-
-
-from stockholm.money import Money  # noqa
