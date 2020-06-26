@@ -1,4 +1,5 @@
 from decimal import Decimal
+
 import pytest
 
 from stockholm import InvalidOperandError, Money

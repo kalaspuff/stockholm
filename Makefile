@@ -13,7 +13,7 @@ pytest:
 	PYTHONPATH=. poetry run pytest --cov-report term-missing --cov=stockholm tests/
 
 flake8:
-	poetry run flake8 stockholm/ tests/
+	poetry run flake8 --isort-show-traceback stockholm/ tests/
 
 mypy:
 	poetry run mypy stockholm/
@@ -23,6 +23,9 @@ version:
 
 black:
 	poetry run black -l 120 stockholm/ tests/
+
+isort:
+	poetry run isort -rc stockholm/ tests/
 
 build:
 	rm -rf dist/

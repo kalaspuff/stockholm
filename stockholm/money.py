@@ -1,13 +1,11 @@
-from functools import reduce
+import decimal
 import re
+from decimal import ROUND_HALF_UP, Decimal
+from functools import reduce
 from typing import Any, Dict, Generic, Iterable, List, Optional, Tuple, Type, TypeVar, Union, cast
 
-import decimal
-from decimal import Decimal, ROUND_HALF_UP
-
 from .currency import BaseCurrency
-from .exceptions import CurrencyMismatchError, ConversionError, InvalidOperandError
-
+from .exceptions import ConversionError, CurrencyMismatchError, InvalidOperandError
 
 __all__ = ["Money"]
 

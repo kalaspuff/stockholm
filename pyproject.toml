@@ -29,6 +29,8 @@ python = "^3.6 || ^3.7 || ^3.8"
 [tool.poetry.dev-dependencies]
 flake8 = "^3.8.3"
 flake8-black = "^0.2.0"
+flake8-isort = "^3.0.0"
+isort = { version = "^4.3.21", extras = ["pyproject"] }
 pytest = "^5.4.3"
 pytest-cov = "^2.10"
 black = "=19.10b0"
@@ -38,3 +40,10 @@ codecov = "^2.1.7"
 [tool.black]
 line-length = 120
 target_version = ["py36", "py37", "py38"]
+
+[tool.isort]
+line_length = 120
+multi_line_output = 3
+use_parentheses = true
+include_trailing_comma = true
+#known_first_party = "stockholm"

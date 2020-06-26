@@ -1,6 +1,6 @@
+from decimal import Decimal
 from typing import Any, Optional
 
-from decimal import Decimal
 import pytest
 
 from stockholm import ConversionError, Currency, Money
