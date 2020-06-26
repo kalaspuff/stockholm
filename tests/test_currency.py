@@ -1,9 +1,10 @@
 from decimal import Decimal
+
 import pytest
 
 import stockholm
 from stockholm import BaseCurrency, Currency, Money
-from stockholm.currency import Bitcoin, CLF, DOGE, DogeCoin, Ethereum, IQD, JPY, USD, XBT, get_currency
+from stockholm.currency import CLF, DOGE, IQD, JPY, USD, XBT, Bitcoin, DogeCoin, Ethereum, get_currency
 
 
 def test_currency():

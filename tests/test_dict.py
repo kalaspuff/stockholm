@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from stockholm import Money, Currency, get_currency
+from stockholm import Currency, Money, get_currency
 
 
 def test_asdict():

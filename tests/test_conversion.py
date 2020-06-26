@@ -1,9 +1,9 @@
-import pytest
-
 from decimal import Decimal
 
-from stockholm import Currency, Money
+import pytest
+
 import stockholm.currency
+from stockholm import Currency, Money
 
 
 def test_conversion_extensions() -> None:

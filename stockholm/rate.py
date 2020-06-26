@@ -1,7 +1,6 @@
-from typing import Any, Dict, Optional, Type, Union, cast
-
 import decimal
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import ROUND_HALF_UP, Decimal
+from typing import Any, Dict, Optional, Type, Union, cast
 
 from .currency import BaseCurrency
 from .exceptions import ConversionError
