@@ -140,7 +140,7 @@ class MoneyModel(Generic[MoneyType]):
                 raise ConversionError("Invalid value for 'value'")
 
         if amount is not None and isinstance(amount, Dict):
-            amount = cast(MoneyType, self.__class__.from_dict(amount))
+            amount = self.__class__.from_dict(amount)
 
         if amount is None:
             raise ConversionError("Missing input values for monetary amount")

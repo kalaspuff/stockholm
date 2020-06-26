@@ -2,8 +2,6 @@ import sys
 from decimal import Decimal
 from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union, cast
 
-from stockholm.money import Money  # noqa
-
 
 class MetaCurrency(type):
     ticker: str
@@ -1523,3 +1521,5 @@ class Currency(type):
 
 
 Currency._load_currencies(all_currencies())
+
+from stockholm.money import Money  # noqa isort:skip
