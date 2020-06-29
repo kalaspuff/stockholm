@@ -41,11 +41,28 @@ def test_asdict():
 
 
 def test_from_dict():
-    d = {"value": "13384711 JPY", "units": 13384711, "nanos": 0, "currency_code": "JPY"}
-    assert str(Money.from_dict(d)) == "13384711.00 JPY"
-    assert str(Money.from_dict(d).to_currency(get_currency(d.get("currency_code")))) == "13384711 JPY"
-    assert str(Money(d)) == "13384711.00 JPY"
-    assert str(Money(d, currency=get_currency(d.get("currency_code")))) == "13384711 JPY"
+    input_dict = {"value": "13384711 JPY", "units": 13384711, "nanos": 0, "currency_code": "JPY"}
+    assert str(Money.from_dict(input_dict)) == "13384711.00 JPY"
+    assert str(Money.from_dict(input_dict).to_currency(get_currency(input_dict.get("currency_code")))) == "13384711 JPY"
+    assert str(Money(input_dict)) == "13384711.00 JPY"
+    assert str(Money(input_dict, currency=get_currency(input_dict.get("currency_code")))) == "13384711 JPY"
+
+
+def test_from_json():
+    input_value = '{"value": "13384711 JPY", "units": 13384711, "nanos": 0, "currency_code": "JPY"}'
+    assert str(Money.from_json(input_value)) == "13384711.00 JPY"
+    assert str(Money.from_json(input_value).to_currency(get_currency("JPY"))) == "13384711 JPY"
+    assert str(Money.from_json(input_value).to_currency(get_currency("SEK"))) == "13384711.00 SEK"
+    assert str(Money(input_value)) == "13384711.00 JPY"
+    assert str(Money(input_value, currency=get_currency("JPY"))) == "13384711 JPY"
+
+
+def test_from_protobuf():
+    input_value = b"\n\x03USD\x10\x90\xf0\x84\x02\x18\x80\xbc\xe7\xd1\x01"
+    assert str(Money.from_protobuf(input_value)) == "4274192.44 USD"
+    assert str(Money.from_proto(input_value)) == "4274192.44 USD"
+    assert str(Money.from_protobuf(input_value).to_currency("SEK")) == "4274192.44 SEK"
+    assert str(Money(input_value)) == "4274192.44 USD"
 
 
 def test_json():

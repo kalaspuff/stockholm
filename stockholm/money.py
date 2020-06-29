@@ -1,4 +1,5 @@
 import decimal
+import json
 import re
 from decimal import ROUND_HALF_UP, Decimal
 from functools import reduce
@@ -6,6 +7,35 @@ from typing import Any, Dict, Generic, Iterable, List, Optional, Tuple, Type, Ty
 
 from .currency import BaseCurrency
 from .exceptions import ConversionError, CurrencyMismatchError, InvalidOperandError
+
+try:
+    from google.protobuf.message import Message as ProtoMessage
+except Exception:  # pragma: no cover
+
+    class ProtoMessage(object):  # type: ignore
+        pass
+
+
+try:
+    from .proto.money_pb2 import Money as MoneyProtoMessage
+except Exception:  # pragma: no cover
+
+    class MoneyProtoMessage(object):  # type: ignore
+        def __init__(self, *args: Any, **kwargs: Any) -> None:
+            raise Exception("google.protobuf package not installed")
+
+        def SerializeToString(self, *args: Any, **kwargs: Any) -> None:
+            raise Exception("google.protobuf package not installed")
+
+        def FromString(self, *args: Any, **kwargs: Any) -> None:
+            raise Exception("google.protobuf package not installed")
+
+        def ParseFromString(self, *args: Any, **kwargs: Any) -> None:
+            raise Exception("google.protobuf package not installed")
+
+        def MergeFromString(self, *args: Any, **kwargs: Any) -> None:
+            raise Exception("google.protobuf package not installed")
+
 
 __all__ = ["Money"]
 
@@ -88,6 +118,27 @@ class MoneyModel(Generic[MoneyType]):
     @classmethod
     def from_dict(cls: Type[MoneyType], input_dict: Dict) -> MoneyType:
         return cls(**input_dict)
+
+    @classmethod
+    def from_json(cls: Type[MoneyType], input_value: Union[str, bytes]) -> MoneyType:
+        return cls(**json.loads(input_value))
+
+    @classmethod
+    def from_protobuf(
+        cls: Type[MoneyType],
+        input_value: Union[str, bytes, object],
+        proto_class: Type[ProtoMessage] = MoneyProtoMessage,
+    ) -> MoneyType:
+        if input_value is not None and isinstance(input_value, bytes):
+            input_value = proto_class.FromString(input_value)
+
+        return cls(
+            **{
+                k: getattr(input_value, k)
+                for k in ("value", "units", "nanos", "amount", "currency", "currency_code", "from_sub_units",)
+                if hasattr(input_value, k)
+            }
+        )
 
     def __init__(
         self,
@@ -179,6 +230,32 @@ class MoneyModel(Generic[MoneyType]):
                 output_currency = (
                     output_currency.upper() if output_currency and len(output_currency) == 3 else output_currency
                 )
+
+        if amount is not None and (
+            (isinstance(amount, str) and len(amount) > 1 and amount[0] == "{")
+            or (isinstance(amount, bytes) and len(amount) > 1 and amount[0] == 123)
+        ):
+            try:
+                amount = str(self.__class__.from_dict(json.loads(amount)))
+            except Exception:
+                pass
+
+        if amount is not None and isinstance(amount, bytes):
+            try:
+                amount = MoneyProtoMessage.FromString(amount)
+            except Exception:
+                pass
+
+        if amount is not None and isinstance(amount, ProtoMessage):
+            amount = str(
+                self.__class__.from_dict(
+                    {
+                        k: getattr(amount, k)
+                        for k in ("value", "units", "nanos", "amount", "currency", "currency_code", "from_sub_units",)
+                        if hasattr(amount, k)
+                    }
+                )
+            )
 
         if Money._is_unknown_amount_type(amount):
             try:
@@ -374,6 +451,55 @@ class MoneyModel(Generic[MoneyType]):
 
     def as_float(self) -> float:
         return float(self)
+
+    def as_json(self, keys: Union[List[str], Tuple[str, ...]] = ("value", "units", "nanos", "currency_code")) -> str:
+        mapping = {
+            "value": self.value,
+            "units": self.units,
+            "nanos": self.nanos,
+            "amount": str(self.amount),
+            "currency": self.currency_code,
+            "currency_code": self.currency_code,
+            "from_sub_units": False,
+            "sub_units": self.sub_units,
+        }
+
+        output = {k: mapping.get(k) for k in keys if k in mapping}
+        return json.dumps(output)
+
+    def json(self, keys: Union[List[str], Tuple[str, ...]] = ("value", "units", "nanos", "currency_code")) -> str:
+        return self.as_json(keys=keys)
+
+    def as_protobuf(self, proto_class: Type[ProtoMessage] = MoneyProtoMessage) -> ProtoMessage:
+        message = proto_class()
+
+        mapping = {
+            "value": self.value,
+            "units": self.units,
+            "nanos": self.nanos,
+            "amount": str(self.amount),
+            "currency": self.currency_code,
+            "currency_code": self.currency_code,
+            "from_sub_units": False,
+        }
+
+        for k, v in mapping.items():
+            if hasattr(message, k):
+                try:
+                    setattr(message, k, type(getattr(message, k))(v))
+                except TypeError:  # pragma: no cover
+                    pass
+
+        return message
+
+    def as_proto(self, proto_class: Type[ProtoMessage] = MoneyProtoMessage) -> ProtoMessage:
+        return self.as_protobuf(proto_class=proto_class)
+
+    def protobuf(self, proto_class: Type[ProtoMessage] = MoneyProtoMessage) -> ProtoMessage:
+        return self.as_protobuf(proto_class=proto_class)
+
+    def proto(self, proto_class: Type[ProtoMessage] = MoneyProtoMessage) -> ProtoMessage:
+        return self.as_protobuf(proto_class=proto_class)
 
     def is_signed(self) -> bool:
         return self._amount.is_signed()
@@ -778,3 +904,28 @@ class Money(MoneyModel):
     @classmethod
     def from_dict(cls, input_dict: Dict) -> "Money":
         return cls(**input_dict)
+
+    @classmethod
+    def from_json(cls, input_value: Union[str, bytes]) -> "Money":
+        return cls(**json.loads(input_value))
+
+    @classmethod
+    def from_protobuf(
+        cls, input_value: Union[str, bytes, object], proto_class: Type[ProtoMessage] = MoneyProtoMessage
+    ) -> "Money":
+        if input_value is not None and isinstance(input_value, bytes):
+            input_value = proto_class.FromString(input_value)
+
+        return cls(
+            **{
+                k: getattr(input_value, k)
+                for k in ("value", "units", "nanos", "amount", "currency", "currency_code", "from_sub_units",)
+                if hasattr(input_value, k)
+            }
+        )
+
+    @classmethod
+    def from_proto(
+        cls, input_value: Union[str, bytes, object], proto_class: Type[ProtoMessage] = MoneyProtoMessage
+    ) -> "Money":
+        return cls.from_protobuf(input_value, proto_class=proto_class)

@@ -3,7 +3,7 @@ from typing import Any, Optional
 
 import pytest
 
-from stockholm import ConversionError, Currency, Money
+from stockholm import ConversionError, Currency, Money, MoneyProtoMessage
 
 
 @pytest.mark.parametrize(
@@ -108,6 +108,21 @@ from stockholm import ConversionError, Currency, Money
         (Decimal("Infinity"), None, ConversionError),
         (Decimal("-Infinity"), None, ConversionError),
         (Decimal("NaN"), None, ConversionError),
+        (b"\n\x03EUR\x10\x01\x18\x80\xca\xb5\xee\x01", None, None),
+        (b"\n\x03EUR\x10\x01\x18\x80\xca\xb5\xee\x01", "EUR", None),
+        (b"\n\x03EUR\x10\x01\x18\x80\xca\xb5\xee\x01", "SEK", ConversionError),
+        (b"\x10\xe7$", None, None),
+        (b"\x10\xe7$ SEK", None, ConversionError),
+        ('{"value": "31338.13", "currency_code": "NOK"}', None, None),
+        (b'{"value": "31338.13", "currency_code": "NOK"}', None, None),
+        (b'{"value": "31338.13", "currency_code": "NOK"}', "NOK", None),
+        (b'{"value": "31338.13", "currency_code": "NOK"}', "EUR", ConversionError),
+        (b'{"val": "31338.13"}', None, ConversionError),
+        (b'{"val": "31338.13"', None, ConversionError),
+        (b"{1}", None, ConversionError),
+        ("{1}", None, ConversionError),
+        (MoneyProtoMessage.FromString(b"\n\x03EUR\x10\x01\x18\x80\xca\xb5\xee\x01"), None, None),
+        (MoneyProtoMessage.FromString(b""), None, None),
     ],
 )
 def test_input_values(amount: Any, currency: Any, exception_expected: Optional[Exception]) -> None:

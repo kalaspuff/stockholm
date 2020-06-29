@@ -3,7 +3,7 @@ from typing import Any
 
 import pytest
 
-from stockholm import Money
+from stockholm import Money, MoneyProtoMessage
 
 
 @pytest.mark.parametrize(
@@ -84,6 +84,23 @@ def test_info_methods() -> None:
     assert m.as_float() == float(m)
     assert m.is_zero() is False
     assert m.is_signed() is False
+
+    assert m.as_json() == '{"value": "4711.75 EUR", "units": 4711, "nanos": 750000000, "currency_code": "EUR"}'
+    assert m.json() == '{"value": "4711.75 EUR", "units": 4711, "nanos": 750000000, "currency_code": "EUR"}'
+
+    assert type(m.as_protobuf()) is MoneyProtoMessage
+    assert m.as_protobuf().currency_code == "EUR"
+    assert m.as_protobuf().units == 4711
+    assert m.as_protobuf().nanos == 750000000
+    assert m.as_protobuf().SerializeToString() == b"\n\x03EUR\x10\xe7$\x18\x80\xaf\xd0\xe5\x02"
+    assert m.as_proto().SerializeToString() == b"\n\x03EUR\x10\xe7$\x18\x80\xaf\xd0\xe5\x02"
+    assert m.protobuf().SerializeToString() == b"\n\x03EUR\x10\xe7$\x18\x80\xaf\xd0\xe5\x02"
+    assert m.proto().SerializeToString() == b"\n\x03EUR\x10\xe7$\x18\x80\xaf\xd0\xe5\x02"
+
+    assert type(m.as_protobuf(proto_class=MoneyProtoMessage)) is MoneyProtoMessage
+
+    with pytest.raises(TypeError):
+        m.as_protobuf(proto_class=None)
 
     assert Money(0).is_zero() is True
     assert Money(0).is_signed() is False

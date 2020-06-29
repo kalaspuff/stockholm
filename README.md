@@ -1,4 +1,6 @@
-# `stockholm` — `Money` for Python 3
+# `stockholm`
+**This brings a fully featured `Money` class for Python 3 – `stockholm.Money`.**
+
 [![pypi](https://badge.fury.io/py/stockholm.svg)](https://pypi.python.org/pypi/stockholm/)
 [![Made with Python](https://img.shields.io/pypi/pyversions/stockholm)](https://www.python.org/)
 [![Type hinted - mypy validated](https://img.shields.io/badge/typehinted-yes-teal)](https://github.com/kalaspuff/stockholm)
@@ -9,7 +11,11 @@
 
 An up to date human friendly and flexible approach for development with any kind of monetary amounts. No more working with floats or having to deal with having to think about values in subunits.
 
-Basically a high-end `Money` class for Python 3.x. This is a library to be used by backend and frontend API coders of fintech companies, web merchants or subscription services. It's great for calculations of amounts while keeping a great level of precision or producing output for transport layers as well as having a robust and easy way to import/export values in JSON or Protocol Buffers and the alike. 
+Basically a high-end `Money` class for Python 3.x. This is a library to be used by backend and frontend API coders of fintech companies, web merchants or subscription services. It's great for calculations of amounts while keeping a great level of precision or producing output for transport layers as well as having a robust and easy way to import/export values in *GraphQL*, *JSON* and / or *Protocol Buffers*, etc.
+
+```python
+from stockholm import Money
+```
 
 *A simple, yet powerful way of coding with money.*
 
@@ -25,10 +31,21 @@ Currencies using the `stockholm.Currency` metaclasses can hold additional option
 
 
 ## Installation with `pip`
-Like you would install any other Python package, use `pip`, `poetry`, `pipenv` or your weapon of choice.
+Like you would install any other Python package, use `pip`, `poetry`, `pipenv` or your favourite tool.
 ```
 $ pip install stockholm
 ```
+
+
+## Documentation shortcuts: 
+
+* [**Arithmetics – works with loads of compatible types – completely currency aware.**](#arithmetics---fully-supported)
+* [**Instantiating a monetary amount in many flexible ways.**](#input-data-types-in-flexible-variants)
+* [**Using `stockholm.Money` monetary amount with Protocol Buffers.**](#using-protocol-buffers-for-transporting-monetary-amounts-over-the-network)
+* [**Conversion between dicts, JSON and values for use in GraphQL or other JSON-based API:s:**](#conversion-for-other-transport-medium-for-example-protocol-buffers-or-json)
+  - [**Using dict values for input and output / having GraphQL in mind.**](#monetary-amounts-can-also-be-exported-to-dict-as-well-as-created-with-dict-value-input-which-can-be-great-to-for-example-transport-a-monetary-value-in-json)
+  - [**Parsing and loading JSON data.**](#reading-or-outputting-monetary-amounts-as-json)
+* [**Parameters and functions of the `stockholm.Money` object.**](#parameters-of-the-money-object)
 
 
 ## Usage and examples
@@ -54,6 +71,46 @@ print(round(output / 3, 4))
 
 print(round(output / 3, 1))
 # 4828.20 SEK
+
+# Note that you can only do arithmetics on two monetary amounts which shares the
+# same currency, monetary amounts that doesn't hold a currency at all or an
+# operation between a currency aware monetary object and a value that doesn't hold
+# data about a currency.
+# Look at the following examples of completely legit operations.
+
+Money("100 SEK") + Money("50 SEK")
+# <stockholm.Money: "150.00 SEK">
+
+Money("100 EUR") * 20 + 5 - 3.5
+# <stockholm.Money: "2001.50 EUR">
+
+Money("100 USD") - Money("10")
+# <stockholm.Money: "90.00 USD">
+
+Money("100") - Money("50") + 20
+# <stockholm.Money: "70.00">
+
+Money("100") + Money(2, currency="GBP")
+# <stockholm.Money: "102.00 GBP">
+
+Money("100", currency="EUR") + Money("10 EUR") - 50 + "20.51 EUR"
+# <stockholm.Money: "80.51 EUR">
+
+# And here's operations that tries to use two amounts with different currencies.
+
+Money("100", currency="SEK") + Money("10 EUR")
+# ! This results in a stockholm.exceptions.CurrencyMismatchError exception
+
+Money(1) + Money("55 EUR") + Money(10, currency="EUR").to_currency("USD")
+# ! This results in a stockholm.exceptions.CurrencyMismatchError exception
+
+# Also note that you cannot multiply two currency aware monetary amounts by each
+# other, for example say "5 EUR" * "5 EUR", that in that case would've resulted
+# in "25 EUR EUR". A monetary amount can only hold one instance of currency.
+
+Money("5 EUR") * Money("5 EUR")
+# ! This results in a stockholm.exceptions.InvalidOperandError exception
+
 ```
 
 #### Formatting / Advanced string formatting
@@ -91,7 +148,7 @@ print(f"{sek_money:.4M}")  # SEK 119889.5760
 print(f"{sek_money:c}")  # SEK
 ```
 
-*Use `stockholm.Currency` types for proper defaults of minimum number of decimal digits to output in strings, etc. All ISO 4217 currency codes implemented, see https://github.com/kalaspuff/stockholm/blob/master/stockholm/currency.py for the full list.*
+##### *Use `stockholm.Currency` types for proper defaults of minimum number of decimal digits to output in strings, etc. All ISO 4217 currency codes implemented, see https://github.com/kalaspuff/stockholm/blob/master/stockholm/currency.py for the full list.*
 ```python
 from stockholm import Currency, Money, get_currency
 from stockholm.currency import JPY, SEK, EUR, IQD, USDCoin, Bitcoin
@@ -143,6 +200,9 @@ money = Money("0.30285471")
 Money(money, currency="BTC")
 # <stockholm.Money: "0.30285471 BTC">
 
+# Reading values as "sub units" (multiplied by 100) can come in handy when parsing
+# some older types of banking files, where all values are presented as strings in
+# cents / ören / etc.
 cents_as_str = "471100"
 money = Money(cents_as_str, currency="USD", from_sub_units=True)
 # <stockholm.Money: "4711.00 USD">
@@ -171,7 +231,8 @@ sum(amounts)
 ```
 
 #### Conversion for other transport medium (for example Protocol Buffers or JSON)
-*Easily splittable into `units` and `nanos` for transport in network medium, for example using the [`google.type.Money` protobuf definition](https://github.com/googleapis/googleapis/blob/master/google/type/money.proto) when using Protocol Buffers.*
+
+##### *Easily splittable into `units` and `nanos` for transport in network medium, for example using the [`google.type.Money` protobuf definition](https://github.com/googleapis/googleapis/blob/master/google/type/money.proto) when using Protocol Buffers.*
 ```python
 from stockholm import Money
 
@@ -184,7 +245,7 @@ Money(units=22583, nanos=753820000, currency="SEK")
 # <stockholm.Money: "22583.75382 SEK">
 ```
 
-*Monetary amounts can also be exported to `dict` as well as created with `dict` value input, which can be great to for example transport a monetary value in JSON.*
+##### *Monetary amounts can also be exported to `dict` as well as created with `dict` value input, which can be great to for example transport a monetary value in JSON.*
 ```python
 from stockholm import Money
 
@@ -204,6 +265,218 @@ money = Money.from_dict({
     "currency_code": "SEK"
 })
 # <stockholm.Money: "4711.75 SEK">
+```
+
+##### *Using Protocol Buffers for transporting monetary amounts over the network.*
+```python
+from stockholm import Money
+
+# By default we're utilizing Google's protobuf message called google.type.Money, however
+# the protobuf class can be overriden with your own if using similar keys and value types.
+# https://github.com/googleapis/googleapis/blob/master/google/type/money.proto
+
+money = Money("4711.75", "SEK")
+money.as_protobuf()
+# This will produce a protobuf object which by default holds values for units, nanos and
+# currency_code as per the google.type.Money protobuf message definition.
+# Use money.as_protobuf(proto_class=YourProtoClass) if you're using custom messages that
+# are not of Google's proto message type.
+#
+# To get the exact byte output produced from the proto class, call their
+# SerailizeToString() function.
+money.as_protobuf().SerializeToString()
+# b'\n\x03SEK\x10\xe7$\x18\x80\xaf\xd0\xe5\x02'
+
+# Of course we can also instantiate a monetary amount object by passing a proto message,
+# either by using the already parsed proto object, or by passing the byte data directly.
+# If no proto_class keyword argument is specified, we'll once again default to
+# google.type.Money.
+money = Money.from_protobuf(b'\n\x03SEK\x10\xe7$\x18\x80\xaf\xd0\xe5\x02')
+# <stockholm.Money: "4711.75 SEK">
+
+# In another example we'll build the message just before hand to be extra descriptive
+# of what's happening. The stockholm.MoneyProtoMessage class is a compiled Python
+# representation of the google.type.Money protobuf message definition. You can also use
+# your own custom class.
+from stockholm import MoneyProtoMessage
+message = MoneyProtoMessage()
+message.units = 2549
+message.nanos = 990000000
+# If you're using custom classes that aren't generated from google.type.Money, then pass
+# your generated class as the proto_class keyword argument. In this example, it's not
+# actually needed, since MoneyProtoMessage is built from google.type.Money definitions.
+money = Money.from_protobuf(message, proto_class=MoneyProtoMessage)
+# <stockholm.Money: "2549.99">
+message.SerializeToString()
+# b'\x10\xf5\x13\x18\x80\xe7\x88\xd8\x03'
+
+# Usually the byte data may already be parsed from your proto class into your
+# proto objects, and if you're using google.type.Money in your messages you could
+# pass in the object without any additional proto_class keyword.
+#
+# In the following example we have a message that contains a field on position 1
+# named "remaining_sum", which in turn holds a google.type.Money value.
+#
+# Let's say the message holds the following as a parsed proto object:
+# remaining_sum {
+#  currency_code: "USD"
+#  units: 42
+# }
+#
+# It's binary representation is b'\n\x07\n\x03USD\x10*'.
+# And the binary representation of message.remaining_sum is b'\n\x03USD\x10*'.
+#
+# By passing the monetary part of the message (in this case, the field remaining_sum)
+# we can immediately create a monetary amount object which is currency aware.
+money = Money.from_protobuf(message.remaining_sum)
+# <stockholm.Money: "42.00 USD">
+#
+# Of course this newly instantiated montary amount object can be accessed in many
+# different ways, can use arithmetics like normally, etc.
+money.amount
+# Decimal('42.000000000')
+money.units
+# 42
+money.nanos
+# 0
+money.currency
+# "USD"
+money + 10
+# <stockholm.Money: "52.00 USD">
+money * 31 - 20 + Money("0.50")
+# <stockholm.Money: "1282.50 USD">
+```
+
+##### *Reading or outputting monetary amounts as JSON*
+```python
+from stockholm import Money
+
+# Outputting key-values as a dict or JSON string. For example great when sending monetary
+# amounts over GraphQL or internal API:s.
+money = Money(5767.50, currency="EUR")
+# <stockholm.Money: "5767.50 EUR">
+#
+# If no keys keyword argument is specified the default keys will be used, which is
+# value, units, nanos and currency_code.
+money.as_json()
+# '{"value": "5767.50 EUR", "units": 5767, "nanos": 500000000, "currency_code": "EUR"}'
+#
+# Besides value, units, nanos and currency_code, the other keys that can be specified
+# are amount and currency (converted to str and equivalent to currency_code in this
+# context).
+money.as_json(keys=("amount", "currency_code"))
+# '{"amount": "5767.500000000", "currency_code": "EUR"}'
+
+# It's also possible directly parse a monetary amount from its incoming JSON string
+Money.from_json('{"value": "5767.50 EUR", "units": 5767, "nanos": 500000000}')
+# <stockholm.Money: "5767.50 EUR">
+Money.from_json('{"amount": "5767.500000000", "currency_code": "EUR"}')
+# <stockholm.Money: "5767.50 EUR">
+```
+
+#### Parameters of the Money object
+
+```python
+from stockholm import Currency, Money
+
+# This is our monetary object, instantiated as 59112.50 EUR using the
+# currency object stockholm.Currency.EUR, which among other things holds data
+# regarding how many decimal digits should normally be printed. A monetary amount
+# in EUR is usually demoninated with two decimal digits.
+
+money = Money("59112.50", currency=Currency.EUR)
+# <stockholm.Money: "59112.50 EUR">
+
+money.amount
+# Decimal('59112.50')
+# Type: decimal.Decimal
+
+money.value
+# '59112.50 EUR'
+# Type: string
+
+money.units
+# 59112
+# Type: integer
+
+money.nanos
+# 500000000
+# Type: integer
+
+money.currency_code
+# 'EUR'
+# Type: Either: A string or None
+
+money.currency
+# <stockholm.Currency: "EUR">
+# Type: Either: a currency object, a string (equivalent to currency_code) or None
+
+money.sub_units
+# Decimal('5911250')
+# Type: decimal.Decimal
+
+money.asdict()
+# {'value': '59112.50 EUR', 'units': 59112, 'nanos': 500000000, 'currency_code': 'EUR'}
+# Type: dict
+
+money.as_string()  # or: str(money)
+# '59112.50 EUR'
+# Type: string
+
+money.as_int()  # or: int(money)
+# 59112
+# Type: integer
+
+money.as_float()  # or: float(money)
+# 59112.5
+# Type: float
+# Note that using floats may cause you to lose precision. Floats are strongly discouraged.
+
+money.is_signed()
+# False
+# Type: boolean
+
+money.is_zero()
+# False
+# Type: boolean
+
+money.to_integral()
+# <stockholm.Money: "59113.00 EUR">
+# Type: stockholm.Money
+
+money.amount_as_string(min_decimals=4, max_decimals=7)
+# 59112.5000
+# Type: string
+
+money.amount_as_string(min_decimals=0)
+# 59112.5
+# Type: string
+
+money.amount_as_string(max_decimals=0)
+# 59113
+# Type: string
+
+money.to_currency(currency="SEK")
+# <stockholm.Money: "59113.50 SEK">
+# Type: stockholm.Money
+
+money.as_json()
+# '{"value": "59112.50 EUR", "units": 59112, "nanos": 500000000, "currency_code": "EUR"}'
+# Type: string
+
+money.as_json(keys=("amount", "currency"))
+# '{"amount": "59112.50", "currency": "EUR"}'
+# Type: string
+
+money.as_protobuf()
+# currency_code: "EUR"
+# units: 59112
+# nanos: 500000000
+# Type: stockholm.proto.money_pb2.Money, generated from proto definitions at
+# https://github.com/googleapis/googleapis/blob/master/google/type/money.proto
+
+money.as_protobuf(proto_class=CustomMoneyProtoMessage)
+# Type: An instance of CustomMoneyProtoMessage populated with the properties of money
 ```
 
 
