@@ -30,6 +30,12 @@ Like you would install any other Python package, use `pip`, `poetry`, `pipenv` o
 $ pip install stockholm
 ```
 
+Shortcuts: 
+* [Using `stockholm.Money` monetary amount with Protocol Buffers](#using-protocol-buffers-for-transporting-monetary-amounts-over-the-network)
+* [Parameters of the `stockholm.Money` object](#parameters-of-the-money-object)
+* [Instantiating a monetary amount in flexible ways](#input-data-types-in-flexible-variants)
+* [Conversion between dicts and JSON for use in GraphQL or JSON-based API:s]()
+
 
 ## Usage and examples
 
