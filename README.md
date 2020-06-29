@@ -31,7 +31,7 @@ Currencies using the `stockholm.Currency` metaclasses can hold additional option
 
 
 ## Installation with `pip`
-Like you would install any other Python package, use `pip`, `poetry`, `pipenv` or your weapon of choice.
+Like you would install any other Python package, use `pip`, `poetry`, `pipenv` or your favourite tool.
 ```
 $ pip install stockholm
 ```
