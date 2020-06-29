@@ -3,7 +3,7 @@ from typing import Any, Optional
 
 import pytest
 
-from stockholm import Currency, Money
+from stockholm import Currency, Money, MoneyProtoMessage
 
 
 class ThirdPartyMoney:
@@ -88,6 +88,15 @@ class ThirdPartyMoney:
         (ThirdPartyMoney(1, "SEK"), None, False, "0.01 SEK"),
         (ThirdPartyMoney("100", "SEK"), None, False, "1.00 SEK"),
         (ThirdPartyMoney(471150, "EUR"), "EUR", False, "4711.50 EUR"),
+        (b"\n\x03EUR\x10\x01\x18\x80\xca\xb5\xee\x01", None, False, "1.50 EUR"),
+        (b"\n\x03EUR\x10\x01\x18\x80\xca\xb5\xee\x01", "EUR", False, "1.50 EUR"),
+        (b"\x10\xe7$", "EUR", False, "4711.00 EUR"),
+        (b"\x10\xe7$", None, False, "4711.00"),
+        ('{"value": "31338.13", "currency_code": "NOK"}', None, False, "31338.13 NOK"),
+        (b'{"value": "31338.13", "currency_code": "NOK"}', None, False, "31338.13 NOK"),
+        (b'{"value": "31338.13", "currency_code": "NOK"}', "NOK", False, "31338.13 NOK"),
+        (MoneyProtoMessage.FromString(b"\n\x03EUR\x10\x01\x18\x80\xca\xb5\xee\x01"), None, False, "1.50 EUR"),
+        (MoneyProtoMessage.FromString(b""), None, False, "0.00"),
     ],
 )
 def test_basic_str_output(amount: Any, currency: Any, from_sub_units: Optional[bool], expected: str) -> None:

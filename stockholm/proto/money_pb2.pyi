@@ -5,9 +5,7 @@ from google.protobuf.descriptor import (
     FileDescriptor as google___protobuf___descriptor___FileDescriptor,
 )
 
-from google.protobuf.message import (
-    Message as google___protobuf___message___Message,
-)
+from google.protobuf.message import Message as google___protobuf___message___Message
 
 from typing import (
     Optional as typing___Optional,
@@ -15,10 +13,7 @@ from typing import (
     Union as typing___Union,
 )
 
-from typing_extensions import (
-    Literal as typing_extensions___Literal,
-)
-
+from typing_extensions import Literal as typing_extensions___Literal
 
 builtin___bool = bool
 builtin___bytes = bytes
@@ -28,7 +23,6 @@ if sys.version_info < (3,):
     builtin___buffer = buffer
     builtin___unicode = unicode
 
-
 DESCRIPTOR: google___protobuf___descriptor___FileDescriptor = ...
 
 class Money(google___protobuf___message___Message):
@@ -36,18 +30,24 @@ class Money(google___protobuf___message___Message):
     currency_code: typing___Text = ...
     units: builtin___int = ...
     nanos: builtin___int = ...
-
-    def __init__(self,
+    def __init__(
+        self,
         *,
-        currency_code : typing___Optional[typing___Text] = None,
-        units : typing___Optional[builtin___int] = None,
-        nanos : typing___Optional[builtin___int] = None,
-        ) -> None: ...
+        currency_code: typing___Optional[typing___Text] = None,
+        units: typing___Optional[builtin___int] = None,
+        nanos: typing___Optional[builtin___int] = None,
+    ) -> None: ...
     if sys.version_info >= (3,):
         @classmethod
         def FromString(cls, s: builtin___bytes) -> Money: ...
     else:
         @classmethod
         def FromString(cls, s: typing___Union[builtin___bytes, builtin___buffer, builtin___unicode]) -> Money: ...
-    def ClearField(self, field_name: typing_extensions___Literal[u"currency_code",b"currency_code",u"nanos",b"nanos",u"units",b"units"]) -> None: ...
+    def ClearField(
+        self,
+        field_name: typing_extensions___Literal[
+            "currency_code", b"currency_code", "nanos", b"nanos", "units", b"units"
+        ],
+    ) -> None: ...
+
 type___Money = Money
