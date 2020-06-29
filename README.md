@@ -36,6 +36,11 @@ Like you would install any other Python package, use `pip`, `poetry`, `pipenv` o
 $ pip install stockholm
 ```
 
+Or to install with Protocol Buffers support, automatically including the `protobuf` package.
+```
+$ pip install stockholm[protobuf]
+```
+
 
 ## Documentation shortcuts: 
 
