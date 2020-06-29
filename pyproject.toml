@@ -25,6 +25,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.6 || ^3.7 || ^3.8"
+protobuf = { version = "^3", optional = true }
 
 [tool.poetry.dev-dependencies]
 flake8 = "^3.8.3"
@@ -36,6 +37,10 @@ pytest-cov = "^2.10"
 black = "=19.10b0"
 mypy = "^0.780.0"
 codecov = "^2.1.7"
+protobuf = "^3"
+
+[tool.poetry.extras]
+protobuf = ["protobuf"]
 
 [tool.black]
 line-length = 120
