@@ -41,7 +41,7 @@ $ pip install stockholm
 * [**Arithmetics – works with loads of compatible types – completely currency aware.**](#arithmetics---fully-supported)
 * [**Instantiating a monetary amount in many flexible ways.**](#input-data-types-in-flexible-variants)
 * [**Using `stockholm.Money` monetary amount with Protocol Buffers.**](#using-protocol-buffers-for-transporting-monetary-amounts-over-the-network)
-* [**Conversion between dicts, JSON and values for use in GraphQL or other JSON-based API:s:**](conversion-for-other-transport-medium-for-example-protocol-buffers-or-json)
+* [**Conversion between dicts, JSON and values for use in GraphQL or other JSON-based API:s:**](#conversion-for-other-transport-medium-for-example-protocol-buffers-or-json)
   - [**Using dict values for input and output / having GraphQL in mind.**](#monetary-amounts-can-also-be-exported-to-dict-as-well-as-created-with-dict-value-input-which-can-be-great-to-for-example-transport-a-monetary-value-in-json)
   - [**Parsing and loading JSON data.**](#reading-or-outputting-monetary-amounts-as-json)
 * [**Parameters and functions of the `stockholm.Money` object.**](#parameters-of-the-money-object)
