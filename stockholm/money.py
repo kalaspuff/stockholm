@@ -474,7 +474,7 @@ class MoneyModel(Generic[MoneyType]):
         for k, v in mapping.items():
             if hasattr(message, k):
                 try:
-                    setattr(message, k, v)
+                    setattr(message, k, type(getattr(message, k))(v))
                 except TypeError:  # pragma: no cover
                     pass
 
