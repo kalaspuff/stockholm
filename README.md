@@ -1,4 +1,6 @@
-# `stockholm` — `Money` for Python 3
+# `stockholm`
+**This brings a fully featured `Money` class for Python 3 – `stockholm.Money`.**
+
 [![pypi](https://badge.fury.io/py/stockholm.svg)](https://pypi.python.org/pypi/stockholm/)
 [![Made with Python](https://img.shields.io/pypi/pyversions/stockholm)](https://www.python.org/)
 [![Type hinted - mypy validated](https://img.shields.io/badge/typehinted-yes-teal)](https://github.com/kalaspuff/stockholm)
@@ -9,7 +11,11 @@
 
 An up to date human friendly and flexible approach for development with any kind of monetary amounts. No more working with floats or having to deal with having to think about values in subunits.
 
-Basically a high-end `Money` class for Python 3.x. This is a library to be used by backend and frontend API coders of fintech companies, web merchants or subscription services. It's great for calculations of amounts while keeping a great level of precision or producing output for transport layers as well as having a robust and easy way to import/export values in JSON or Protocol Buffers and the alike.
+Basically a high-end `Money` class for Python 3.x. This is a library to be used by backend and frontend API coders of fintech companies, web merchants or subscription services. It's great for calculations of amounts while keeping a great level of precision or producing output for transport layers as well as having a robust and easy way to import/export values in *GraphQL*, *JSON* and / or *Protocol Buffers*, etc.
+
+```python
+from stockholm import Money
+```
 
 *A simple, yet powerful way of coding with money.*
 
@@ -32,12 +38,13 @@ $ pip install stockholm
 
 
 ## Documentation shortcuts: 
-* [**Using `stockholm.Money` monetary amount with Protocol Buffers**](#using-protocol-buffers-for-transporting-monetary-amounts-over-the-network)
-* [**Instantiating a monetary amount in flexible ways**](#input-data-types-in-flexible-variants)
-* *Conversion between dicts, JSON and values for use in GraphQL or other JSON-based API:s*
-  * [**Using dict values for input and output**](#monetary-amounts-can-also-be-exported-to-dict-as-well-as-created-with-dict-value-input-which-can-be-great-to-for-example-transport-a-monetary-value-in-json)
-  * [**Parsing and loading JSON data**](#reading-or-outputting-monetary-amounts-as-json)
-* [**Parameters of the `stockholm.Money` object**](#parameters-of-the-money-object)
+* [**Arithmetics – works with loads of compatible types – completely currency aware.**](#arithmetics-fully-supported)
+* [**Instantiating a monetary amount in many flexible ways.**](#input-data-types-in-flexible-variants)
+* [**Using `stockholm.Money` monetary amount with Protocol Buffers.**](#using-protocol-buffers-for-transporting-monetary-amounts-over-the-network)
+* **Conversion between dicts, JSON and values for use in GraphQL or other JSON-based API:s:**
+  - [**Using dict values for input and output / having GraphQL in mind.**](#monetary-amounts-can-also-be-exported-to-dict-as-well-as-created-with-dict-value-input-which-can-be-great-to-for-example-transport-a-monetary-value-in-json)
+  - [**Parsing and loading JSON data.**](#reading-or-outputting-monetary-amounts-as-json)
+* [**Parameters and functions of the `stockholm.Money` object.**](#parameters-of-the-money-object)
 
 
 ## Usage and examples
