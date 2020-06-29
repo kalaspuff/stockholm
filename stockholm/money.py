@@ -452,11 +452,23 @@ class MoneyModel(Generic[MoneyType]):
     def as_float(self) -> float:
         return float(self)
 
-    def as_json(self) -> str:
-        return json.dumps(self.asdict())
+    def as_json(self, keys: Union[List[str], Tuple[str, ...]] = ("value", "units", "nanos", "currency_code")) -> str:
+        mapping = {
+            "value": self.value,
+            "units": self.units,
+            "nanos": self.nanos,
+            "amount": str(self.amount),
+            "currency": self.currency_code,
+            "currency_code": self.currency_code,
+            "from_sub_units": False,
+            "sub_units": self.sub_units,
+        }
 
-    def json(self) -> str:
-        return self.as_json()
+        output = {k: mapping.get(k) for k in keys if k in mapping}
+        return json.dumps(output)
+
+    def json(self, keys: Union[List[str], Tuple[str, ...]] = ("value", "units", "nanos", "currency_code")) -> str:
+        return self.as_json(keys=keys)
 
     def as_protobuf(self, proto_class: Type[ProtoMessage] = MoneyProtoMessage) -> ProtoMessage:
         message = proto_class()
