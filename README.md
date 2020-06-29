@@ -131,7 +131,7 @@ print(f"{sek_money:.4M}")  # SEK 119889.5760
 print(f"{sek_money:c}")  # SEK
 ```
 
-*Use `stockholm.Currency` types for proper defaults of minimum number of decimal digits to output in strings, etc. All ISO 4217 currency codes implemented, see https://github.com/kalaspuff/stockholm/blob/master/stockholm/currency.py for the full list.*
+##### *Use `stockholm.Currency` types for proper defaults of minimum number of decimal digits to output in strings, etc. All ISO 4217 currency codes implemented, see https://github.com/kalaspuff/stockholm/blob/master/stockholm/currency.py for the full list.*
 ```python
 from stockholm import Currency, Money, get_currency
 from stockholm.currency import JPY, SEK, EUR, IQD, USDCoin, Bitcoin
@@ -214,7 +214,8 @@ sum(amounts)
 ```
 
 #### Conversion for other transport medium (for example Protocol Buffers or JSON)
-*Easily splittable into `units` and `nanos` for transport in network medium, for example using the [`google.type.Money` protobuf definition](https://github.com/googleapis/googleapis/blob/master/google/type/money.proto) when using Protocol Buffers.*
+
+##### *Easily splittable into `units` and `nanos` for transport in network medium, for example using the [`google.type.Money` protobuf definition](https://github.com/googleapis/googleapis/blob/master/google/type/money.proto) when using Protocol Buffers.*
 ```python
 from stockholm import Money
 
@@ -227,7 +228,7 @@ Money(units=22583, nanos=753820000, currency="SEK")
 # <stockholm.Money: "22583.75382 SEK">
 ```
 
-*Monetary amounts can also be exported to `dict` as well as created with `dict` value input, which can be great to for example transport a monetary value in JSON.*
+##### *Monetary amounts can also be exported to `dict` as well as created with `dict` value input, which can be great to for example transport a monetary value in JSON.*
 ```python
 from stockholm import Money
 
@@ -249,7 +250,7 @@ money = Money.from_dict({
 # <stockholm.Money: "4711.75 SEK">
 ```
 
-*Using Protocol Buffers for transporting monetary amounts over the network.*
+##### *Using Protocol Buffers for transporting monetary amounts over the network.*
 ```python
 from stockholm import Money
 
@@ -329,7 +330,7 @@ money * 31 - 20 + Money("0.50")
 # <stockholm.Money: "1282.50 USD">
 ```
 
-*Reading or outputting monetary amounts as JSON*
+##### *Reading or outputting monetary amounts as JSON*
 ```python
 from stockholm import Money
 
