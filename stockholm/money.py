@@ -135,7 +135,15 @@ class MoneyModel(Generic[MoneyType]):
         return cls(
             **{
                 k: getattr(input_value, k)
-                for k in ("value", "units", "nanos", "amount", "currency", "currency_code", "from_sub_units",)
+                for k in (
+                    "value",
+                    "units",
+                    "nanos",
+                    "amount",
+                    "currency",
+                    "currency_code",
+                    "from_sub_units",
+                )
                 if hasattr(input_value, k)
             }
         )
@@ -251,7 +259,15 @@ class MoneyModel(Generic[MoneyType]):
                 self.__class__.from_dict(
                     {
                         k: getattr(amount, k)
-                        for k in ("value", "units", "nanos", "amount", "currency", "currency_code", "from_sub_units",)
+                        for k in (
+                            "value",
+                            "units",
+                            "nanos",
+                            "amount",
+                            "currency",
+                            "currency_code",
+                            "from_sub_units",
+                        )
                         if hasattr(amount, k)
                     }
                 )
@@ -919,7 +935,15 @@ class Money(MoneyModel):
         return cls(
             **{
                 k: getattr(input_value, k)
-                for k in ("value", "units", "nanos", "amount", "currency", "currency_code", "from_sub_units",)
+                for k in (
+                    "value",
+                    "units",
+                    "nanos",
+                    "amount",
+                    "currency",
+                    "currency_code",
+                    "from_sub_units",
+                )
                 if hasattr(input_value, k)
             }
         )
