@@ -25,7 +25,7 @@ black:
 	poetry run black -l 120 stockholm/ tests/
 
 isort:
-	poetry run isort -rc stockholm/ tests/
+	poetry run isort stockholm/ tests/
 
 build:
 	rm -rf dist/
