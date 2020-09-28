@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.4.3] - 2020-09-28
+
+* Fixes an issue that caused a monetary amount without currency to get a `"None"` string instead of an empty string as value to `currency_code` when creating a protobuf message using the `.as_protobuf()` method.
+
+
 ## [0.4.2] - 2020-06-29
 
 * Added support for conversion to and from Protocol Buffers using the new `Money.from_protobuf` or `money.as_protobuf` functions. By default using the [`google.type.Money`](https://github.com/googleapis/googleapis/blob/master/google/type/money.proto) protobuf definition.
