@@ -5,11 +5,11 @@ description = "An up to date human friendly and flexible approach for developmen
 authors = ["Carl Oscar Aaro <hello@carloscar.com>"]
 homepage = "https://github.com/kalaspuff/stockholm"
 repository = "https://github.com/kalaspuff/stockholm"
-keywords = ["money", "monetary amount", "monetary value", "currency", "formatting", "protobuf", "protocol buffers", "graphql", "json"]
+keywords = ["money", "monetary amount", "monetary value", "currency", "formatting", "protobuf", "protocol buffers", "graphql", "json", "python money", "monetary object"]
 readme = "README.md"
 license = "MIT"
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Topic :: Software Development :: Libraries",
     "Topic :: Office/Business :: Financial",
     "Programming Language :: Python",
@@ -30,12 +30,12 @@ protobuf = { version = "^3", optional = true }
 [tool.poetry.dev-dependencies]
 flake8 = "^3.8.3"
 flake8-black = "^0.2.0"
-flake8-isort = "^3.0.0"
-isort = { version = "^4.3.21", extras = ["pyproject"] }
-pytest = "^5.4.3"
-pytest-cov = "^2.10"
-black = "=19.10b0"
-mypy = "^0.780.0"
+flake8-isort = "^4.0.0"
+isort = { version = "^5.5.3", extras = ["pyproject"] }
+pytest = "^6.1.0"
+pytest-cov = "^2.10.0"
+black = { version = "*", allow-prereleases = true }
+mypy = "^0.782"
 codecov = "^2.1.7"
 protobuf = "^3"
 
@@ -45,10 +45,11 @@ protobuf = ["protobuf"]
 [tool.black]
 line-length = 120
 target_version = ["py36", "py37", "py38"]
+include = '\.pyi?$'
+exclude = '\.git/|\.mypy_cache/|\.venv/|\.pytest_cache/|\.vscode/|__pycache__/|build/|dist/'
 
 [tool.isort]
+profile = "black"
 line_length = 120
-multi_line_output = 3
-use_parentheses = true
-include_trailing_comma = true
 known_first_party = "stockholm"
+skip = ".mypy_cache,__pycache__"
