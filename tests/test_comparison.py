@@ -12,6 +12,7 @@ from stockholm import CurrencyMismatchError, Money
         (Money("0"), Money("0"), True),
         (Money("-0"), Money("0"), True),
         (Money("-0"), Money("-0"), True),
+        (Money(1.337), Money("1.337"), True),
         (Money("-0", currency="SEK"), Money("-0"), True),
         (Money("-0 USD"), Money("SEK -0"), True),
         (Money("0 USD"), Money("SEK -0"), True),

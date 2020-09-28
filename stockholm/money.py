@@ -494,8 +494,8 @@ class MoneyModel(Generic[MoneyType]):
             "units": self.units,
             "nanos": self.nanos,
             "amount": str(self.amount),
-            "currency": self.currency_code,
-            "currency_code": self.currency_code,
+            "currency": self.currency_code or "",
+            "currency_code": self.currency_code or "",
             "from_sub_units": False,
         }
 
