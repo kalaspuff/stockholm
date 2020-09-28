@@ -464,9 +464,9 @@ testing = ["pytest (>=3.5,<3.7.3 || >3.7.3)", "pytest-checkdocs (>=1.2.3)", "pyt
 protobuf = ["protobuf"]
 
 [metadata]
-content-hash = "894a76f0127718aae934fec5e938a96e61e753a1c0ba76ceafd8bdcdbeaacd5e"
+content-hash = "1a5623e189bbe390978b1f7a32adee2ed264651e1bd5b54abca5b47c3ff73dc8"
 lock-version = "1.0"
-python-versions = "^3.6 || ^3.7 || ^3.8"
+python-versions = "^3.6 || ^3.7 || ^3.8 || ^3.9"
 
 [metadata.files]
 appdirs = [
