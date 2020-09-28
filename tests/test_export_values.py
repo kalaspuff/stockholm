@@ -121,3 +121,41 @@ def test_info_methods() -> None:
     assert m.as_int() == 0
     assert m.is_zero() is False
     assert m.is_signed() is True
+
+    assert m.as_protobuf().currency_code == "EUR"
+    assert m.as_protobuf().units == 0
+    assert m.as_protobuf().nanos == 0
+    assert m.as_protobuf().SerializeToString() == b"\n\x03EUR"
+
+    m = Money(1.337)
+
+    assert m.amount == Decimal("1.337")
+    assert m.currency is None
+    assert m.currency_code is None
+    assert m.units == 1
+    assert m.nanos == 337000000
+
+    assert m.amount_as_string() == "1.337"
+    assert m.amount_as_string(max_decimals=2) == "1.34"
+
+    assert m.as_protobuf().currency_code == ""
+    assert m.as_protobuf().units == 1
+    assert m.as_protobuf().nanos == 337000000
+    assert m.as_protobuf().SerializeToString() == b"\x10\x01\x18\xc0\xec\xd8\xa0\x01"
+
+    m = Money(0)
+
+    assert m.amount == Decimal("0")
+    assert m.currency is None
+    assert m.currency_code is None
+    assert m.units == 0
+    assert m.nanos == 0
+
+    assert m.amount_as_string() == "0.00"
+    assert m.amount_as_string(max_decimals=4) == "0.00"
+    assert m.amount_as_string(max_decimals=0) == "0"
+
+    assert m.as_protobuf().currency_code == ""
+    assert m.as_protobuf().units == 0
+    assert m.as_protobuf().nanos == 0
+    assert m.as_protobuf().SerializeToString() == b""
