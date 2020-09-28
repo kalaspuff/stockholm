@@ -42,7 +42,7 @@ $ pip install stockholm[protobuf]
 ```
 
 
-## Documentation shortcuts: 
+## Documentation shortcuts:
 
 * [**Arithmetics – works with loads of compatible types – completely currency aware.**](#arithmetics---fully-supported)
 * [**Instantiating a monetary amount in many flexible ways.**](#input-data-types-in-flexible-variants)
