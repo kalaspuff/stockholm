@@ -22,7 +22,7 @@ version:
 	poetry version `python stockholm/__version__.py`
 
 black:
-	poetry run black -l 120 stockholm/ tests/
+	poetry run black stockholm/ tests/
 
 isort:
 	poetry run isort stockholm/ tests/
