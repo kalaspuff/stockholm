@@ -38,7 +38,7 @@ release:
 	make version
 	make build
 	poetry publish
-	git add pyproject.toml stockholm/__version__.py
+	git add pyproject.toml stockholm/__version__.py CHANGELOG.md
 	git commit -m "Bumped version" --allow-empty
 	git tag -a `python stockholm/__version__.py` -m `python stockholm/__version__.py`
 	git push
