@@ -1,6 +1,7 @@
 # `stockholm`
 **This brings a fully featured `Money` class for Python 3 – `stockholm.Money`.**
 
+![Python package](https://github.com/kalaspuff/stockholm/workflows/Python%20package/badge.svg)
 [![pypi](https://badge.fury.io/py/stockholm.svg)](https://pypi.python.org/pypi/stockholm/)
 [![Made with Python](https://img.shields.io/pypi/pyversions/stockholm)](https://www.python.org/)
 [![Type hinted - mypy validated](https://img.shields.io/badge/typehinted-yes-teal)](https://github.com/kalaspuff/stockholm)
