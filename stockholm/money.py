@@ -558,13 +558,13 @@ class MoneyModel(Generic[MoneyType]):
         if min_decimals is None and max_decimals is None:
             if self._currency and isinstance(self._currency, BaseCurrency):
                 min_decimals = self._currency.decimal_digits
-            min_decimals = DEFAULT_MIN_DECIMALS if min_decimals is None else min_decimals
-            max_decimals = max(cast(int, min_decimals), DEFAULT_MAX_DECIMALS)
+            min_decimals = int(DEFAULT_MIN_DECIMALS if min_decimals is None else min_decimals)
+            max_decimals = max(min_decimals, DEFAULT_MAX_DECIMALS)
         elif min_decimals is None:
             if self._currency and isinstance(self._currency, BaseCurrency):
                 min_decimals = self._currency.decimal_digits
-            min_decimals = DEFAULT_MIN_DECIMALS if min_decimals is None else min_decimals
-            min_decimals = min(cast(int, min_decimals), max_decimals)
+            min_decimals = int(DEFAULT_MIN_DECIMALS if min_decimals is None else min_decimals)
+            min_decimals = min(min_decimals, max_decimals)
         elif max_decimals is None:
             max_decimals = max(min_decimals, DEFAULT_MAX_DECIMALS)
 
