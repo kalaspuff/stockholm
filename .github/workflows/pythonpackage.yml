@@ -6,31 +6,47 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    env:
+      POETRY_VIRTUALENVS_CREATE: false
     strategy:
       max-parallel: 4
       matrix:
         python-version: [3.6, 3.7, 3.8, 3.9]
 
     steps:
-    - uses: actions/checkout@v1
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install poetry
-        poetry install
-    - name: Test with pytest
-      run: |
-        PYTHONPATH=. poetry run pytest --cov stockholm/
-    - name: Lint with flake8
-      run: |
-        poetry run flake8 stockholm/ tests/
-    - name: Type check with mypy
-      run: |
-        poetry run mypy stockholm/
-    - name: Codecov
-      run: |
-        poetry run codecov --token=${{ secrets.CODECOV_TOKEN }}
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Set up Poetry cache for Python dependencies
+        uses: actions/cache@v2
+        if: startsWith(runner.os, 'Linux')
+        with:
+          path: ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: ${{ runner.os }}-poetry-
+      - name: Install Poetry
+        run: |
+          curl -fsS -o get-poetry.py https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py
+          python get-poetry.py -y
+          echo "$HOME/.poetry/bin" >> $GITHUB_PATH
+          rm -f get-poetry.py
+      - name: Install dependencies
+        run: |
+          poetry install --no-interaction
+          poetry show --tree
+      - name: Test poetry build step
+        run: poetry build
+      - name: Test with pytest
+        run: |
+          pytest --cov stockholm/ -v
+      - name: Lint with flake8
+        run: |
+          flake8 stockholm/ tests/
+      - name: Type check with mypy
+        run: |
+          mypy stockholm/
+      - name: Codecov
+        run: |
+          codecov --token=${{ secrets.CODECOV_TOKEN }}
