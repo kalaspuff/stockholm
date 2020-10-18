@@ -12,12 +12,7 @@ updates:
     allow:
       - dependency-name: "*"
         dependency-type: "development"
-  - package-ecosystem: "pip"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 15
-    allow:
-      - dependency-name: "*"
+      - dependency-name: "protobuf"
         dependency-type: "production"
-    versioning-strategy: lockfile-only
+      - dependency-name: "six"
+        dependency-type: "production"
