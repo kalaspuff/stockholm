@@ -3,8 +3,21 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 15
+    allow:
+      - dependency-name: "*"
+        dependency-type: "development"
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 15
+    allow:
+      - dependency-name: "*"
+        dependency-type: "production"
+    versioning-strategy: lockfile-only
