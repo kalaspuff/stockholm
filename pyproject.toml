@@ -29,7 +29,7 @@ python = "^3.6 || ^3.7 || ^3.8 || ^3.9"
 protobuf = { version = "^3", optional = true }
 
 [tool.poetry.dev-dependencies]
-flake8 = "^3.8.3"
+flake8 = "^3.8.4"
 flake8-black = "^0.2.0"
 flake8-isort = "^4.0.0"
 isort = { version = "^5.6.4", extras = ["pyproject"] }
