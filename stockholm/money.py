@@ -275,7 +275,14 @@ class MoneyModel(Generic[MoneyType]):
 
         if amount is not None and Money._is_unknown_amount_type(amount):
             try:
-                for func_name in ("from_unknown", "from_unknown_value", "from_value", "from_input", "convert_from", "transform_from"):
+                for func_name in (
+                    "from_unknown",
+                    "from_unknown_value",
+                    "from_value",
+                    "from_input",
+                    "convert_from",
+                    "transform_from",
+                ):
                     func = getattr(self.__class__, func_name, None)
                     if func:
                         match_amount = func(amount)
@@ -352,7 +359,14 @@ class MoneyModel(Generic[MoneyType]):
                 output_amount = Decimal(amount)
             except Exception:
                 try:
-                    for func_name in ("from_unknown", "from_unknown_value", "from_value", "from_input", "convert_from", "transform_from"):
+                    for func_name in (
+                        "from_unknown",
+                        "from_unknown_value",
+                        "from_value",
+                        "from_input",
+                        "convert_from",
+                        "transform_from",
+                    ):
                         func = getattr(self.__class__, func_name, None)
                         if func:
                             amount = cast(MoneyType, self.__class__(func(amount)))
@@ -785,7 +799,15 @@ class MoneyModel(Generic[MoneyType]):
         return self._amount >= converted_other._amount
 
     def __add__(self, other: Any) -> MoneyType:
-        cls: Type[MoneyType] = self.__class__ if self.__class__ == other.__class__ else (Money if self.__class__ is Money or other.__class__ is Money else (self.__class__ if isinstance(self, Money) and not isinstance(other, Money) else Money))
+        cls: Type[MoneyType] = (
+            self.__class__
+            if self.__class__ == other.__class__
+            else (
+                Money
+                if self.__class__ is Money or other.__class__ is Money
+                else (self.__class__ if isinstance(self, Money) and not isinstance(other, Money) else Money)
+            )
+        )
 
         converted_other = self._convert_other(other)
         amount = self._amount + converted_other._amount
@@ -797,7 +819,15 @@ class MoneyModel(Generic[MoneyType]):
         return self.__add__(other)
 
     def __sub__(self, other: Any) -> MoneyType:
-        cls: Type[MoneyType] = self.__class__ if self.__class__ == other.__class__ else (Money if self.__class__ is Money or other.__class__ is Money else (self.__class__ if isinstance(self, Money) and not isinstance(other, Money) else Money))
+        cls: Type[MoneyType] = (
+            self.__class__
+            if self.__class__ == other.__class__
+            else (
+                Money
+                if self.__class__ is Money or other.__class__ is Money
+                else (self.__class__ if isinstance(self, Money) and not isinstance(other, Money) else Money)
+            )
+        )
 
         converted_other = self._convert_other(other)
         amount = self._amount - converted_other._amount
@@ -806,7 +836,15 @@ class MoneyModel(Generic[MoneyType]):
         return cls(amount, currency=currency)
 
     def __rsub__(self, other: Any) -> MoneyType:
-        cls: Type[MoneyType] = self.__class__ if self.__class__ == other.__class__ else (Money if self.__class__ is Money or other.__class__ is Money else (self.__class__ if isinstance(self, Money) and not isinstance(other, Money) else Money))
+        cls: Type[MoneyType] = (
+            self.__class__
+            if self.__class__ == other.__class__
+            else (
+                Money
+                if self.__class__ is Money or other.__class__ is Money
+                else (self.__class__ if isinstance(self, Money) and not isinstance(other, Money) else Money)
+            )
+        )
 
         converted_other = self._convert_other(other)
         amount = converted_other._amount - self._amount
@@ -815,7 +853,15 @@ class MoneyModel(Generic[MoneyType]):
         return cls(amount, currency=currency)
 
     def __mul__(self, other: Any) -> MoneyType:
-        cls: Type[MoneyType] = self.__class__ if self.__class__ == other.__class__ else (Money if self.__class__ is Money or other.__class__ is Money else (self.__class__ if isinstance(self, Money) and not isinstance(other, Money) else Money))
+        cls: Type[MoneyType] = (
+            self.__class__
+            if self.__class__ == other.__class__
+            else (
+                Money
+                if self.__class__ is Money or other.__class__ is Money
+                else (self.__class__ if isinstance(self, Money) and not isinstance(other, Money) else Money)
+            )
+        )
 
         if not isinstance(other, Money):
             converted_other = self._convert_other(other)
@@ -833,7 +879,15 @@ class MoneyModel(Generic[MoneyType]):
         return self.__mul__(other)
 
     def __truediv__(self, other: Any) -> MoneyType:
-        cls: Type[MoneyType] = self.__class__ if self.__class__ == other.__class__ else (Money if self.__class__ is Money or other.__class__ is Money else (self.__class__ if isinstance(self, Money) and not isinstance(other, Money) else Money))
+        cls: Type[MoneyType] = (
+            self.__class__
+            if self.__class__ == other.__class__
+            else (
+                Money
+                if self.__class__ is Money or other.__class__ is Money
+                else (self.__class__ if isinstance(self, Money) and not isinstance(other, Money) else Money)
+            )
+        )
 
         converted_other = self._convert_other(other, allow_currency_mismatch=True)
 
@@ -848,7 +902,15 @@ class MoneyModel(Generic[MoneyType]):
         return cls(amount, currency=self._currency)
 
     def __floordiv__(self, other: Any) -> MoneyType:
-        cls: Type[MoneyType] = self.__class__ if self.__class__ == other.__class__ else (Money if self.__class__ is Money or other.__class__ is Money else (self.__class__ if isinstance(self, Money) and not isinstance(other, Money) else Money))
+        cls: Type[MoneyType] = (
+            self.__class__
+            if self.__class__ == other.__class__
+            else (
+                Money
+                if self.__class__ is Money or other.__class__ is Money
+                else (self.__class__ if isinstance(self, Money) and not isinstance(other, Money) else Money)
+            )
+        )
 
         converted_other = self._convert_other(other, allow_currency_mismatch=True)
 
@@ -863,7 +925,15 @@ class MoneyModel(Generic[MoneyType]):
         return cls(amount, currency=self._currency)
 
     def __mod__(self, other: Any) -> MoneyType:
-        cls: Type[MoneyType] = self.__class__ if self.__class__ == other.__class__ else (Money if self.__class__ is Money or other.__class__ is Money else (self.__class__ if isinstance(self, Money) and not isinstance(other, Money) else Money))
+        cls: Type[MoneyType] = (
+            self.__class__
+            if self.__class__ == other.__class__
+            else (
+                Money
+                if self.__class__ is Money or other.__class__ is Money
+                else (self.__class__ if isinstance(self, Money) and not isinstance(other, Money) else Money)
+            )
+        )
 
         converted_other = self._convert_other(other, allow_currency_mismatch=True)
         amount = self._amount % converted_other._amount
@@ -876,7 +946,15 @@ class MoneyModel(Generic[MoneyType]):
         return cls(amount, currency=currency)
 
     def __divmod__(self, other: Any) -> Tuple[MoneyType, MoneyType]:
-        cls: Type[MoneyType] = self.__class__ if self.__class__ == other.__class__ else (Money if self.__class__ is Money or other.__class__ is Money else (self.__class__ if isinstance(self, Money) and not isinstance(other, Money) else Money))
+        cls: Type[MoneyType] = (
+            self.__class__
+            if self.__class__ == other.__class__
+            else (
+                Money
+                if self.__class__ is Money or other.__class__ is Money
+                else (self.__class__ if isinstance(self, Money) and not isinstance(other, Money) else Money)
+            )
+        )
 
         converted_other = self._convert_other(other, allow_currency_mismatch=True)
         quotient, remainder = divmod(self._amount, converted_other._amount)
@@ -892,7 +970,15 @@ class MoneyModel(Generic[MoneyType]):
         return cls(quotient, currency=currency), cls(remainder, currency=currency)
 
     def __pow__(self, other: Any) -> MoneyType:
-        cls: Type[MoneyType] = self.__class__ if self.__class__ == other.__class__ else (Money if self.__class__ is Money or other.__class__ is Money else (self.__class__ if isinstance(self, Money) and not isinstance(other, Money) else Money))
+        cls: Type[MoneyType] = (
+            self.__class__
+            if self.__class__ == other.__class__
+            else (
+                Money
+                if self.__class__ is Money or other.__class__ is Money
+                else (self.__class__ if isinstance(self, Money) and not isinstance(other, Money) else Money)
+            )
+        )
 
         if not isinstance(other, Money):
             converted_other = self._convert_other(other)
