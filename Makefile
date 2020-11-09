@@ -37,7 +37,7 @@ release:
 	make mypy
 	make version
 	make build
-	poetry publish
+	poetry run twine upload dist/stockholm-`python stockholm/__version__.py`*
 	git add pyproject.toml stockholm/__version__.py CHANGELOG.md
 	git commit -m "Bumped version" --allow-empty
 	git tag -a `python stockholm/__version__.py` -m `python stockholm/__version__.py`
