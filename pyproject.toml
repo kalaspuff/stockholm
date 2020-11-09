@@ -1,11 +1,11 @@
 [tool.poetry]
 name = "stockholm"
-version = "0.4.3"
+version = "0.4.4"
 description = "Human friendly and flexible package for working with monetary amounts"
 authors = ["Carl Oscar Aaro <hello@carloscar.com>"]
 homepage = "https://github.com/kalaspuff/stockholm"
 repository = "https://github.com/kalaspuff/stockholm"
-keywords = ["money", "monetary amount", "monetary value", "currency", "formatting", "protobuf", "protocol buffers", "graphql", "json", "python money", "monetary object", "finance", "fintech"]
+keywords = ["money", "monetary amount", "monetary value", "currency", "formatting", "protobuf", "protocol buffers", "graphql", "money graphql", "protobuf money", "protocol buffers money", "json", "python money", "monetary object", "python money class", "finance", "fintech"]
 readme = "README.md"
 license = "MIT"
 classifiers = [
@@ -33,12 +33,13 @@ flake8 = "^3.8.4"
 flake8-black = "^0.2.0"
 flake8-isort = "^4.0.0"
 isort = { version = "^5.6.4", extras = ["pyproject"] }
-pytest = "^6.1.1"
+pytest = "^6.1.2"
 pytest-cov = "^2.10.0"
 black = { version = "*", allow-prereleases = true }
 mypy = "^0.790"
 codecov = "^2.1.10"
 protobuf = "^3"
+twine = ">=3.2.0"
 
 [tool.poetry.extras]
 protobuf = ["protobuf"]
@@ -53,4 +54,4 @@ exclude = '\.git/|\.mypy_cache/|\.venv/|\.pytest_cache/|\.vscode/|__pycache__/|b
 profile = "black"
 line_length = 120
 known_first_party = "stockholm"
-skip = ".mypy_cache,__pycache__"
+skip = ".mypy_cache,__pycache__,stockholm.egg-info,.eggs,.vscode,dist"

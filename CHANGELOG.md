@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.4] - 2020-11-09
+
+* Python 3.9 supported.
+* Minor type annotation fixes.
+
+
 ## [0.4.3] - 2020-09-28
 
 * Fixes an issue that caused a monetary amount without currency to get a `"None"` string instead of an empty string as value to `currency_code` when creating a protobuf message using the `.as_protobuf()` method.
