@@ -37,7 +37,7 @@ pytest = "^6.1.2"
 pytest-cov = "^2.10.0"
 black = { version = "*", allow-prereleases = true }
 mypy = "^0.790"
-codecov = "^2.1.10"
+codecov = "^2.1.11"
 protobuf = "^3"
 twine = ">=3.2.0"
 
