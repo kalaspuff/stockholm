@@ -32,7 +32,7 @@ protobuf = { version = "^3", optional = true }
 flake8 = "^3.8.4"
 flake8-black = "^0.2.0"
 flake8-isort = "^4.0.0"
-isort = { version = "^5.6.4", extras = ["pyproject"] }
+isort = { version = "^5.7.0", extras = ["pyproject"] }
 pytest = "^6.2.2"
 pytest-cov = "^2.10.0"
 black = { version = "*", allow-prereleases = true }
