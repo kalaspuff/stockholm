@@ -25,21 +25,20 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.6 || ^3.7 || ^3.8 || ^3.9"
+python = "^3.6"
 protobuf = { version = "^3", optional = true }
 
 [tool.poetry.dev-dependencies]
-flake8 = "^3.8.4"
-flake8-black = "^0.2.0"
-flake8-isort = "^4.0.0"
-isort = { version = "^5.6.4", extras = ["pyproject"] }
-pytest = "^6.1.2"
-pytest-cov = "^2.10.0"
-black = { version = "*", allow-prereleases = true }
-mypy = "^0.790"
-codecov = "^2.1.10"
-protobuf = "^3"
-twine = ">=3.2.0"
+flake8 = { version = ">=3.8.4", markers = "sys_platform != \"win32\"" }
+flake8-black = { version = ">=0.2.0", markers = "sys_platform != \"win32\"" }
+flake8-isort = { version = ">=4.0.0", markers = "sys_platform != \"win32\"" }
+isort = { version = ">=5.6.0", markers = "sys_platform != \"win32\"" }
+pytest = { version = ">=6.1.0", markers = "sys_platform != \"win32\"" }
+pytest-cov = { version = ">=2.10.0", markers = "sys_platform != \"win32\"" }
+black = { version = "*", markers = "sys_platform != \"win32\"", allow-prereleases = true }
+mypy = { version = ">=0.800", markers = "sys_platform != \"win32\"" }
+codecov = { version = ">=2.1.10", markers = "sys_platform != \"win32\"" }
+protobuf = { version = "^3", markers = "sys_platform != \"win32\"" }
 
 [tool.poetry.extras]
 protobuf = ["protobuf"]
@@ -48,10 +47,10 @@ protobuf = ["protobuf"]
 line-length = 120
 target_version = ["py36", "py37", "py38"]
 include = '\.pyi?$'
-exclude = '\.git/|\.mypy_cache/|\.venv/|\.pytest_cache/|\.vscode/|__pycache__/|build/|dist/'
+exclude = '\.eggs/|\.egg-info/|\.git/|\.github/|\.mypy_cache/|\.venv/|\.pytest_cache/|\.vscode/|__pycache__/|build/|dist/|setup\.py'
 
 [tool.isort]
 profile = "black"
 line_length = 120
 known_first_party = "stockholm"
-skip = ".mypy_cache,__pycache__,stockholm.egg-info,.eggs,.vscode,dist"
+skip = ".mypy_cache,__pycache__,.pytest_cache,.eggs,.venv,.git,.vscode,.github,dist"
