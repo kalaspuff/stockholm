@@ -40,13 +40,13 @@ jobs:
       run: poetry build
     - name: Test with pytest
       run: |
-        PACKAGENAME=$(poetry version | awk {'print $1'}) pytest --cov=$PACKAGENAME/ tests -v
+        PACKAGENAME=$(poetry version | awk {'print $1'}) && pytest --cov=$PACKAGENAME/ tests -v
     - name: Lint with flake8
       run: |
-        PACKAGENAME=$(poetry version | awk {'print $1'}) flake8 $PACKAGENAME/ tests/
+        PACKAGENAME=$(poetry version | awk {'print $1'}) && flake8 $PACKAGENAME/ tests/
     - name: Type check with mypy
       run: |
-        PACKAGENAME=$(poetry version | awk {'print $1'}) mypy $PACKAGENAME/
+        PACKAGENAME=$(poetry version | awk {'print $1'}) && mypy $PACKAGENAME/
     - name: Codecov
       run: |
         codecov --token=${{ secrets.CODECOV_TOKEN }}
