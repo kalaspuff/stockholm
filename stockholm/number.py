@@ -43,7 +43,7 @@ class Number(Money):
         if from_sub_units is not None:
             raise ConversionError("Numbers cannot be created from sub units")
 
-        super().__init__.__func__(self, amount=amount, units=units, nanos=nanos, value=value, **kwargs)
+        getattr(super(), "__init__").__func__(self, amount=amount, units=units, nanos=nanos, value=value, **kwargs)
         money = cast(MoneyType, self)
 
         if money._currency:
