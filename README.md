@@ -10,7 +10,7 @@
 
 *Library for formatting and performing arithmetic and comparison operations on monetary amounts. Also with support for currency handling, exchange and network transport structure generation as well as parsing.*
 
-<img width="550" alt="Screenshot 2021-06-29 at 18 48 12" src="https://user-images.githubusercontent.com/89139/123837060-b4bb3480-d90a-11eb-98d9-ce4e5d01dadc.png">
+<img width="550" alt="Screenshot 2021-06-29 at 19 01 38" src="https://user-images.githubusercontent.com/89139/123838632-79ba0080-d90c-11eb-8a1e-5a67c63c24d8.png">
 
 Basically `stockholm` is a human friendly and modern `Money` class for Python 3. This is a library to be used by backend and frontend API coders of fintech companies, web merchants or subscription services. It's great for calculations of amounts while keeping a great level of precision or producing output for transport layers as well as having a robust and easy way to import/export values in *GraphQL*, *JSON*, *Protocol Buffers*, etc.
 
