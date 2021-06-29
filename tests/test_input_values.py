@@ -3,7 +3,7 @@ from typing import Any, Optional
 
 import pytest
 
-from stockholm import ConversionError, Currency, Money, MoneyProtoMessage
+from stockholm import ConversionError, Currency, Money, MoneyProtobufMessage
 
 
 @pytest.mark.parametrize(
@@ -121,8 +121,8 @@ from stockholm import ConversionError, Currency, Money, MoneyProtoMessage
         (b'{"val": "31338.13"', None, ConversionError),
         (b"{1}", None, ConversionError),
         ("{1}", None, ConversionError),
-        (MoneyProtoMessage.FromString(b"\n\x03EUR\x10\x01\x18\x80\xca\xb5\xee\x01"), None, None),
-        (MoneyProtoMessage.FromString(b""), None, None),
+        (MoneyProtobufMessage.FromString(b"\n\x03EUR\x10\x01\x18\x80\xca\xb5\xee\x01"), None, None),
+        (MoneyProtobufMessage.FromString(b""), None, None),
     ],
 )
 def test_input_values(amount: Any, currency: Any, exception_expected: Optional[Exception]) -> None:

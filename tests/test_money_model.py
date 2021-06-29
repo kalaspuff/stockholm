@@ -1,4 +1,4 @@
-from stockholm import MoneyProtoMessage
+from stockholm import MoneyProtobufMessage
 from stockholm.money import MoneyModel
 
 
@@ -27,5 +27,5 @@ def test_money_model_from_protobuf_bytes():
 
 
 def test_money_model_from_protobuf():
-    input_proto_message = MoneyProtoMessage.FromString(b"\n\x03JPY\x10\x87\xf8\xb0\x06")
+    input_proto_message = MoneyProtobufMessage.FromString(b"\n\x03JPY\x10\x87\xf8\xb0\x06")
     assert str(MoneyModel.from_protobuf(input_proto_message)) == "13384711.00 JPY"

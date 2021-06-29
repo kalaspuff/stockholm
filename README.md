@@ -301,17 +301,17 @@ money = Money.from_protobuf(b'\n\x03SEK\x10\xe7$\x18\x80\xaf\xd0\xe5\x02')
 # <stockholm.Money: "4711.75 SEK">
 
 # In another example we'll build the message just before hand to be extra descriptive
-# of what's happening. The stockholm.MoneyProtoMessage class is a compiled Python
+# of what's happening. The stockholm.MoneyProtobufMessage class is a compiled Python
 # representation of the google.type.Money protobuf message definition. You can also use
 # your own custom class.
-from stockholm import MoneyProtoMessage
-message = MoneyProtoMessage()
+from stockholm import MoneyProtobufMessage
+message = MoneyProtobufMessage()
 message.units = 2549
 message.nanos = 990000000
 # If you're using custom classes that aren't generated from google.type.Money, then pass
 # your generated class as the proto_class keyword argument. In this example, it's not
-# actually needed, since MoneyProtoMessage is built from google.type.Money definitions.
-money = Money.from_protobuf(message, proto_class=MoneyProtoMessage)
+# actually needed, since MoneyProtobufMessage is built from google.type.Money definitions.
+money = Money.from_protobuf(message, proto_class=MoneyProtobufMessage)
 # <stockholm.Money: "2549.99">
 message.SerializeToString()
 # b'\x10\xf5\x13\x18\x80\xe7\x88\xd8\x03'
@@ -478,11 +478,11 @@ money.as_protobuf()
 # currency_code: "EUR"
 # units: 59112
 # nanos: 500000000
-# Type: stockholm.proto.money_pb2.Money, generated from proto definitions at
+# Type: stockholm.protobuf.money_pb2.Money, generated from proto definitions at
 # https://github.com/googleapis/googleapis/blob/master/google/type/money.proto
 
-money.as_protobuf(proto_class=CustomMoneyProtoMessage)
-# Type: An instance of CustomMoneyProtoMessage populated with the properties of money
+money.as_protobuf(proto_class=CustomMoneyProtobufMessage)
+# Type: An instance of CustomMoneyProtobufMessage populated with the properties of money
 ```
 
 

@@ -7,35 +7,7 @@ from typing import Any, Dict, Generic, Iterable, List, Optional, Tuple, Type, Ty
 
 from .currency import BaseCurrency, BaseCurrencyType
 from .exceptions import ConversionError, CurrencyMismatchError, InvalidOperandError
-
-try:
-    from google.protobuf.message import Message as ProtoMessage
-except Exception:  # pragma: no cover
-
-    class ProtoMessage(object):  # type: ignore
-        pass
-
-
-try:
-    from .proto.money_pb2 import Money as MoneyProtoMessage
-except Exception:  # pragma: no cover
-
-    class MoneyProtoMessage(object):  # type: ignore
-        def __init__(self, *args: Any, **kwargs: Any) -> None:
-            raise Exception("google.protobuf package not installed")
-
-        def SerializeToString(self, *args: Any, **kwargs: Any) -> None:
-            raise Exception("google.protobuf package not installed")
-
-        def FromString(self, *args: Any, **kwargs: Any) -> None:
-            raise Exception("google.protobuf package not installed")
-
-        def ParseFromString(self, *args: Any, **kwargs: Any) -> None:
-            raise Exception("google.protobuf package not installed")
-
-        def MergeFromString(self, *args: Any, **kwargs: Any) -> None:
-            raise Exception("google.protobuf package not installed")
-
+from .protobuf import GenericProtobufMessage, MoneyProtobufMessage
 
 __all__ = ["Money"]
 
@@ -127,7 +99,7 @@ class MoneyModel(Generic[MoneyType]):
     def from_protobuf(
         cls: Type[MoneyType],
         input_value: Union[str, bytes, object],
-        proto_class: Type[ProtoMessage] = MoneyProtoMessage,
+        proto_class: Type[GenericProtobufMessage] = MoneyProtobufMessage,
     ) -> MoneyType:
         if input_value is not None and isinstance(input_value, bytes):
             input_value = proto_class.FromString(input_value)
@@ -252,11 +224,11 @@ class MoneyModel(Generic[MoneyType]):
 
         if amount is not None and isinstance(amount, bytes):
             try:
-                amount = MoneyProtoMessage.FromString(amount)
+                amount = MoneyProtobufMessage.FromString(amount)
             except Exception:
                 pass
 
-        if amount is not None and isinstance(amount, ProtoMessage):
+        if amount is not None and isinstance(amount, GenericProtobufMessage):
             amount = str(
                 self.__class__.from_dict(
                     {
@@ -488,7 +460,7 @@ class MoneyModel(Generic[MoneyType]):
     def json(self, keys: Union[List[str], Tuple[str, ...]] = ("value", "units", "nanos", "currency_code")) -> str:
         return self.as_json(keys=keys)
 
-    def as_protobuf(self, proto_class: Type[ProtoMessage] = MoneyProtoMessage) -> ProtoMessage:
+    def as_protobuf(self, proto_class: Type[GenericProtobufMessage] = MoneyProtobufMessage) -> GenericProtobufMessage:
         message = proto_class()
 
         mapping = {
@@ -510,13 +482,13 @@ class MoneyModel(Generic[MoneyType]):
 
         return message
 
-    def as_proto(self, proto_class: Type[ProtoMessage] = MoneyProtoMessage) -> ProtoMessage:
+    def as_proto(self, proto_class: Type[GenericProtobufMessage] = MoneyProtobufMessage) -> GenericProtobufMessage:
         return self.as_protobuf(proto_class=proto_class)
 
-    def protobuf(self, proto_class: Type[ProtoMessage] = MoneyProtoMessage) -> ProtoMessage:
+    def protobuf(self, proto_class: Type[GenericProtobufMessage] = MoneyProtobufMessage) -> GenericProtobufMessage:
         return self.as_protobuf(proto_class=proto_class)
 
-    def proto(self, proto_class: Type[ProtoMessage] = MoneyProtoMessage) -> ProtoMessage:
+    def proto(self, proto_class: Type[GenericProtobufMessage] = MoneyProtobufMessage) -> GenericProtobufMessage:
         return self.as_protobuf(proto_class=proto_class)
 
     def is_signed(self) -> bool:
@@ -929,7 +901,7 @@ class Money(MoneyModel):
 
     @classmethod
     def from_protobuf(
-        cls, input_value: Union[str, bytes, object], proto_class: Type[ProtoMessage] = MoneyProtoMessage
+        cls, input_value: Union[str, bytes, object], proto_class: Type[GenericProtobufMessage] = MoneyProtobufMessage
     ) -> "Money":
         if input_value is not None and isinstance(input_value, bytes):
             input_value = proto_class.FromString(input_value)
@@ -952,6 +924,6 @@ class Money(MoneyModel):
 
     @classmethod
     def from_proto(
-        cls, input_value: Union[str, bytes, object], proto_class: Type[ProtoMessage] = MoneyProtoMessage
+        cls, input_value: Union[str, bytes, object], proto_class: Type[GenericProtobufMessage] = MoneyProtobufMessage
     ) -> "Money":
         return cls.from_protobuf(input_value, proto_class=proto_class)

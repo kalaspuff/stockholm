@@ -3,7 +3,7 @@ from typing import Any, Optional
 
 import pytest
 
-from stockholm import Currency, Money, MoneyProtoMessage
+from stockholm import Currency, Money, MoneyProtobufMessage
 
 
 class ThirdPartyMoney:
@@ -95,8 +95,8 @@ class ThirdPartyMoney:
         ('{"value": "31338.13", "currency_code": "NOK"}', None, False, "31338.13 NOK"),
         (b'{"value": "31338.13", "currency_code": "NOK"}', None, False, "31338.13 NOK"),
         (b'{"value": "31338.13", "currency_code": "NOK"}', "NOK", False, "31338.13 NOK"),
-        (MoneyProtoMessage.FromString(b"\n\x03EUR\x10\x01\x18\x80\xca\xb5\xee\x01"), None, False, "1.50 EUR"),
-        (MoneyProtoMessage.FromString(b""), None, False, "0.00"),
+        (MoneyProtobufMessage.FromString(b"\n\x03EUR\x10\x01\x18\x80\xca\xb5\xee\x01"), None, False, "1.50 EUR"),
+        (MoneyProtobufMessage.FromString(b""), None, False, "0.00"),
     ],
 )
 def test_basic_str_output(amount: Any, currency: Any, from_sub_units: Optional[bool], expected: str) -> None:
