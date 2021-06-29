@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import sys
 from decimal import Decimal
 from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union, cast
@@ -10,7 +12,7 @@ class MetaCurrency(type):
     preferred_ticker: Optional[str]
     _meta: bool
 
-    def __new__(cls, name: str, bases: Tuple[type, ...], attributedict: Dict) -> "MetaCurrency":
+    def __new__(cls: Type[MetaCurrency], name: str, bases: Tuple[type, ...], attributedict: Dict) -> MetaCurrency:
         ticker = attributedict.get("ticker", attributedict.get("__qualname__"))
         decimal_digits = attributedict.get("decimal_digits", 2)
         interchangeable_with = attributedict.get("interchangeable_with")
@@ -22,12 +24,11 @@ class MetaCurrency(type):
         attributedict["interchangeable_with"] = sorted(interchangeable_with) if interchangeable_with else None
         attributedict["preferred_ticker"] = preferred_ticker if preferred_ticker else None
 
-        attributedict["_meta"] = bool(not bases)
+        attributedict["_meta"] = bool(not bases or (name in ("BaseCurrency", "Currency") and len(bases) == 1 and str(type(bases[0])) == "<class 'stockholm.currency.MetaCurrency'>"))
         attributedict["as_string"] = lambda: str(attributedict["ticker"])
         attributedict["as_str"] = lambda: str(attributedict["ticker"])
 
-        result: Type[BaseCurrency] = type.__new__(cls, name, bases, attributedict)
-        return result
+        return cast(Type["BaseCurrency"], super().__new__(cls, name, bases, attributedict))
 
     def money(
         self,
@@ -110,8 +111,14 @@ class MetaCurrency(type):
     def __bool__(self) -> bool:
         return bool(self.ticker)
 
+    def __instancecheck__(self, instance: Any) -> bool:
+        return_value = super().__instancecheck__(instance)
+        if not return_value and (type(instance) is BaseCurrency or type(instance) is BaseCurrencyType):
+            return True
+        return return_value
 
-class BaseCurrency(metaclass=MetaCurrency):
+
+class BaseCurrencyType(metaclass=MetaCurrency):
     ticker: str
     decimal_digits: int
     interchangeable_with: Optional[Union[Tuple[str, ...], List[str], Set[str]]]
@@ -125,9 +132,6 @@ class BaseCurrency(metaclass=MetaCurrency):
         interchangeable_with: Optional[Union[Tuple[str, ...], List[str], Set[str]]] = None,
         preferred_ticker: Optional[str] = None,
     ) -> None:
-        if not self._meta:
-            raise TypeError("'BaseCurrency' object is not callable")
-
         if currency and isinstance(currency, BaseCurrency):
             object.__setattr__(self, "ticker", currency.ticker)
             decimal_digits = currency.decimal_digits if decimal_digits is None else decimal_digits
@@ -195,12 +199,12 @@ class BaseCurrency(metaclass=MetaCurrency):
         if self.ticker:
             if not other:
                 return False
-            elif isinstance(other, BaseCurrency):
+            elif isinstance(other, (BaseCurrency, BaseCurrencyType)) or isinstance(type(other), BaseCurrency):
                 return bool(self.ticker == other.ticker)
             elif isinstance(other, str):
                 return bool(self.ticker == other)
         else:
-            if isinstance(other, BaseCurrency):
+            if isinstance(other, (BaseCurrency, BaseCurrencyType)) or isinstance(type(other), BaseCurrency):
                 return not other.ticker
             elif isinstance(other, str):
                 return bool(other == "")
@@ -216,6 +220,18 @@ class BaseCurrency(metaclass=MetaCurrency):
 
     def __bool__(self) -> bool:
         return bool(self.ticker)
+
+
+class BaseCurrency(BaseCurrencyType):
+    def __new__(cls,
+        currency: Optional[Union["Currency", str]] = None,
+        decimal_digits: Optional[int] = None,
+        interchangeable_with: Optional[Union[Tuple[str, ...], List[str], Set[str]]] = None,
+        preferred_ticker: Optional[str] = None,
+    ) -> BaseCurrency:
+        if not cls._meta:
+            raise TypeError("'BaseCurrency' object is not callable")
+        return cast(BaseCurrency, BaseCurrencyType(currency=currency, decimal_digits=decimal_digits, interchangeable_with=interchangeable_with, preferred_ticker=preferred_ticker))
 
 
 # ISO 4217 currency codes
@@ -1505,21 +1521,319 @@ def get_currency(ticker: str) -> BaseCurrency:
     return cast(BaseCurrency, getattr(sys.modules[__name__], ticker, BaseCurrency(ticker)))
 
 
-def all_currencies() -> List[str]:
-    return [ticker for ticker in dir(sys.modules[__name__]) if ticker and ticker == ticker.upper()]
+# Note to future self – this is generally bad practice (but helps with type hint annotations).
+class Currency(BaseCurrency):
+    ADF = ADF
+    ADP = ADP
+    AED = AED
+    AFA = AFA
+    AFN = AFN
+    ALL = ALL
+    AMD = AMD
+    ANG = ANG
+    AOA = AOA
+    AOK = AOK
+    AON = AON
+    AOR = AOR
+    ARA = ARA
+    ARL = ARL
+    ARP = ARP
+    ARS = ARS
+    ATS = ATS
+    AUD = AUD
+    AWG = AWG
+    AZM = AZM
+    AZN = AZN
+    BAD = BAD
+    BAM = BAM
+    BBD = BBD
+    BCH = BCH
+    BDT = BDT
+    BEF = BEF
+    BGL = BGL
+    BGN = BGN
+    BHD = BHD
+    BIF = BIF
+    BMD = BMD
+    BNB = BNB
+    BND = BND
+    BOB = BOB
+    BOP = BOP
+    BOV = BOV
+    BRB = BRB
+    BRC = BRC
+    BRE = BRE
+    BRL = BRL
+    BRN = BRN
+    BRR = BRR
+    BSD = BSD
+    BTC = BTC
+    BTN = BTN
+    BWP = BWP
+    BYB = BYB
+    BYN = BYN
+    BYR = BYR
+    BZD = BZD
+    CAD = CAD
+    CDF = CDF
+    CHE = CHE
+    CHF = CHF
+    CHW = CHW
+    CLF = CLF
+    CLP = CLP
+    CNH = CNH
+    CNY = CNY
+    COP = COP
+    COU = COU
+    CRC = CRC
+    CSD = CSD
+    CSK = CSK
+    CUC = CUC
+    CUP = CUP
+    CVE = CVE
+    CYP = CYP
+    CZK = CZK
+    DDM = DDM
+    DEM = DEM
+    DJF = DJF
+    DKK = DKK
+    DOGE = DOGE
+    DOP = DOP
+    DZD = DZD
+    ECS = ECS
+    ECV = ECV
+    EEK = EEK
+    EGP = EGP
+    EOS = EOS
+    ERN = ERN
+    ESA = ESA
+    ESB = ESB
+    ESP = ESP
+    ETB = ETB
+    ETH = ETH
+    EUR = EUR
+    FIM = FIM
+    FJD = FJD
+    FKP = FKP
+    FRF = FRF
+    GBP = GBP
+    GEL = GEL
+    GGP = GGP
+    GHC = GHC
+    GHS = GHS
+    GIP = GIP
+    GMD = GMD
+    GNE = GNE
+    GNF = GNF
+    GQE = GQE
+    GRD = GRD
+    GTQ = GTQ
+    GWP = GWP
+    GYD = GYD
+    HKD = HKD
+    HNL = HNL
+    HRD = HRD
+    HRK = HRK
+    HTG = HTG
+    HUF = HUF
+    IDR = IDR
+    IEP = IEP
+    ILP = ILP
+    ILR = ILR
+    ILS = ILS
+    IMP = IMP
+    INR = INR
+    IQD = IQD
+    IRR = IRR
+    ISJ = ISJ
+    ISK = ISK
+    ITL = ITL
+    JED = JED
+    JMD = JMD
+    JOD = JOD
+    JPY = JPY
+    KES = KES
+    KGS = KGS
+    KHR = KHR
+    KID = KID
+    KMF = KMF
+    KPW = KPW
+    KRW = KRW
+    KWD = KWD
+    KYD = KYD
+    KZT = KZT
+    LAJ = LAJ
+    LAK = LAK
+    LBP = LBP
+    LKR = LKR
+    LRD = LRD
+    LSL = LSL
+    LTC = LTC
+    LTL = LTL
+    LUF = LUF
+    LVL = LVL
+    LYD = LYD
+    MAD = MAD
+    MAF = MAF
+    MCF = MCF
+    MDL = MDL
+    MGA = MGA
+    MGF = MGF
+    MKD = MKD
+    MKN = MKN
+    MLF = MLF
+    MMK = MMK
+    MNT = MNT
+    MOP = MOP
+    MRO = MRO
+    MRU = MRU
+    MTL = MTL
+    MUR = MUR
+    MVQ = MVQ
+    MVR = MVR
+    MWK = MWK
+    MXN = MXN
+    MXP = MXP
+    MXV = MXV
+    MYR = MYR
+    MZM = MZM
+    MZN = MZN
+    NAD = NAD
+    NGN = NGN
+    NIC = NIC
+    NIO = NIO
+    NIS = NIS
+    NLG = NLG
+    NOK = NOK
+    NPR = NPR
+    NTD = NTD
+    NZD = NZD
+    OMR = OMR
+    PAB = PAB
+    PEH = PEH
+    PEI = PEI
+    PEN = PEN
+    PGK = PGK
+    PHP = PHP
+    PKR = PKR
+    PLN = PLN
+    PLZ = PLZ
+    PRB = PRB
+    PTE = PTE
+    PYG = PYG
+    QAR = QAR
+    RMB = RMB
+    ROL = ROL
+    RON = RON
+    RSD = RSD
+    RUB = RUB
+    RUR = RUR
+    RWF = RWF
+    SAR = SAR
+    SBD = SBD
+    SCR = SCR
+    SDD = SDD
+    SDG = SDG
+    SDP = SDP
+    SEK = SEK
+    SGD = SGD
+    SHP = SHP
+    SIT = SIT
+    SKK = SKK
+    SLL = SLL
+    SLS = SLS
+    SML = SML
+    SOS = SOS
+    SRD = SRD
+    SRG = SRG
+    SSP = SSP
+    STD = STD
+    STN = STN
+    SUR = SUR
+    SVC = SVC
+    SYP = SYP
+    SZL = SZL
+    THB = THB
+    TJR = TJR
+    TJS = TJS
+    TMM = TMM
+    TMT = TMT
+    TND = TND
+    TOP = TOP
+    TPE = TPE
+    TRL = TRL
+    TRY = TRY
+    TTD = TTD
+    TVD = TVD
+    TWD = TWD
+    TZS = TZS
+    UAH = UAH
+    UAK = UAK
+    UGS = UGS
+    UGX = UGX
+    USD = USD
+    USDC = USDC
+    USDT = USDT
+    USN = USN
+    USS = USS
+    UYI = UYI
+    UYN = UYN
+    UYP = UYP
+    UYU = UYU
+    UYW = UYW
+    UZS = UZS
+    VAL = VAL
+    VEB = VEB
+    VEF = VEF
+    VES = VES
+    VND = VND
+    VUV = VUV
+    WST = WST
+    XAF = XAF
+    XAG = XAG
+    XAU = XAU
+    XBA = XBA
+    XBB = XBB
+    XBC = XBC
+    XBD = XBD
+    XBT = XBT
+    XCD = XCD
+    XCH = XCH
+    XDR = XDR
+    XEU = XEU
+    XFO = XFO
+    XFU = XFU
+    XLM = XLM
+    XMR = XMR
+    XOF = XOF
+    XPD = XPD
+    XPF = XPF
+    XPT = XPT
+    XRP = XRP
+    XSU = XSU
+    XTS = XTS
+    XUA = XUA
+    XXX = XXX
+    YDD = YDD
+    YER = YER
+    YUD = YUD
+    YUG = YUG
+    YUM = YUM
+    YUN = YUN
+    YUO = YUO
+    YUR = YUR
+    ZAL = ZAL
+    ZAR = ZAR
+    ZMK = ZMK
+    ZMW = ZMW
+    ZRN = ZRN
+    ZRZ = ZRZ
+    ZWB = ZWB
+    ZWC = ZWC
+    ZWD = ZWD
+    ZWL = ZWL
+    ZWN = ZWN
+    ZWR = ZWR
 
-
-class Currency(type):
-    def __new__(cls, *args: Any, **kwargs: Any) -> BaseCurrency:  # type: ignore
-        result: BaseCurrency = BaseCurrency(*args, **kwargs)
-        return result
-
-    @staticmethod
-    def _load_currencies(currencies: List[str]) -> None:
-        for ticker in currencies:
-            setattr(Currency, ticker, getattr(sys.modules[__name__], ticker))
-
-
-Currency._load_currencies(all_currencies())
 
 from stockholm.money import Money  # noqa isort:skip
