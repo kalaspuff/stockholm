@@ -24,22 +24,30 @@ def get_transaction_amounts(content: str) -> List[Money]:
 
         try:
             if line.startswith("00"):
-                transaction_count = int(line[64:(64 + 6)])
+                transaction_count = int(line[64 : (64 + 6)])
             elif line.startswith("99"):
-                total_amount = Money(line[25:(25 + 11)], from_sub_units=True, currency=get_currency(line[36:(36 + 3)]))
-                transaction_count_validation = int(line[16:(16 + 6)])
+                total_amount = Money(
+                    line[25 : (25 + 11)], from_sub_units=True, currency=get_currency(line[36 : (36 + 3)])
+                )
+                transaction_count_validation = int(line[16 : (16 + 6)])
                 break
             elif line.startswith("4"):
-                amount = Money(line[27:(27 + 9)], from_sub_units=True, currency=get_currency(line[50:(50 + 3)]))
+                amount = Money(line[27 : (27 + 9)], from_sub_units=True, currency=get_currency(line[50 : (50 + 3)]))
                 amounts.append((amount))
         except Exception as exc:
-            raise Exception(f"Invalid content format – [line number = {line_num}, line length = {len(line)}, exception = ({type(exc)} – '{exc}')]")
+            raise Exception(
+                f"Invalid content format – [line number = {line_num}, line length = {len(line)}, exception = ({type(exc)} – '{exc}')]"
+            )
 
     if transaction_count != transaction_count_validation:
-        raise Exception(f"Transaction count does not match – ['00': count = {transaction_count} | '99': count = {transaction_count_validation}]")
+        raise Exception(
+            f"Transaction count does not match – ['00': count = {transaction_count} | '99': count = {transaction_count_validation}]"
+        )
 
     if transaction_count != len(amounts):
-        raise Exception(f"Transaction count does not match – ['00': count = {transaction_count} | '4X': count = {len(amounts)}]")
+        raise Exception(
+            f"Transaction count does not match – ['00': count = {transaction_count} | '4X': count = {len(amounts)}]"
+        )
 
     if not transaction_count:
         return amounts
@@ -49,17 +57,25 @@ def get_transaction_amounts(content: str) -> List[Money]:
         total_amount_sum = Money.sum(amounts)
     except CurrencyMismatchError:
         currency_codes_string = "', '".join({str(a.currency_code) for a in amounts})
-        raise Exception(f"Multiple currency codes within the same content block – ['00': currency = '{total_amount.currency}' | '4X': currencies = ('{currency_codes_string}')]")
+        raise Exception(
+            f"Multiple currency codes within the same content block – ['00': currency = '{total_amount.currency}' | '4X': currencies = ('{currency_codes_string}')]"
+        )
 
     if total_amount.currency != total_amount_sum.currency:
-        raise Exception(f"Currency codes does not match – ['00': currency = '{total_amount.currency}' | '4X': currency = '{total_amount_sum.currency}']")
+        raise Exception(
+            f"Currency codes does not match – ['00': currency = '{total_amount.currency}' | '4X': currency = '{total_amount_sum.currency}']"
+        )
 
     if not total_amount.currency:
-        raise Exception(f"Currency codes missing – ['00': currency = '{total_amount.currency}' | '4X': currency = '{total_amount_sum.currency}']")
+        raise Exception(
+            f"Currency codes missing – ['00': currency = '{total_amount.currency}' | '4X': currency = '{total_amount_sum.currency}']"
+        )
 
     if total_amount != total_amount_sum:
         diff = abs(total_amount - total_amount_sum)
-        raise Exception(f"Sums of amounts differ with {diff} – ['00': amount = {total_amount} | '4X': amount = {total_amount_sum}]")
+        raise Exception(
+            f"Sums of amounts differ with {diff} – ['00': amount = {total_amount} | '4X': amount = {total_amount_sum}]"
+        )
 
     return amounts
 
