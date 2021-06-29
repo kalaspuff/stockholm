@@ -459,7 +459,7 @@ protobuf = ["protobuf"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "e60295090d41bd325f2a8fd06e790b0d76afed13abc1f439c6f6d99135729330"
+content-hash = "a813d84b487934752f8d5194837e179f5ded24c39a61e15cd84cce8784425319"
 
 [metadata.files]
 appdirs = [
