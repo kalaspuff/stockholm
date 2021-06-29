@@ -21,7 +21,7 @@ flake8:
 	poetry run flake8 ${PACKAGENAME}/ tests/
 
 mypy:
-	poetry run mypy ${PACKAGENAME}/
+	poetry run mypy ${PACKAGENAME}/ tests/types/
 
 version:
 	poetry version `python ${PACKAGENAME}/__version__.py`
