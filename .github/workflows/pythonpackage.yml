@@ -46,7 +46,7 @@ jobs:
         PACKAGENAME=$(poetry version | awk {'print $1'}) && flake8 $PACKAGENAME/ tests/
     - name: Type check with mypy
       run: |
-        PACKAGENAME=$(poetry version | awk {'print $1'}) && mypy $PACKAGENAME/ tests/types/
+        PACKAGENAME=$(poetry version | awk {'print $1'}) && mypy $PACKAGENAME/ tests/types/ tests/examples/
     - name: Codecov
       run: |
         codecov --token=${{ secrets.CODECOV_TOKEN }}
