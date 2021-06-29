@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.5.0] - 2021-06-30
+
+* Major updates to improve type hints and intellisense within editors.
+* Reworked the currency classes to utilize the metaclass in a better way.
+* Additional updates to ease development working with Protocol Buffers and monetary amounts (mostly related to better type hint annotations which gives a better developer experience).
+* Updates to the readme with additional examples.
+* Dropped support for Python 3.6.
+
+
 ## [0.4.4] - 2020-11-09
 
 * Python 3.9 supported.
