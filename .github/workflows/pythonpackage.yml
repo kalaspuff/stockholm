@@ -11,7 +11,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9]
+        python-version: [3.7, 3.8, 3.9]
 
     steps:
     - uses: actions/checkout@v2
@@ -46,7 +46,7 @@ jobs:
         PACKAGENAME=$(poetry version | awk {'print $1'}) && flake8 $PACKAGENAME/ tests/
     - name: Type check with mypy
       run: |
-        PACKAGENAME=$(poetry version | awk {'print $1'}) && mypy $PACKAGENAME/
+        PACKAGENAME=$(poetry version | awk {'print $1'}) && mypy $PACKAGENAME/ tests/types/
     - name: Codecov
       run: |
         codecov --token=${{ secrets.CODECOV_TOKEN }}

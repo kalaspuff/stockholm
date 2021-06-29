@@ -3,7 +3,7 @@ from decimal import Decimal
 import pytest
 
 import stockholm
-from stockholm import BaseCurrency, Currency, Money
+from stockholm import BaseCurrency, Currency, DefaultCurrency, Money
 from stockholm.currency import CLF, DOGE, IQD, JPY, USD, XBT, Bitcoin, DogeCoin, Ethereum, get_currency
 
 
@@ -26,6 +26,25 @@ def test_currency():
     assert str(m.currency.ticker) == "EUR"
     assert m.currency_code == "EUR"
     assert EUR.decimal_digits == 2
+
+
+def test_default_currency():
+    with pytest.raises(TypeError):
+        DefaultCurrency()
+
+    m1 = Money(4711)
+    m2 = Money(4711, DefaultCurrency)
+    m3 = Money(4711, currency=DefaultCurrency)
+
+    assert m1 == m2 == m3
+
+    assert m1.currency is None
+    assert m2.currency is None
+    assert m3.currency is None
+
+    assert m1.currency_code is None
+    assert m2.currency_code is None
+    assert m3.currency_code is None
 
 
 def test_currency_arithmetics():

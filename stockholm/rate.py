@@ -1,10 +1,10 @@
 import decimal
 from decimal import ROUND_HALF_UP, Decimal
-from typing import Any, Dict, Optional, Type, Union, cast
+from typing import Any, Dict, Optional, Union, cast
 
-from .currency import BaseCurrency
+from .currency import CurrencyValue, DefaultCurrency, DefaultCurrencyValue
 from .exceptions import ConversionError
-from .money import DefaultCurrency, Money, MoneyType
+from .money import Money, MoneyType
 
 RoundingContext = decimal.Context(rounding=ROUND_HALF_UP)
 
@@ -16,7 +16,7 @@ class Rate(Money):
     def from_sub_units(
         cls,
         amount: Optional[Union[MoneyType, Decimal, int, float, str, object]],
-        currency: Optional[Union[Type[DefaultCurrency], BaseCurrency, str]] = DefaultCurrency,
+        currency: Optional[Union[DefaultCurrencyValue, CurrencyValue, str]] = DefaultCurrency,
         value: Optional[Union[MoneyType, Decimal, int, float, str]] = None,
         currency_code: Optional[str] = None,
         **kwargs: Any,
@@ -30,7 +30,7 @@ class Rate(Money):
     def __init__(
         self,
         amount: Optional[Union[MoneyType, Decimal, Dict, int, float, str, object]] = None,
-        currency: Optional[Union[Type[DefaultCurrency], BaseCurrency, str]] = DefaultCurrency,
+        currency: Optional[Union[DefaultCurrencyValue, CurrencyValue, str]] = DefaultCurrency,
         from_sub_units: Optional[bool] = None,
         units: Optional[int] = None,
         nanos: Optional[int] = None,
@@ -67,7 +67,7 @@ class Rate(Money):
     def asdict(self) -> Dict:
         return {"value": self.value, "units": self.units, "nanos": self.nanos}
 
-    def to_currency(self, currency: Optional[Union[BaseCurrency, str]]) -> MoneyType:
+    def to_currency(self, currency: Optional[Union[CurrencyValue, str]]) -> MoneyType:
         raise ConversionError("Rates does not have a currency")
 
     def to_sub_units(self) -> MoneyType:
