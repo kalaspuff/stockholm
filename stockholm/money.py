@@ -39,6 +39,7 @@ _parse_format_specifier_regex = re.compile(
 )
 
 MoneyType = TypeVar("MoneyType", bound="MoneyModel")
+ProtobufMessageType = TypeVar("ProtobufMessageType", bound=GenericProtobufMessage)
 
 
 class DefaultCurrency:
@@ -472,8 +473,8 @@ class MoneyModel(Generic[MoneyType]):
     def json(self, keys: Union[List[str], Tuple[str, ...]] = ("value", "units", "nanos", "currency_code")) -> str:
         return self.as_json(keys=keys)
 
-    def as_protobuf(self, proto_class: Type[GenericProtobufMessage] = MoneyProtobufMessage) -> GenericProtobufMessage:
-        message = proto_class()
+    def as_protobuf(self, proto_class: Type[ProtobufMessageType] = MoneyProtobufMessage) -> ProtobufMessageType:  # type: ignore
+        message: ProtobufMessageType = proto_class()
 
         mapping = {
             "value": self.value,
@@ -494,13 +495,13 @@ class MoneyModel(Generic[MoneyType]):
 
         return message
 
-    def as_proto(self, proto_class: Type[GenericProtobufMessage] = MoneyProtobufMessage) -> GenericProtobufMessage:
+    def as_proto(self, proto_class: Type[ProtobufMessageType] = MoneyProtobufMessage) -> ProtobufMessageType:  # type: ignore
         return self.as_protobuf(proto_class=proto_class)
 
-    def protobuf(self, proto_class: Type[GenericProtobufMessage] = MoneyProtobufMessage) -> GenericProtobufMessage:
+    def protobuf(self, proto_class: Type[ProtobufMessageType] = MoneyProtobufMessage) -> ProtobufMessageType:  # type: ignore
         return self.as_protobuf(proto_class=proto_class)
 
-    def proto(self, proto_class: Type[GenericProtobufMessage] = MoneyProtobufMessage) -> GenericProtobufMessage:
+    def proto(self, proto_class: Type[ProtobufMessageType] = MoneyProtobufMessage) -> ProtobufMessageType:  # type: ignore
         return self.as_protobuf(proto_class=proto_class)
 
     def is_signed(self) -> bool:

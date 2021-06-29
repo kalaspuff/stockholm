@@ -12,7 +12,7 @@ except Exception:  # pragma: no cover
     setattr(this_module, "GenericProtobufMessage", _GenericProtobufMessage)
 
 try:
-    from .money_pb2 import Money as MoneyProtobufMessage  # noqa
+    from .money_pb2 import MoneyProtobufMessage  # noqa
 except Exception:  # pragma: no cover
 
     class _MoneyProtobufMessage(object):

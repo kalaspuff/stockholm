@@ -10,7 +10,7 @@ import typing_extensions
 
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor = ...
 
-class Money(google.protobuf.message.Message):
+class MoneyProtobufMessage(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
     CURRENCY_CODE_FIELD_NUMBER: builtins.int
     UNITS_FIELD_NUMBER: builtins.int
@@ -30,4 +30,5 @@ class Money(google.protobuf.message.Message):
         field_name: typing_extensions.Literal["currency_code", b"currency_code", "nanos", b"nanos", "units", b"units"],
     ) -> None: ...
 
+Money = MoneyProtobufMessage
 global___Money = Money

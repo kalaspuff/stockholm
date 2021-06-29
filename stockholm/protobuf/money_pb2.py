@@ -106,7 +106,7 @@ _MONEY = _descriptor.Descriptor(
 DESCRIPTOR.message_types_by_name["Money"] = _MONEY
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
-Money = _reflection.GeneratedProtocolMessageType(
+MoneyProtobufMessage = _reflection.GeneratedProtocolMessageType(
     "Money",
     (_message.Message,),
     {
@@ -115,6 +115,7 @@ Money = _reflection.GeneratedProtocolMessageType(
         # @@protoc_insertion_point(class_scope:google.type.Money)
     },
 )
+Money = MoneyProtobufMessage
 _sym_db.RegisterMessage(Money)
 
 
