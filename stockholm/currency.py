@@ -4,8 +4,6 @@ import sys
 from decimal import Decimal
 from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union, cast
 
-from .compat import Protocol
-
 
 class DefaultCurrencyValue(type):
     pass
@@ -1863,11 +1861,5 @@ class Currency(BaseCurrency):
     ZWR = ZWR
 
 
-class CurrencyValue(Protocol):
-    ticker: str
-    decimal_digits: int
-    interchangeable_with: Optional[Union[Tuple[str, ...], List[str], Set[str]]]
-    preferred_ticker: Optional[str]
-
-
+from .compat import CurrencyValue  # noqa isort:skip
 from stockholm.money import Money  # noqa isort:skip
