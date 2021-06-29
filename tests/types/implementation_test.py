@@ -1,6 +1,5 @@
 import stockholm.currency
-from stockholm import Money, Currency, BaseCurrency, get_currency
-
+from stockholm import BaseCurrency, Currency, Money, get_currency
 
 assert Money(100, stockholm.currency.EUR) == Money("100 EUR")
 assert Money(100, BaseCurrency("SEK")) == Money("100 SEK")

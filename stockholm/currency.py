@@ -24,7 +24,14 @@ class MetaCurrency(type):
         attributedict["interchangeable_with"] = sorted(interchangeable_with) if interchangeable_with else None
         attributedict["preferred_ticker"] = preferred_ticker if preferred_ticker else None
 
-        attributedict["_meta"] = bool(not bases or (name in ("BaseCurrency", "Currency") and len(bases) == 1 and str(type(bases[0])) == "<class 'stockholm.currency.MetaCurrency'>"))
+        attributedict["_meta"] = bool(
+            not bases
+            or (
+                name in ("BaseCurrency", "Currency")
+                and len(bases) == 1
+                and str(type(bases[0])) == "<class 'stockholm.currency.MetaCurrency'>"
+            )
+        )
         attributedict["as_string"] = lambda: str(attributedict["ticker"])
         attributedict["as_str"] = lambda: str(attributedict["ticker"])
 
@@ -223,7 +230,8 @@ class BaseCurrencyType(metaclass=MetaCurrency):
 
 
 class BaseCurrency(BaseCurrencyType):
-    def __new__(cls,
+    def __new__(
+        cls,
         currency: Optional[Union["Currency", str]] = None,
         decimal_digits: Optional[int] = None,
         interchangeable_with: Optional[Union[Tuple[str, ...], List[str], Set[str]]] = None,
@@ -231,7 +239,15 @@ class BaseCurrency(BaseCurrencyType):
     ) -> BaseCurrency:
         if not cls._meta:
             raise TypeError("'BaseCurrency' object is not callable")
-        return cast(BaseCurrency, BaseCurrencyType(currency=currency, decimal_digits=decimal_digits, interchangeable_with=interchangeable_with, preferred_ticker=preferred_ticker))
+        return cast(
+            BaseCurrency,
+            BaseCurrencyType(
+                currency=currency,
+                decimal_digits=decimal_digits,
+                interchangeable_with=interchangeable_with,
+                preferred_ticker=preferred_ticker,
+            ),
+        )
 
 
 # ISO 4217 currency codes

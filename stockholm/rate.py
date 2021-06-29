@@ -16,7 +16,9 @@ class Rate(Money):
     def from_sub_units(
         cls,
         amount: Optional[Union[MoneyType, Decimal, int, float, str, object]],
-        currency: Optional[Union[Type[DefaultCurrency], Type[BaseCurrency], BaseCurrencyType, BaseCurrency, str]] = DefaultCurrency,
+        currency: Optional[
+            Union[Type[DefaultCurrency], Type[BaseCurrency], BaseCurrencyType, BaseCurrency, str]
+        ] = DefaultCurrency,
         value: Optional[Union[MoneyType, Decimal, int, float, str]] = None,
         currency_code: Optional[str] = None,
         **kwargs: Any,
@@ -30,7 +32,9 @@ class Rate(Money):
     def __init__(
         self,
         amount: Optional[Union[MoneyType, Decimal, Dict, int, float, str, object]] = None,
-        currency: Optional[Union[Type[DefaultCurrency], Type[BaseCurrency], BaseCurrencyType, BaseCurrency, str]] = DefaultCurrency,
+        currency: Optional[
+            Union[Type[DefaultCurrency], Type[BaseCurrency], BaseCurrencyType, BaseCurrency, str]
+        ] = DefaultCurrency,
         from_sub_units: Optional[bool] = None,
         units: Optional[int] = None,
         nanos: Optional[int] = None,
@@ -67,7 +71,9 @@ class Rate(Money):
     def asdict(self) -> Dict:
         return {"value": self.value, "units": self.units, "nanos": self.nanos}
 
-    def to_currency(self, currency: Optional[Union[BaseCurrency, Type[BaseCurrency], BaseCurrencyType, str]]) -> MoneyType:
+    def to_currency(
+        self, currency: Optional[Union[BaseCurrency, Type[BaseCurrency], BaseCurrencyType, str]]
+    ) -> MoneyType:
         raise ConversionError("Rates does not have a currency")
 
     def to_sub_units(self) -> MoneyType:

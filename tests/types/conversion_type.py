@@ -1,6 +1,4 @@
-import stockholm
-from stockholm import Money, Currency
-
+from stockholm import Currency, Money
 
 dict_value = Money(13.50, Currency.SEK).asdict()
 assert dict_value["value"] == "13.50 SEK"

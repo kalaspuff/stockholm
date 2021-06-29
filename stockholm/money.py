@@ -58,7 +58,9 @@ class MoneyModel(Generic[MoneyType]):
     def sum(
         cls,
         iterable: Iterable,
-        currency: Optional[Union[Type[DefaultCurrency], Type[BaseCurrency], BaseCurrencyType, BaseCurrency, str]] = DefaultCurrency,
+        currency: Optional[
+            Union[Type[DefaultCurrency], Type[BaseCurrency], BaseCurrencyType, BaseCurrency, str]
+        ] = DefaultCurrency,
         currency_code: Optional[str] = None,
         from_sub_units: Optional[bool] = None,
         **kwargs: Any,
@@ -80,7 +82,9 @@ class MoneyModel(Generic[MoneyType]):
     def from_sub_units(
         cls: Type[MoneyType],
         amount: Optional[Union[MoneyType, Decimal, int, float, str, object]],
-        currency: Optional[Union[Type[DefaultCurrency], Type[BaseCurrency], BaseCurrencyType, BaseCurrency, str]] = DefaultCurrency,
+        currency: Optional[
+            Union[Type[DefaultCurrency], Type[BaseCurrency], BaseCurrencyType, BaseCurrency, str]
+        ] = DefaultCurrency,
         value: Optional[Union[MoneyType, Decimal, int, float, str]] = None,
         currency_code: Optional[str] = None,
         **kwargs: Any,
@@ -123,7 +127,9 @@ class MoneyModel(Generic[MoneyType]):
     def __init__(
         self,
         amount: Optional[Union[MoneyType, Decimal, Dict, int, float, str, object]] = None,
-        currency: Optional[Union[Type[DefaultCurrency], Type[BaseCurrency], BaseCurrencyType, BaseCurrency, str]] = DefaultCurrency,
+        currency: Optional[
+            Union[Type[DefaultCurrency], Type[BaseCurrency], BaseCurrencyType, BaseCurrency, str]
+        ] = DefaultCurrency,
         from_sub_units: Optional[bool] = None,
         units: Optional[int] = None,
         nanos: Optional[int] = None,
@@ -278,7 +284,11 @@ class MoneyModel(Generic[MoneyType]):
                     )
                     if output_currency is not None and match_currency != output_currency:
                         raise ConversionError("Mismatching currency in input value and 'currency' argument")
-                    output_currency = output_currency if isinstance(output_currency, (BaseCurrencyType, BaseCurrency)) else match_currency
+                    output_currency = (
+                        output_currency
+                        if isinstance(output_currency, (BaseCurrencyType, BaseCurrency))
+                        else match_currency
+                    )
 
                 amount = match_amount
             except AttributeError:
@@ -307,7 +317,9 @@ class MoneyModel(Generic[MoneyType]):
             if match_currency is not None:
                 if output_currency is not None and match_currency != output_currency:
                     raise ConversionError("Mismatching currency in input value and 'currency' argument")
-                output_currency = output_currency if isinstance(output_currency, (BaseCurrencyType, BaseCurrency)) else match_currency
+                output_currency = (
+                    output_currency if isinstance(output_currency, (BaseCurrencyType, BaseCurrency)) else match_currency
+                )
 
             try:
                 output_amount = Decimal(amount)
@@ -509,7 +521,9 @@ class MoneyModel(Generic[MoneyType]):
     def to_integral(self) -> MoneyType:
         return self.__round__(0)
 
-    def to_currency(self, currency: Optional[Union[Type[BaseCurrency], BaseCurrencyType, BaseCurrency, str]]) -> MoneyType:
+    def to_currency(
+        self, currency: Optional[Union[Type[BaseCurrency], BaseCurrencyType, BaseCurrency, str]]
+    ) -> MoneyType:
         return cast(MoneyType, self.__class__(self, currency=currency))
 
     def to(self, currency: Optional[Union[Type[BaseCurrency], BaseCurrencyType, BaseCurrency, str]]) -> MoneyType:
@@ -694,9 +708,17 @@ class MoneyModel(Generic[MoneyType]):
 
         return converted_other
 
-    def _preferred_currency(self, other: MoneyType) -> Optional[Union[Type[BaseCurrency], BaseCurrencyType, BaseCurrency, str]]:
-        currency = self._currency if self._currency and isinstance(self._currency, (BaseCurrencyType, BaseCurrency)) else None
-        currency = other._currency if not currency and other._currency and isinstance(other, (BaseCurrencyType, BaseCurrency)) else None
+    def _preferred_currency(
+        self, other: MoneyType
+    ) -> Optional[Union[Type[BaseCurrency], BaseCurrencyType, BaseCurrency, str]]:
+        currency = (
+            self._currency if self._currency and isinstance(self._currency, (BaseCurrencyType, BaseCurrency)) else None
+        )
+        currency = (
+            other._currency
+            if not currency and other._currency and isinstance(other, (BaseCurrencyType, BaseCurrency))
+            else None
+        )
         return currency or self._currency or other._currency
 
     def __eq__(self, other: Any) -> bool:
@@ -879,7 +901,9 @@ class Money(MoneyModel):
     def from_sub_units(
         cls,
         amount: Optional[Union[MoneyType, Decimal, int, float, str, object]],
-        currency: Optional[Union[Type[DefaultCurrency], Type[BaseCurrency], BaseCurrencyType, BaseCurrency, str]] = DefaultCurrency,
+        currency: Optional[
+            Union[Type[DefaultCurrency], Type[BaseCurrency], BaseCurrencyType, BaseCurrency, str]
+        ] = DefaultCurrency,
         value: Optional[Union[MoneyType, Decimal, int, float, str]] = None,
         currency_code: Optional[str] = None,
         **kwargs: Any,
