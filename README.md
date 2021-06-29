@@ -8,17 +8,25 @@
 [![MIT License](https://img.shields.io/github/license/kalaspuff/stockholm.svg)](https://github.com/kalaspuff/stockholm/blob/master/LICENSE)
 [![Code coverage](https://codecov.io/gh/kalaspuff/stockholm/branch/master/graph/badge.svg)](https://codecov.io/gh/kalaspuff/stockholm/tree/master/stockholm)
 
-*Library for formatting and performing arithmetic and comparison operations on monetary amounts. Also with support for currency handling, exchange and network transport structure generation as well as parsing.*
+*Library for formatting and performing arithmetic and comparison operations on monetary amounts. Also with support for currency handling, rates, exchange and serialization + deserialization for when transporting monetary amount data across network layers (built-in data generation and parsing).*
 
-<img width="550" alt="Screenshot 2021-06-29 at 19 01 38" src="https://user-images.githubusercontent.com/89139/123838632-79ba0080-d90c-11eb-8a1e-5a67c63c24d8.png">
+![stockholm.Money](https://user-images.githubusercontent.com/89139/123852607-c9a0c380-d91c-11eb-9d47-cf7cd5751c01.png)
 
 Basically `stockholm` is a human friendly and modern `Money` class for Python 3. This is a library to be used by backend and frontend API coders of fintech companies, web merchants or subscription services. It's great for calculations of amounts while keeping a great level of precision or producing output for transport layers as well as having a robust and easy way to import/export values in *GraphQL*, *JSON*, *Protocol Buffers*, etc.
 
-The goal is to provide a flexible and robust package for development with any kind of monetary amounts. No more working with floats or having to deal with having to think about values in subunits for transport layers or losing hours of sleep because of the default way `Decimal` does rounding.
+The goal is to provide a flexible and robust package for development with any kind of monetary amounts. No more working with floats or having to deal with having to think about values in subunits for data transport layers or losing hours of sleep because of the default way that `Decimal` does rounding. The monetary amounts can be transformed from (or into) dicts, strings, protobuf messages, json, floats, ints, Python Decimals, even other monetary amounts.
 
-```python
-from stockholm import Money
-```
+Coding applications, libaries and microservices that consume and publish events that contain monetary amounts shouldn't be any harder than anything else. This package aims to ease that work.
+
+---
+
+Some times you want to receive or publish events with monetary amounts or you need to expose an API endpoint and have a structured way to respond with balances, prices, vat, etc. without risking additional weird errors. If you're developing a merchant solution, a ticketing service or webshop it can be great to have easy and structured interfaces for calculating orders and building summaries or reports. Some may be interfacing with banking infrastructure from the 70s or 80s and has to process data in insanly old string based formats like the example below and validate sums, currencies, etc.
+
+<p align="center">
+<img width="580" alt="stockholm-parse-monetary-amounts" src="https://user-images.githubusercontent.com/89139/123870276-6588fa00-d932-11eb-9438-a4c58a44625b.png">
+</p>
+
+If any of these sounds familiar, a library for handling monetary amounts could help to structure interfaces you build – specially if you're on microservice architectures where code bases quickly gets a life of their own and teams will likely have different takes on their APIs unless strict guidelines (or utility libraries) are in place.
 
 ---
 
