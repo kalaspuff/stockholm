@@ -2,7 +2,16 @@ from __future__ import annotations
 
 import sys
 from decimal import Decimal
-from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union, cast
+from typing import Any, Dict, List, Optional, Protocol, Set, Tuple, Type, Union, cast
+
+
+class DefaultCurrencyValue(type):
+    pass
+
+
+class DefaultCurrency(metaclass=DefaultCurrencyValue):
+    def __new__(cls: Type[DefaultCurrency]) -> DefaultCurrency:
+        raise TypeError("'DefaultCurrency' object is not callable")
 
 
 class MetaCurrency(type):
@@ -51,7 +60,7 @@ class MetaCurrency(type):
 
         return Money(
             amount,
-            currency=cast(BaseCurrency, self),
+            currency=self,
             from_sub_units=from_sub_units,
             units=units,
             nanos=nanos,
@@ -120,7 +129,7 @@ class MetaCurrency(type):
 
     def __instancecheck__(self, instance: Any) -> bool:
         return_value = super().__instancecheck__(instance)
-        if not return_value and (type(instance) is BaseCurrency or type(instance) is BaseCurrencyType):
+        if not return_value and type(instance) is BaseCurrencyType:
             return True
         return return_value
 
@@ -134,7 +143,7 @@ class BaseCurrencyType(metaclass=MetaCurrency):
 
     def __init__(
         self,
-        currency: Optional[Union["Currency", str]] = None,
+        currency: Optional[Union[CurrencyValue, str]] = None,
         decimal_digits: Optional[int] = None,
         interchangeable_with: Optional[Union[Tuple[str, ...], List[str], Set[str]]] = None,
         preferred_ticker: Optional[str] = None,
@@ -206,12 +215,12 @@ class BaseCurrencyType(metaclass=MetaCurrency):
         if self.ticker:
             if not other:
                 return False
-            elif isinstance(other, (BaseCurrency, BaseCurrencyType)) or isinstance(type(other), BaseCurrency):
+            elif isinstance(other, BaseCurrency):
                 return bool(self.ticker == other.ticker)
             elif isinstance(other, str):
                 return bool(self.ticker == other)
         else:
-            if isinstance(other, (BaseCurrency, BaseCurrencyType)) or isinstance(type(other), BaseCurrency):
+            if isinstance(other, BaseCurrency):
                 return not other.ticker
             elif isinstance(other, str):
                 return bool(other == "")
@@ -232,7 +241,7 @@ class BaseCurrencyType(metaclass=MetaCurrency):
 class BaseCurrency(BaseCurrencyType):
     def __new__(
         cls,
-        currency: Optional[Union["Currency", str]] = None,
+        currency: Optional[Union[CurrencyValue, str]] = None,
         decimal_digits: Optional[int] = None,
         interchangeable_with: Optional[Union[Tuple[str, ...], List[str], Set[str]]] = None,
         preferred_ticker: Optional[str] = None,
@@ -1850,6 +1859,13 @@ class Currency(BaseCurrency):
     ZWL = ZWL
     ZWN = ZWN
     ZWR = ZWR
+
+
+class CurrencyValue(Protocol):
+    ticker: str
+    decimal_digits: int
+    interchangeable_with: Optional[Union[Tuple[str, ...], List[str], Set[str]]]
+    preferred_ticker: Optional[str]
 
 
 from stockholm.money import Money  # noqa isort:skip

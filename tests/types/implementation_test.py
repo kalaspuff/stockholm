@@ -17,3 +17,9 @@ assert isinstance(Currency.DKK, BaseCurrency)
 assert isinstance(get_currency("JPY"), BaseCurrency)
 
 assert Currency("SEK") == stockholm.currency.SEK == get_currency("SEK") == Currency.SEK == BaseCurrency("SEK")
+
+assert Money(100, BaseCurrency("SEK")).currency == stockholm.currency.SEK
+assert Money(100, BaseCurrency(stockholm.currency.SEK)).currency == stockholm.currency.SEK
+assert Money(100, BaseCurrency(Currency.SEK)).currency == stockholm.currency.SEK
+assert Money(100, Currency(stockholm.currency.SEK)).currency == stockholm.currency.SEK
+assert Money(100, Currency(Currency.SEK)).currency == stockholm.currency.SEK
