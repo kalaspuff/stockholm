@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import sys
 from decimal import Decimal
-from typing import Any, Dict, List, Optional, Protocol, Set, Tuple, Type, Union, cast
+from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union, cast
+
+from .compat import Protocol
 
 
 class DefaultCurrencyValue(type):
