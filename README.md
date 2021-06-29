@@ -10,15 +10,15 @@
 
 *Library for formatting and performing arithmetic and comparison operations on monetary amounts. Also with support for currency handling, exchange and network transport structure generation as well as parsing.*
 
-An up to date human friendly and flexible approach for development with any kind of monetary amounts. No more working with floats or having to deal with having to think about values in subunits.
+<img width="550" alt="Screenshot 2021-06-29 at 18 48 12" src="https://user-images.githubusercontent.com/89139/123837060-b4bb3480-d90a-11eb-98d9-ce4e5d01dadc.png">
 
-Basically a high-end `Money` class for Python 3.x. This is a library to be used by backend and frontend API coders of fintech companies, web merchants or subscription services. It's great for calculations of amounts while keeping a great level of precision or producing output for transport layers as well as having a robust and easy way to import/export values in *GraphQL*, *JSON* and / or *Protocol Buffers*, etc.
+Basically `stockholm` is a human friendly and modern `Money` class for Python 3. This is a library to be used by backend and frontend API coders of fintech companies, web merchants or subscription services. It's great for calculations of amounts while keeping a great level of precision or producing output for transport layers as well as having a robust and easy way to import/export values in *GraphQL*, *JSON*, *Protocol Buffers*, etc.
+
+The goal is to provide a flexible and robust package for development with any kind of monetary amounts. No more working with floats or having to deal with having to think about values in subunits for transport layers or losing hours of sleep because of the default way `Decimal` does rounding.
 
 ```python
 from stockholm import Money
 ```
-
-*A simple, yet powerful way of coding with money.*
 
 ---
 
@@ -485,6 +485,7 @@ money.as_protobuf(proto_class=CustomMoneyProtobufMessage)
 # Type: An instance of CustomMoneyProtobufMessage populated with the properties of money
 ```
 
+*A simple, yet powerful way of coding with money.*
 
 ## Acknowledgements
 Built with inspiration from https://github.com/carlospalol/money and https://github.com/vimeo/py-money
