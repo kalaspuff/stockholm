@@ -14,7 +14,6 @@ classifiers = [
     "Topic :: Office/Business :: Financial",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
@@ -25,7 +24,7 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.7"
 protobuf = { version = "^3", optional = true }
 
 [tool.poetry.dev-dependencies]
@@ -40,12 +39,14 @@ mypy = { version = ">=0.800", markers = "sys_platform != \"win32\"" }
 codecov = { version = ">=2.1.10", markers = "sys_platform != \"win32\"" }
 protobuf = { version = "^3", markers = "sys_platform != \"win32\"" }
 
+types-protobuf = { version = ">=0.1.13", markers = "sys_platform != \"win32\"" }
+
 [tool.poetry.extras]
 protobuf = ["protobuf"]
 
 [tool.black]
 line-length = 120
-target_version = ["py36", "py37", "py38"]
+target_version = ["py37", "py38", "py39"]
 include = '\.pyi?$'
 exclude = '\.eggs/|\.egg-info/|\.git/|\.github/|\.mypy_cache/|\.venv/|\.pytest_cache/|\.vscode/|__pycache__/|build/|dist/|setup\.py'
 
