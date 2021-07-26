@@ -421,7 +421,7 @@ python-versions = "*"
 
 [[package]]
 name = "types-protobuf"
-version = "3.17.0"
+version = "3.17.4"
 description = "Typing stubs for protobuf"
 category = "dev"
 optional = false
@@ -785,8 +785,8 @@ types-futures = [
     {file = "types_futures-0.1.6-py3-none-any.whl", hash = "sha256:7cb32c3fb4885089d78873a28ad33db3d5300661eac8b3ad327f4f5616fdf742"},
 ]
 types-protobuf = [
-    {file = "types-protobuf-3.17.0.tar.gz", hash = "sha256:00f6c405c67f0144b92e0baab6610c4d4356c2927ee86f77aa71ac2a8648cb8a"},
-    {file = "types_protobuf-3.17.0-py3-none-any.whl", hash = "sha256:dd7df3487c1dc9011653472d3bc7dd486c6b73151707fda12cdef30a0501fd1e"},
+    {file = "types-protobuf-3.17.4.tar.gz", hash = "sha256:36cfec22f0096c9be2d9e44ad33480eb91969ffa72a51fa55842597cf59f8264"},
+    {file = "types_protobuf-3.17.4-py3-none-any.whl", hash = "sha256:b6f53af01ab19b6d19a979c00a06dc73723180f8bf0129761542cfadc46fdd34"},
 ]
 typing-extensions = [
     {file = "typing_extensions-3.10.0.0-py2-none-any.whl", hash = "sha256:0ac0f89795dd19de6b97debb0c6af1c70987fd80a2d62d1958f7e56fcc31b497"},
