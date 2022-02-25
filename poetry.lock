@@ -410,23 +410,12 @@ optional = false
 python-versions = "*"
 
 [[package]]
-name = "types-futures"
-version = "0.1.6"
-description = "Typing stubs for futures"
-category = "dev"
-optional = false
-python-versions = "*"
-
-[[package]]
 name = "types-protobuf"
-version = "3.18.0"
+version = "3.19.12"
 description = "Typing stubs for protobuf"
 category = "dev"
 optional = false
 python-versions = "*"
-
-[package.dependencies]
-types-futures = "*"
 
 [[package]]
 name = "typing-extensions"
@@ -757,13 +746,9 @@ typed-ast = [
     {file = "typed_ast-1.4.3-cp39-cp39-win_amd64.whl", hash = "sha256:9c6d1a54552b5330bc657b7ef0eae25d00ba7ffe85d9ea8ae6540d2197a3788c"},
     {file = "typed_ast-1.4.3.tar.gz", hash = "sha256:fb1bbeac803adea29cedd70781399c99138358c26d05fcbd23c13016b7f5ec65"},
 ]
-types-futures = [
-    {file = "types-futures-0.1.6.tar.gz", hash = "sha256:da372dd55dc08c257de1e3dfd56273e44af9668e077047b0509adcfc43dd2838"},
-    {file = "types_futures-0.1.6-py3-none-any.whl", hash = "sha256:7cb32c3fb4885089d78873a28ad33db3d5300661eac8b3ad327f4f5616fdf742"},
-]
 types-protobuf = [
-    {file = "types-protobuf-3.18.0.tar.gz", hash = "sha256:a391d1a9138fe53fe08aeb6aa15ca7f1a188659b9a6c12af5313c55730eccd6c"},
-    {file = "types_protobuf-3.18.0-py3-none-any.whl", hash = "sha256:6228bcbd43544eb4b8a8d7c64f0d5f3e9bccf1ebbc6df39e4102f0dcad602156"},
+    {file = "types-protobuf-3.19.12.tar.gz", hash = "sha256:b022247347471219acbe2fe68d2f3623d788252e99e9b97358b7ab904d268a78"},
+    {file = "types_protobuf-3.19.12-py3-none-any.whl", hash = "sha256:130bf00e688ae9376682ac8f3d6610be797d8a6072f102f530ca1d579b52e54b"},
 ]
 typing-extensions = [
     {file = "typing_extensions-4.1.1-py3-none-any.whl", hash = "sha256:21c85e0fe4b9a155d0799430b0ad741cdce7e359660ccbd8b530613e8df88ce2"},
