@@ -10,7 +10,6 @@ try:
         interchangeable_with: Optional[Union[Tuple[str, ...], List[str], Set[str]]]
         preferred_ticker: Optional[str]
 
-
 except ImportError:  # pragma: no cover
     # Compatibility import for Python 3.7
     this_module = sys.modules[__name__]

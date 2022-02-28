@@ -247,7 +247,7 @@ def test_pow() -> None:
     assert m1.currency == "BIT"
     assert str(m1) == "2.00 BIT"
 
-    m2 = m1 ** 4
+    m2 = m1**4
     assert isinstance(m2, Money)
     assert m2.amount == 16
     assert m2.currency == "BIT"
@@ -260,7 +260,7 @@ def test_pow() -> None:
     assert str(m2) == "16.00 BIT"
 
     with pytest.raises(InvalidOperandError):
-        m1 ** m1
+        m1**m1
 
     assert Money(2) ** Money(4) == 16
 

@@ -849,7 +849,7 @@ class MoneyModel(Generic[MoneyType]):
         if converted_other._currency is not None:
             raise InvalidOperandError("Unable to use a monetary amount as an exponent")
 
-        amount = self._amount ** converted_other._amount
+        amount = self._amount**converted_other._amount
         return cls(amount, currency=self._currency)
 
     def __neg__(self) -> MoneyType:
