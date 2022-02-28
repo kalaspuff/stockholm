@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.5.1] - 2022-02-28
+
+* Python 3.10 added to test matrix and trove classifiers to officially claim support.
+
+
 ## [0.5.0] - 2021-06-30
 
 * Major updates to improve type hints and intellisense within editors.
