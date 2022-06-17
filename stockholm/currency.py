@@ -119,7 +119,6 @@ class MetaCurrency(type):
                 "stockholm.MetaCurrency",
                 self.ticker,
                 self.decimal_digits,
-                self.interchangeable_with,
                 self.preferred_ticker,
             )
         )
@@ -231,7 +230,12 @@ class BaseCurrencyType(metaclass=MetaCurrency):
 
     def __hash__(self) -> int:
         return hash(
-            ("stockholm.Currency", self.ticker, self.decimal_digits, self.interchangeable_with, self.preferred_ticker)
+            (
+                "stockholm.Currency",
+                self.ticker,
+                self.decimal_digits,
+                self.preferred_ticker,
+            )
         )
 
     def __bool__(self) -> bool:

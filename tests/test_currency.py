@@ -186,11 +186,15 @@ def test_custom_currency():
 
 
 def test_currency_hashable() -> None:
+    class CNY(BaseCurrency):
+        interchangeable_with = ("CNH", "RMB")
+
     EUR = Currency("EUR")
 
     class SEK(BaseCurrency):
         pass
 
+    assert hash(CNY)
     assert hash(EUR)
     assert hash(SEK)
 
