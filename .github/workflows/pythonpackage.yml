@@ -28,10 +28,8 @@ jobs:
         restore-keys: ${{ runner.os }}-poetry-
     - name: Install Poetry
       run: |
-        curl -fsS -o get-poetry.py https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py
-        python get-poetry.py -y
+        curl -sSL https://install.python-poetry.org | POETRY_HOME="$HOME/.poetry" python - --yes
         echo "$HOME/.poetry/bin" >> $GITHUB_PATH
-        rm -f get-poetry.py
     - name: Install dependencies
       run: |
         poetry install --no-interaction -E protobuf
@@ -40,7 +38,8 @@ jobs:
       run: poetry build
     - name: Test with pytest
       run: |
-        PACKAGENAME=$(poetry version | awk {'print $1'}) && pytest --cov=$PACKAGENAME/ tests -v
+        PACKAGENAME=$(poetry version | awk {'print $1'}) && pytest tests -v
+        PACKAGENAME=$(poetry version | awk {'print $1'}) && PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python pytest --cov=$PACKAGENAME/ tests -v
     - name: Lint with flake8
       run: |
         PACKAGENAME=$(poetry version | awk {'print $1'}) && flake8 $PACKAGENAME/ tests/

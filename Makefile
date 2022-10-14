@@ -12,10 +12,11 @@ default:
 	@echo "- make release      | upload dist and push tag"
 
 install:
-	poetry install
+	poetry install -E protobuf
 
 pytest:
 	PYTHONPATH=. poetry run pytest --cov-report term-missing --cov=${PACKAGENAME}/ tests -v
+	PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python poetry run pytest --cov-report term-missing --cov=${PACKAGENAME}/ tests -v
 
 flake8:
 	poetry run flake8 ${PACKAGENAME}/ tests/
