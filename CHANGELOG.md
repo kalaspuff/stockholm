@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.5.2] - 2022-10-14
+
+* Adds support for the `protobuf` Python bindings versioned 4.x.x.
+
+
 ## [0.5.1] - 2022-02-28
 
 * Python 3.10 added to test matrix and trove classifiers to officially claim support.
