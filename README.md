@@ -312,7 +312,7 @@ money = Money.from_protobuf(b'\n\x03SEK\x10\xe7$\x18\x80\xaf\xd0\xe5\x02')
 # of what's happening. The stockholm.MoneyProtobufMessage (or stockholm.protobuf.Money)
 # class is a generated Python representation of the google.type.Money protobuf message
 # definition. You can also use your own custom class.
-import stockholm.protobuf import MoneyProtobufMessage
+from stockholm import MoneyProtobufMessage
 message = MoneyProtobufMessage()
 message.units = 2549
 message.nanos = 990000000
