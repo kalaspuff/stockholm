@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "stockholm"
-version = "0.5.1"
+version = "0.5.2"
 description = "Human friendly and flexible package for working with monetary amounts"
 authors = ["Carl Oscar Aaro <hello@carloscar.com>"]
 homepage = "https://github.com/kalaspuff/stockholm"
@@ -26,7 +26,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.7"
-protobuf = { version = "^3", optional = true }
+protobuf = { version = ">=3.20.0,<5.0.0", optional = true }
 
 [tool.poetry.dev-dependencies]
 flake8 = { version = ">=3.8.4", markers = "sys_platform != \"win32\"" }
@@ -38,7 +38,7 @@ pytest-cov = { version = ">=2.10.0", markers = "sys_platform != \"win32\"" }
 black = { version = "*", markers = "sys_platform != \"win32\"", allow-prereleases = true }
 mypy = { version = ">=0.800", markers = "sys_platform != \"win32\"" }
 codecov = { version = ">=2.1.10", markers = "sys_platform != \"win32\"" }
-protobuf = { version = "^3", markers = "sys_platform != \"win32\"" }
+protobuf = { version = ">=3.20.0,<5.0.0", markers = "sys_platform != \"win32\"" }
 types-protobuf = { version = ">=0.1.13", markers = "sys_platform != \"win32\"" }
 typing-extensions = {version = ">=3.7.4", markers = "python_version < \"3.8\" and sys_platform != \"win32\""}
 
@@ -47,7 +47,7 @@ protobuf = ["protobuf"]
 
 [tool.black]
 line-length = 120
-target_version = ["py37", "py38", "py39"]
+target_version = ["py37", "py38", "py39", "py310"]
 include = '\.pyi?$'
 exclude = '\.eggs/|\.egg-info/|\.git/|\.github/|\.mypy_cache/|\.venv/|\.pytest_cache/|\.vscode/|__pycache__/|build/|dist/|setup\.py'
 
