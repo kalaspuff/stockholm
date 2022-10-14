@@ -41,6 +41,7 @@ jobs:
     - name: Test with pytest
       run: |
         PACKAGENAME=$(poetry version | awk {'print $1'}) && pytest --cov=$PACKAGENAME/ tests -v
+        PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python PACKAGENAME=$(poetry version | awk {'print $1'}) && pytest --cov=$PACKAGENAME/ tests -v
     - name: Lint with flake8
       run: |
         PACKAGENAME=$(poetry version | awk {'print $1'}) && flake8 $PACKAGENAME/ tests/
