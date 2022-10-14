@@ -12,10 +12,11 @@ except Exception:  # pragma: no cover
     setattr(this_module, "GenericProtobufMessage", _GenericProtobufMessage)
 
 try:
-    from .money_pb2 import MoneyProtobufMessage  # noqa
+    from .money_pb2 import Money  # noqa
+    MoneyProtobufMessage = Money
 except Exception:  # pragma: no cover
 
-    class _MoneyProtobufMessage(object):
+    class _Money(object):
         def __init__(self, *args: Any, **kwargs: Any) -> None:
             raise Exception("google.protobuf package not installed")
 
@@ -32,4 +33,12 @@ except Exception:  # pragma: no cover
             raise Exception("google.protobuf package not installed")
 
     this_module = sys.modules[__name__]
+    setattr(this_module, "Money", _MoneyProtobufMessage)
     setattr(this_module, "MoneyProtobufMessage", _MoneyProtobufMessage)
+
+
+__all__ = [
+    "GenericProtobufMessage",
+    "Money",
+    "MoneyProtobufMessage",
+]
