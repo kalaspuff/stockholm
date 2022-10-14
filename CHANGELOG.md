@@ -3,6 +3,7 @@
 ## [0.5.2] - 2022-10-14
 
 * Adds support for the `protobuf` Python bindings versioned 4.x.x.
+* Fixes an issue with the `__hash__` method on `Currency` objects which affected currencies with an `interchangeable_with` value, such as `CNY` (+ `CNH` / `RMB`), `ILS` (+ `NIS`), `TWD` (+ `NTD`). [Thanks @th-ad]
 
 
 ## [0.5.1] - 2022-02-28
