@@ -35,3 +35,9 @@ except ImportError:  # pragma: no cover
 
         setattr(this_module, "Protocol", _ProtocolProxy)  # noqa
         setattr(this_module, "CurrencyValue", _CurrencyValueProxy)  # noqa
+
+
+__all__ = [
+    "Protocol",
+    "CurrencyValue",
+]
