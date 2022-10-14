@@ -13,6 +13,7 @@ except Exception:  # pragma: no cover
 
 try:
     from .money_pb2 import Money  # noqa
+
     MoneyProtobufMessage = Money
 except Exception:  # pragma: no cover
 

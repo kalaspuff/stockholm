@@ -56,6 +56,9 @@ class Money(google.protobuf.message.Message):
         units: builtins.int = ...,
         nanos: builtins.int = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["currency_code", b"currency_code", "nanos", b"nanos", "units", b"units"]) -> None: ...
+    def ClearField(
+        self,
+        field_name: typing_extensions.Literal["currency_code", b"currency_code", "nanos", b"nanos", "units", b"units"],
+    ) -> None: ...
 
 global___Money = Money

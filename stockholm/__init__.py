@@ -11,7 +11,7 @@ __all__ = [
     "__version__",
     "__version_info__",
     "__author__",
-    "__email__" ,
+    "__email__",
     "BaseCurrency",
     "Currency",
     "CurrencyValue",
