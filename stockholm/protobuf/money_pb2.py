@@ -18,10 +18,10 @@ DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, "google.type.money_pb2", globals())
-if _descriptor._USE_C_DESCRIPTORS == False:
+if _descriptor._USE_C_DESCRIPTORS == False:  # noqa: E712
 
     DESCRIPTOR._options = None
     DESCRIPTOR._serialized_options = b"\n\017com.google.typeB\nMoneyProtoP\001Z6google.golang.org/genproto/googleapis/type/money;money\370\001\001\242\002\003GTP"
-    _MONEY._serialized_start = 40
-    _MONEY._serialized_end = 128
+    _MONEY._serialized_start = 40  # noqa: F821
+    _MONEY._serialized_end = 128  # noqa: F821
 # @@protoc_insertion_point(module_scope)

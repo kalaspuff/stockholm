@@ -17,7 +17,7 @@ try:
     MoneyProtobufMessage = Money
 except Exception:  # pragma: no cover
 
-    class _Money(object):
+    class _MoneyProtobufMessage(object):
         def __init__(self, *args: Any, **kwargs: Any) -> None:
             raise Exception("google.protobuf package not installed")
 

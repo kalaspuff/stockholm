@@ -67,10 +67,10 @@ class Rate(Money):
     def asdict(self) -> Dict:
         return {"value": self.value, "units": self.units, "nanos": self.nanos}
 
-    def to_currency(self, currency: Optional[Union[CurrencyValue, str]]) -> MoneyType:
+    def to_currency(self, currency: Optional[Union[CurrencyValue, str]]) -> MoneyType:  # type: ignore
         raise ConversionError("Rates does not have a currency")
 
-    def to_sub_units(self) -> MoneyType:
+    def to_sub_units(self) -> MoneyType:  # type: ignore
         raise ConversionError("Rates cannot be measured in sub units")
 
     def __repr__(self) -> str:
