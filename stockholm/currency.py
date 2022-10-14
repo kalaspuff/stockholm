@@ -30,7 +30,7 @@ class MetaCurrency(type):
         attributedict["ticker"] = ticker.split(".")[-1] if ticker else ""
         attributedict["currency"] = attributedict["ticker"]
         attributedict["decimal_digits"] = decimal_digits
-        attributedict["interchangeable_with"] = sorted(interchangeable_with) if interchangeable_with else None
+        attributedict["interchangeable_with"] = tuple(sorted(interchangeable_with)) if interchangeable_with else None
         attributedict["preferred_ticker"] = preferred_ticker if preferred_ticker else None
 
         attributedict["_meta"] = bool(
@@ -152,7 +152,7 @@ class BaseCurrencyType(metaclass=MetaCurrency):
             object.__setattr__(self, "ticker", currency.ticker)
             decimal_digits = currency.decimal_digits if decimal_digits is None else decimal_digits
             interchangeable_with = (
-                currency.interchangeable_with if interchangeable_with is None else interchangeable_with
+                currency.interchangeable_with if interchangeable_with is None else tuple(interchangeable_with)
             )
             preferred_ticker = currency.preferred_ticker if preferred_ticker is None else preferred_ticker
         elif currency and isinstance(currency, str):
@@ -162,7 +162,9 @@ class BaseCurrencyType(metaclass=MetaCurrency):
 
         object.__setattr__(self, "currency", self.ticker)
         object.__setattr__(self, "decimal_digits", 2 if decimal_digits is None else decimal_digits)
-        object.__setattr__(self, "interchangeable_with", sorted(interchangeable_with) if interchangeable_with else None)
+        object.__setattr__(
+            self, "interchangeable_with", tuple(sorted(interchangeable_with)) if interchangeable_with else None
+        )
         object.__setattr__(self, "preferred_ticker", preferred_ticker if preferred_ticker else None)
 
         object.__setattr__(self, "_meta", False)
