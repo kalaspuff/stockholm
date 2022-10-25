@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "stockholm"
-version = "0.5.2"
+version = "0.5.3"
 description = "Human friendly and flexible package for working with monetary amounts"
 authors = ["Carl Oscar Aaro <hello@carloscar.com>"]
 homepage = "https://github.com/kalaspuff/stockholm"
@@ -18,6 +18,7 @@ classifiers = [
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Intended Audience :: Developers",
     "Intended Audience :: Financial and Insurance Industry",
     "Typing :: Typed",
