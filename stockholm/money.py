@@ -116,6 +116,7 @@ class MoneyModel(Generic[MoneyType]):
                     "currency",
                     "currency_code",
                     "from_sub_units",
+                    "sub_units",
                 )
                 if hasattr(input_value, k)
             }
@@ -412,11 +413,32 @@ class MoneyModel(Generic[MoneyType]):
             return output.to_integral()
         return output
 
-    def asdict(self) -> Dict[str, Optional[Union[str, int]]]:
-        return {"value": self.value, "units": self.units, "nanos": self.nanos, "currency_code": self.currency_code}
+    def asdict(
+        self, keys: Union[List[str], Tuple[str, ...]] = ("value", "units", "nanos", "currency_code")
+    ) -> Dict[str, Optional[Union[str, int, bool]]]:
+        output: Dict[str, Optional[Union[str, int, bool]]] = {}
+        for key in keys:
+            if key == "value":
+                output[key] = self.value
+            elif key == "units":
+                output[key] = self.units
+            elif key == "nanos":
+                output[key] = self.nanos
+            elif key == "amount":
+                output[key] = self.amount_as_string()
+            elif key in ("currency", "currency_code"):
+                output[key] = self.currency_code
+            elif key == "from_sub_units":
+                output[key] = False
+            elif key == "sub_units":
+                output[key] = self.to_sub_units().amount_as_string(min_decimals=0)
 
-    def as_dict(self) -> Dict[str, Optional[Union[str, int]]]:
-        return self.asdict()
+        return output
+
+    def as_dict(
+        self, keys: Union[List[str], Tuple[str, ...]] = ("value", "units", "nanos", "currency_code")
+    ) -> Dict[str, Optional[Union[str, int, bool]]]:
+        return self.asdict(keys=keys)
 
     def keys(self) -> List[str]:
         return list(self.asdict())
@@ -444,19 +466,7 @@ class MoneyModel(Generic[MoneyType]):
         return float(self)
 
     def as_json(self, keys: Union[List[str], Tuple[str, ...]] = ("value", "units", "nanos", "currency_code")) -> str:
-        mapping = {
-            "value": self.value,
-            "units": self.units,
-            "nanos": self.nanos,
-            "amount": str(self.amount),
-            "currency": self.currency_code,
-            "currency_code": self.currency_code,
-            "from_sub_units": False,
-            "sub_units": self.sub_units,
-        }
-
-        output = {k: mapping.get(k) for k in keys if k in mapping}
-        return json.dumps(output)
+        return json.dumps(self.asdict(keys=keys))
 
     def json(self, keys: Union[List[str], Tuple[str, ...]] = ("value", "units", "nanos", "currency_code")) -> str:
         return self.as_json(keys=keys)
@@ -464,17 +474,10 @@ class MoneyModel(Generic[MoneyType]):
     def as_protobuf(self, proto_class: Type[ProtobufMessageType] = MoneyProtobufMessage) -> ProtobufMessageType:  # type: ignore
         message: ProtobufMessageType = proto_class()
 
-        mapping = {
-            "value": self.value,
-            "units": self.units,
-            "nanos": self.nanos,
-            "amount": str(self.amount),
-            "currency": self.currency_code or "",
-            "currency_code": self.currency_code or "",
-            "from_sub_units": False,
-        }
-
-        for k, v in mapping.items():
+        values = self.asdict(keys=tuple(proto_class.DESCRIPTOR.fields_by_name.keys()))
+        for k, v in values.items():
+            if v is None:
+                continue
             if hasattr(message, k):
                 try:
                     setattr(message, k, type(getattr(message, k))(v))

@@ -50,6 +50,7 @@ jobs:
       run: |
         python tests/types/implementation_test.py
         python tests/types/conversion_type.py
+        python tests/examples/bankfile_test.py
     - name: Codecov
       run: |
         codecov --token=${{ secrets.CODECOV_TOKEN }}

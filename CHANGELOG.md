@@ -1,5 +1,38 @@
 # Changelog
 
+## [0.5.4] - 2022-XX-XX
+
+* The `money.asdict()` function can now be called with an optional `keys` argument, which can be used to specify a tuple of keys which shuld be used in the returned dict.
+
+  The default behaviour has not changed. `money.asdict()` is equivalent to `money.asdict(keys=("value", "units", "nanos", "currency_code"))`.
+
+  Values to use in the `keys` tuple for `stockholm.Money` objects are any combination of the following:
+
+  | key | description | return type | example |
+  | :-- | :---------- | :---------- | -------: |
+  | `value` | amount + currency code | `str` | `"9001.50 USD"`
+  | `units` | units of the amount | `int` | `9001` |
+  | `nanos` | number of nano units of the amount | `int` | `500000000` |
+  | `currency_code` | currency code if available | `str \| None` | `"USD"` |
+  | `currency` | currency code if available | `str \| None` | `"USD"` |
+  | `amount` | the monetary amount (excl. currency code) | `str` | `"9001.50"` |
+
+  Code example:
+
+  ```python
+  from stockholm import Money
+
+  Money("4711 USD").asdict(keys=("value", "units", "nanos", "currency_code"))
+  # {'value': '4711.00 USD', 'units': 4711, 'nanos': 0, 'currency_code': 'USD'}
+
+  Money("4711 USD").asdict(keys=("amount", "currency"))
+  # {'amount': '4711.00', 'currency': 'USD'}
+
+  Money(nanos=10).asdict(keys=("value", "currency", "units", "nanos"))
+  # {'value': '0.00000001', 'currency': None, 'units': 0, 'nanos': 10}
+  ```
+
+
 ## [0.5.3] - 2022-10-25
 
 * Python 3.11 added to test matrix and trove classifiers to officially claim support.
