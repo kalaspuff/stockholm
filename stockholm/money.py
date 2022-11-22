@@ -7,7 +7,8 @@ from decimal import ROUND_HALF_UP, Decimal
 from functools import reduce
 from typing import Any, Dict, Generic, Iterable, List, Optional, Tuple, Type, TypeVar, Union, cast
 
-from .currency import BaseCurrencyType, CurrencyValue, DefaultCurrency, DefaultCurrencyValue
+from .compat import CurrencyValue
+from .currency import BaseCurrencyType, DefaultCurrency, DefaultCurrencyValue
 from .exceptions import ConversionError, CurrencyMismatchError, InvalidOperandError
 from .protobuf import GenericProtobufMessage, MoneyProtobufMessage
 

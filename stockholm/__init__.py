@@ -1,7 +1,9 @@
 from .__version__ import __version__, __version_info__  # noqa
-from .currency import BaseCurrency, Currency, CurrencyValue, DefaultCurrency, DefaultCurrencyValue, get_currency  # noqa
+from .compat import CurrencyValue  # noqa
+from .currency import BaseCurrency, Currency, DefaultCurrency, DefaultCurrencyValue, get_currency  # noqa
 from .exceptions import ConversionError, CurrencyMismatchError, InvalidOperandError, MoneyException  # noqa
-from .money import Money, MoneyProtobufMessage, MoneyType  # noqa
+from .money import Money, MoneyType  # noqa
+from .protobuf import MoneyProtobufMessage
 from .rate import ExchangeRate, Rate  # noqa
 
 __author__ = "Carl Oscar Aaro"
