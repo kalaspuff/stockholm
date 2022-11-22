@@ -10,14 +10,19 @@
 
 *Library for formatting and performing arithmetic and comparison operations on monetary amounts. Also with support for currency handling, rates, exchange and serialization + deserialization for when transporting monetary amount data across network layers (built-in data generation and parsing).*
 
-```pycon
->>> Money(9001.42, currency=USD)
-<stockholm.Money: "9001.42 USD">
-```
+### Why a library for monetary amounts - why this library?
+
+* Combine a value with a currency, as they usually should be read, written and transported together.
+* Able to work with a plethora of different source types. Human friendly approach with developer experience in mind.
+* Get rid of the gotchas if otherwise using `decimal.Decimal`. Sensible rounding by default. Never lose precision when making arithmetic operations. String output as you would expect.
+* Generate (and parse) structured data to be used in transport layers such as GraphQL or Protobuf.
+* Type hinted, battle tested and supporting several versions of Python.
+
+In its simplest form:
 
 ```pycon
->>> Money("4711 EUR") / 5
-<stockholm.Money: "942.20 EUR">
+>>> Money("9001.42", currency=USD)
+<stockholm.Money: "9001.42 USD">
 ```
 
 ![stockholm.Money](https://user-images.githubusercontent.com/89139/123852607-c9a0c380-d91c-11eb-9d47-cf7cd5751c01.png)
@@ -86,11 +91,15 @@ Coding applications, libaries and microservices that consume and publish events 
 <stockholm.Money: "498.75 SEK">
 ```
 
----
+### When to use `stockholm`
 
-Some times you want to receive or publish events with monetary amounts or you need to expose an API endpoint and have a structured way to respond with balances, prices, vat, etc. without risking additional weird errors. If you're developing a merchant solution, a ticketing service or webshop it can be great to have easy and structured interfaces for calculating orders and building summaries or reports.
+There are times when you want to receive or publish events with monetary amounts or you need to expose an API endpoint and have a structured way to respond with balances, prices, vat, etc. without risking additional weirdness.
 
-Some may be interfacing with banking infrastructure from the 70s or 80s and has to process data in insanly old string based formats like the example below and validate sums, currencies, etc.
+If you're developing a merchant solution, a ticketing service or webshop it can be great to have easy and structured interfaces for calculating orders and building summaries or reports.
+
+#### We're no fan of `float`, but you can do more than just `int`
+
+Some may be interfacing with banking infrastructure from the 70s or 80s 😓 and has to process data in insanly old string based formats like the example below and validate sums, currencies, etc.
 
 <p align="center">
 <img width="580" alt="stockholm-parse-monetary-amounts" src="https://user-images.githubusercontent.com/89139/123870276-6588fa00-d932-11eb-9438-a4c58a44625b.png">
@@ -98,7 +107,7 @@ Some may be interfacing with banking infrastructure from the 70s or 80s and has 
 
 If any of these sounds familiar, a library for handling monetary amounts could help to structure interfaces you build – specially if you're on microservice architectures where code bases quickly gets a life of their own and teams will likely have different takes on their APIs unless strict guidelines (or utility libraries) are in place.
 
----
+## The basic interfaces
 
 #### `from stockholm import Money`
 
@@ -153,11 +162,13 @@ print(f"The exchange rate is {exchange_rate} ({jpy_money:c} -> {sek_money:c})")
 
 ## Installation with `pip`
 Like you would install any other Python package, use `pip`, `poetry`, `pipenv` or your favourite tool.
+
 ```
 $ pip install stockholm
 ```
 
-Or to install with Protocol Buffers support, automatically including the `protobuf` package.
+To install with Protocol Buffers support, specify the `protobuf` extras.
+
 ```
 $ pip install stockholm[protobuf]
 ```
@@ -176,7 +187,9 @@ $ pip install stockholm[protobuf]
 ## Usage and examples
 
 #### Arithmetics - fully supported
+
 *Full arithmetic support with different types, backed by `Decimal` for dealing with rounding errors, while also keeping the monetary amount fully currency aware.*
+
 ```python
 from stockholm import Money
 
@@ -239,7 +252,9 @@ Money("5 EUR") * Money("5 EUR")
 ```
 
 #### Formatting / Advanced string formatting
+
 *Advanced string formatting functionality.*
+
 ```python
 from stockholm import Money, Rate
 
@@ -274,6 +289,7 @@ print(f"{sek_money:c}")  # SEK
 ```
 
 ##### *Use `stockholm.Currency` types for proper defaults of minimum number of decimal digits to output in strings, etc. All ISO 4217 currency codes implemented, see https://github.com/kalaspuff/stockholm/blob/master/stockholm/currency.py for the full list.*
+
 ```python
 from stockholm import Currency, Money, get_currency
 from stockholm.currency import JPY, SEK, EUR, IQD, USDCoin, Bitcoin
@@ -303,7 +319,9 @@ print(Money(1338, get_currency("JPY")))  # 1338 JPY
 ```
 
 #### Input data types in flexible variants
+
 *Flexible ways for assigning values to a monetary amount using many different input data types and methods.*
+
 ```python
 from decimal import Decimal
 from stockholm import Money
@@ -336,7 +354,9 @@ money.sub_units
 ```
 
 #### List arithmetics - summary of monetary amounts in list
+
 *Adding several monetary amounts from a list.*
+
 ```python
 from stockholm import Money
 
@@ -358,6 +378,7 @@ sum(amounts)
 #### Conversion for other transport medium (for example Protocol Buffers or JSON)
 
 ##### *Easily splittable into `units` and `nanos` for transport in network medium, for example using the [`google.type.Money` protobuf definition](https://github.com/googleapis/googleapis/blob/master/google/type/money.proto) when using Protocol Buffers.*
+
 ```python
 from stockholm import Money
 
@@ -371,6 +392,7 @@ Money(units=22583, nanos=753820000, currency="SEK")
 ```
 
 ##### *Monetary amounts can also be exported to `dict` as well as created with `dict` value input, which can be great to for example transport a monetary value in JSON.*
+
 ```python
 from stockholm import Money
 
@@ -392,7 +414,36 @@ money = Money.from_dict({
 # <stockholm.Money: "4711.75 SEK">
 ```
 
+The `money.asdict()` function can be called with an optional `keys` argument, which can be used to specify a tuple of keys which shuld be used in the returned dict.
+
+The default behaviour of `money.asdict()` is equivalent to `money.asdict(keys=("value", "units", "nanos", "currency_code"))`.
+
+Values to use in the `keys` tuple for `stockholm.Money` objects are any combination of the following:
+
+| key | description | return type | example |
+| :-- | :---------- | :---------- | -------: |
+| `value` | amount + currency code | `str` | `"9001.50 USD"`
+| `units` | units of the amount | `int` | `9001` |
+| `nanos` | number of nano units of the amount | `int` | `500000000` |
+| `currency_code` | currency code if available | `str \| None` | `"USD"` |
+| `currency` | currency code if available | `str \| None` | `"USD"` |
+| `amount` | the monetary amount (excl. currency code) | `str` | `"9001.50"` |
+
+```python
+from stockholm import Money
+
+Money("4711 USD").asdict(keys=("value", "units", "nanos", "currency_code"))
+# {'value': '4711.00 USD', 'units': 4711, 'nanos': 0, 'currency_code': 'USD'}
+
+Money("4711 USD").asdict(keys=("amount", "currency"))
+# {'amount': '4711.00', 'currency': 'USD'}
+
+Money(nanos=10).asdict(keys=("value", "currency", "units", "nanos"))
+# {'value': '0.00000001', 'currency': None, 'units': 0, 'nanos': 10}
+```
+
 ##### *Using Protocol Buffers for transporting monetary amounts over the network.*
+
 ```python
 from stockholm import Money
 
@@ -474,6 +525,7 @@ money * 31 - 20 + Money("0.50")
 ```
 
 ##### *Reading or outputting monetary amounts as JSON*
+
 ```python
 from stockholm import Money
 
@@ -608,4 +660,5 @@ money.as_protobuf(proto_class=CustomMoneyProtobufMessage)
 *A simple, yet powerful way of coding with money.*
 
 ## Acknowledgements
+
 Built with inspiration from https://github.com/carlospalol/money and https://github.com/vimeo/py-money
