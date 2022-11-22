@@ -4,7 +4,7 @@ from .currency import BaseCurrency, Currency, DefaultCurrency, DefaultCurrencyVa
 from .exceptions import ConversionError, CurrencyMismatchError, InvalidOperandError, MoneyException  # noqa
 from .money import Money, MoneyType  # noqa
 from .protobuf import MoneyProtobufMessage
-from .rate import ExchangeRate, Rate  # noqa
+from .rate import ExchangeRate, Number, Rate  # noqa
 
 __author__ = "Carl Oscar Aaro"
 __email__ = "hello@carloscar.com"
@@ -27,6 +27,7 @@ __all__ = [
     "Money",
     "MoneyProtobufMessage",
     "MoneyType",
+    "Number",
     "ExchangeRate",
     "Rate",
 ]

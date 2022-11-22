@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "stockholm"
-version = "0.5.3"
+version = "0.5.4"
 description = "Human friendly and flexible package for working with monetary amounts"
 authors = ["Carl Oscar Aaro <hello@carloscar.com>"]
 homepage = "https://github.com/kalaspuff/stockholm"

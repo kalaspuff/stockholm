@@ -40,6 +40,37 @@ def test_asdict():
         Money(1338, currency=Currency.SEK)["does_not_exist"]
 
 
+def test_asdict_with_keys():
+    assert Money("4711.25", currency=Currency.SEK).asdict(keys=("amount", "currency", "units", "nanos")) == {
+        "amount": "4711.25",
+        "currency": "SEK",
+        "units": 4711,
+        "nanos": 250000000,
+    }
+    assert Money("1337 USD").asdict(keys=("amount", "currency", "sub_units")) == {
+        "amount": "1337.00",
+        "currency": "USD",
+        "sub_units": "133700",
+    }
+    assert Money("1337", currency=Currency.JPY).asdict(keys=("amount", "currency", "sub_units")) == {
+        "amount": "1337",
+        "currency": "JPY",
+        "sub_units": "1337",
+    }
+    assert Money("0.00000001", currency=Currency("EUR")).asdict(
+        keys=("value", "units", "nanos", "amount", "currency", "currency_code", "from_sub_units", "sub_units")
+    ) == {
+        "value": "0.00000001 EUR",
+        "units": 0,
+        "nanos": 10,
+        "amount": "0.00000001",
+        "currency": "EUR",
+        "currency_code": "EUR",
+        "from_sub_units": False,
+        "sub_units": "0.000001",
+    }
+
+
 def test_from_dict():
     input_dict = {"value": "13384711 JPY", "units": 13384711, "nanos": 0, "currency_code": "JPY"}
     assert str(Money.from_dict(input_dict)) == "13384711.00 JPY"
