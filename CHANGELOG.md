@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.5.4] - 2022-XX-XX
+## [0.5.4] - 2022-11-22
 
 * The `money.asdict()` function can now be called with an optional `keys` argument, which can be used to specify a tuple of keys which shuld be used in the returned dict.
 * A `Number` class has been added, which can be used to differentiate between monetary values and values that doesn't hold a currency – `stockholm.Number`. Like `Rate` objects, the `Number` objects cannot be instantiated with a currency or currency code.
