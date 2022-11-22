@@ -6,9 +6,9 @@
 * A `Number` class has been added, which can be used to differentiate between monetary values and values that doesn't hold a currency – `stockholm.Number`. Like `Rate` objects, the `Number` objects cannot be instantiated with a currency or currency code.
 * Added additional documentation and examples to the README.
 
-#### How to use `money.asdict(keys)`
+---
 
-The default behaviour for `money.asdict()` has not changed. `money.asdict()` is equivalent to `money.asdict(keys=("value", "units", "nanos", "currency_code"))`.
+The default behaviour for calling `money.asdict()` without arguments has not changed. `money.asdict()` is equivalent to `money.asdict(keys=("value", "units", "nanos", "currency_code"))`.
 
 Values to use in the `keys` tuple for `stockholm.Money` objects are any combination of the following:
 
@@ -21,7 +21,7 @@ Values to use in the `keys` tuple for `stockholm.Money` objects are any combinat
 | `currency` | currency code if available | `str \| None` | `"USD"` |
 | `amount` | the monetary amount (excl. currency code) | `str` | `"9001.50"` |
 
-Code example:
+Code examples:
 
 ```python
 from stockholm import Money
@@ -36,22 +36,26 @@ Money(nanos=10).asdict(keys=("value", "currency", "units", "nanos"))
 # {'value': '0.00000001', 'currency': None, 'units': 0, 'nanos': 10}
 ```
 
+---
 
 ## [0.5.3] - 2022-10-25
 
 * Python 3.11 added to test matrix and trove classifiers to officially claim support.
 
+---
 
 ## [0.5.2] - 2022-10-14
 
 * Adds support for the `protobuf` Python bindings versioned 4.x.x.
 * Fixes an issue with the `__hash__` method on `Currency` objects which affected currencies with an `interchangeable_with` value, such as `CNY` (+ `CNH` / `RMB`), `ILS` (+ `NIS`), `TWD` (+ `NTD`). [Thanks @th-ad]
 
+---
 
 ## [0.5.1] - 2022-02-28
 
 * Python 3.10 added to test matrix and trove classifiers to officially claim support.
 
+---
 
 ## [0.5.0] - 2021-06-30
 
@@ -61,17 +65,20 @@ Money(nanos=10).asdict(keys=("value", "currency", "units", "nanos"))
 * Updates to the readme with additional examples.
 * Dropped support for Python 3.6.
 
+---
 
 ## [0.4.4] - 2020-11-09
 
 * Python 3.9 supported.
 * Minor type annotation fixes.
 
+---
 
 ## [0.4.3] - 2020-09-28
 
 * Fixes an issue that caused a monetary amount without currency to get a `"None"` string instead of an empty string as value to `currency_code` when creating a protobuf message using the `.as_protobuf()` method.
 
+---
 
 ## [0.4.2] - 2020-06-29
 
@@ -79,6 +86,7 @@ Money(nanos=10).asdict(keys=("value", "currency", "units", "nanos"))
 * Instantiation of monetary object by passing JSON data and the possibility to get a JSON string based on a monetary amount object.
 * Added documentation. Mostly regarding the use and examples about Protocol Buffers, but also a whole new section about the properties that are available on the `stockholm.Money` object.
 
+---
 
 ## [0.4.1] - 2020-06-26
 
@@ -86,12 +94,14 @@ Money(nanos=10).asdict(keys=("value", "currency", "units", "nanos"))
 * Added target-versions of the supported Python versions for `black` to not accidentally break any backwards compatibility.
 * Fixes default decimal digit formatting of the Ugandan shilling (*currency code **UGX***). [Thanks @tritas]
 
+---
 
 ## [0.4.0] - 2019-12-07
 
 * Added a sub type of `Money` which is named `Rate`, which mostly works the same way but doesn't support currencies. In many applications monetary values can be multiplied with rates (the *rate* can for example be the units of an item on an invoice, where the sum of the item row would be the item price multiplied with the rate). The `Rate` sub type is merely for differentiating monetary values (which fully supports currencies) from the simpler rate type.
 * Updated type hinting and object creation methods to work with inheritance.
 
+---
 
 ## [0.3.7] - 2019-11-28
 
@@ -99,66 +109,78 @@ Money(nanos=10).asdict(keys=("value", "currency", "units", "nanos"))
 * To return a dict from a `stockholm.Money` object it can either be casted to `dict` (`dict(money)`) or by using `money.asdict()`.
 * Monetary amounts can also be created using dict input either by using `Money.from_dict(input_dict)` or by calling the constructor directly with `dict` input such as `Money(dict_input)`.
 
+---
 
 ## [0.3.6] - 2019-11-28
 
 * Project documentation improvements.
 * Removed debug output on currency imports.
 
+---
 
 ## [0.3.5] - 2019-11-28
 
 * Added money() method to currency objects. For example `stockholm.Currency.EUR.money(100)` would equal `stockholm.Money(100, stockholm.Currency.EUR)`.
 * Prevents currency objects to create new currency objects by using them as object constructors.
 
+---
 
 ## [0.3.4] - 2019-11-28
 
 * Added shortcut to `round(self, 0)` as the method `to_integral` which also returns a `Money` object.
 * Added `currency_code` as a property which outputs the currency in string format.
 
+---
 
 ## [0.3.3] - 2019-11-27
 
 * Added `sub_units` property of money objects for easy conversion to and from sub_units.
 
+---
 
 ## [0.3.2] - 2019-11-27
 
 * Updated README with examples about `units` and `nanos` properties.
 * Added `get_currency(ticker)` method available directly from root package, to make it importable with `from stockholm import get_currency`.
 
+---
 
 ## [0.3.1] - 2019-11-27
 
 * Adds method `to_sub_units()` on monetary amounts which for most currencies multiplies the value with 100, but for example for `stockholm.currency.JPY` wouldn't change the value at all.
 * Adds method `to_currency(currency)` (and shorted `to(currency)`) on monetary amounts which just changes the currency of the monetary amount without any kind of changes to the amount itself.
 
+---
 
 ## [0.3.0] - 2019-11-27
 
 * `Money.from_sub_units(amount, currency)` method is a classmethod which does the same thing as `Money(amount, currency, from_sub_units=True)`. For example a `100` subunits of `stockholm.Currency.SEK` would result in a monetary amount of `1.00 SEK`, while 100 subunits of `stockholm.Currency.JPY` would result in `100 JPY`.
 
+---
 
 ## [0.2.2] - 2019-11-27
 
 * Replaces `is_cents` with `from_sub_units` which is aware of number of digits in a `BaseCurrency`.
 
+---
 
 ## [0.2.1] - 2019-11-27
 
 * Added support for custom currency types with non-uppercase ticker symbols.
 
+---
 
 ## [0.2.0] - 2019-11-27
 
 * Restructured currency to also be able to fetch currencies directly on `stockholm.Currency`
 
+---
 
 ## [0.1.1] - 2019-11-26
 
 * Added `get_currency(currency)` method to `stockholm.currency` which returns a currency type that includes metadata about formatting and the default minimum decimals digits, etc.
 
+---
 
 ## [0.1.0] - 2019-11-25
 
