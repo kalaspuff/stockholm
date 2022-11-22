@@ -102,7 +102,7 @@ class Rate(Money):
         return super().amount_as_string(min_decimals=min_decimals, max_decimals=max_decimals)
 
     def to_currency(self, currency: Optional[Union[CurrencyValue, str]]) -> MoneyType:  # type: ignore
-        raise ConversionError("Rates and numbers does not have a currency")
+        return Money(self, currency=currency)
 
     def to_sub_units(self) -> MoneyType:  # type: ignore
         raise ConversionError("Rates and numbers cannot be measured in sub units")
@@ -115,3 +115,11 @@ class Rate(Money):
 
 
 ExchangeRate = Rate
+
+
+class Number(Rate):
+    def __repr__(self) -> str:
+        return f'<stockholm.Number: "{self}">'
+
+    def __hash__(self) -> int:
+        return hash(("stockholm.Number", self._amount))
