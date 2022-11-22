@@ -27,38 +27,39 @@
 
 ![stockholm.Money](https://user-images.githubusercontent.com/89139/123852607-c9a0c380-d91c-11eb-9d47-cf7cd5751c01.png)
 
-### Brief description with basic examples
+### Basic examples
 
 Basically `stockholm` is a human friendly and modern `Money` class for Python 3. This is a library to be used by backend and frontend API coders of fintech companies, web merchants or subscription services. It's great for calculations of amounts while keeping a great level of precision.
 
 ```python
 from stockholm import Money, Rate
-from stockholm.currency import GBP
 
-loan_amount = Money("250380.00", GBP)
-# <stockholm.Money: "250380.00 GBP">
+loan_amount = Money("250380.00", currency="EUR")
+# <stockholm.Money: "250380.00 EUR">
 
 interest_rate = Rate(0.073)
 # <stockholm.Rate: "0.073">
 
 interest_per_day = loan_amount * (interest_rate / 365)
-# <stockholm.Money: "50.076 GBP">
+# <stockholm.Money: "50.076 EUR">
 ```
 
 Comes with functions to produce output for transport layers as well as having a robust and easy way to import/export values in *GraphQL*, *JSON*, *Protocol Buffers*, etc.
 
 ```python
 interest_per_day.asdict()
-# {'value': '50.076 GBP', 'units': 50, 'nanos': 76000000, 'currency_code': 'GBP'}
+# {'value': '50.076 EUR', 'units': 50, 'nanos': 76000000, 'currency_code': 'EUR'}
+```
 
+```
 interest_per_day.asdict(keys=("amount", "currency"))
-# {'amount': '50.076', 'currency': 'GBP'}
+# {'amount': '50.076', 'currency': 'EUR'}
 ```
 
 ```python
 interest_per_day.as_protobuf()
 # <class 'google.type.money_pb2.Money'>
-# · currency_code: "GBP"
+# · currency_code: "EUR"
 # · units: 50
 # · nanos: 76000000
 ```
