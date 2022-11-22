@@ -249,6 +249,20 @@ Money("5 EUR") * Money("5 EUR")
 
 ### Formatting and advanced string formatting
 
+Use f-string formatting for more human readable output and `money.as_string()` function to output with additional (or less) zero-padded fraction digits.
+
+```python
+from stockholm import Money
+
+amount = Money("13384711 USD")
+
+human_readable_amount = f"{amount:,m}"
+# '13,384,711.00 USD'
+
+amount_without_unnecessary_decimals = amount.as_string(min_decimals=0)
+# '13384711 USD'
+```
+
 *Advanced string formatting functionality.*
 
 ```python
