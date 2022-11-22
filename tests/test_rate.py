@@ -3,7 +3,7 @@ import json
 import pytest
 
 import stockholm
-from stockholm import ConversionError, ExchangeRate, Money, Rate
+from stockholm import ConversionError, ExchangeRate, Money, Number, Rate
 
 
 def test_rate():
@@ -38,6 +38,23 @@ def test_rate():
     assert Rate(Money(100)).__class__ is Rate
 
 
+def test_number():
+    assert Number(100) == 100
+    assert Number("100.50551") == 100.50551
+    assert str(Number("4711.1338")) == "4711.1338"
+
+    assert Number(100.50).value == "100.5"
+    assert Number(100.42).value == "100.42"
+    assert Number(nanos=10).value == "0.00000001"
+
+    assert repr(Number(0.00001) + Number(53.5)) == '<stockholm.Number: "53.50001">'
+    assert (Number(0.00001) + Number(53.5)).asdict() == {"nanos": 500010000, "units": 53, "value": "53.50001"}
+
+    assert str(Number(1.5).to_currency("USD")) == "1.50 USD"
+
+    assert Number(Money(100)).__class__ is Number
+
+
 def test_bad_rates():
     with pytest.raises(ConversionError):
         Rate(1, currency="EUR")
@@ -52,9 +69,6 @@ def test_bad_rates():
         Rate.from_sub_units(100)
 
     with pytest.raises(ConversionError):
-        Rate(1).to_currency("SEK")
-
-    with pytest.raises(ConversionError):
         Rate(1).to_sub_units()
 
     with pytest.raises(ConversionError):
@@ -62,8 +76,15 @@ def test_bad_rates():
 
 
 def test_rate_hashable() -> None:
-    m = stockholm.Rate(0)
-    assert hash(m)
+    r1 = stockholm.Rate(0)
+    r2 = stockholm.Rate(0)
+    r3 = stockholm.Rate(1)
+    n = stockholm.Number(0)
+
+    assert hash(r1)
+    assert hash(r1) == hash(r2)
+    assert hash(r1) != hash(r3)
+    assert hash(r1) != hash(n)
 
 
 def test_rate_asdict():
