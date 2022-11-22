@@ -33,6 +33,7 @@ protobuf = { version = ">=3.20.0,<5.0.0", optional = true }
 flake8 = { version = ">=3.8.4", markers = "sys_platform != \"win32\"" }
 flake8-black = { version = ">=0.2.0", markers = "sys_platform != \"win32\"" }
 flake8-isort = { version = ">=4.0.0", markers = "sys_platform != \"win32\"" }
+flake8-pyproject = { version = ">=1.1.0", markers = "sys_platform != \"win32\"" }
 isort = { version = ">=5.6.0", markers = "sys_platform != \"win32\"" }
 pytest = { version = ">=6.1.0", markers = "sys_platform != \"win32\"" }
 pytest-cov = { version = ">=2.10.0", markers = "sys_platform != \"win32\"" }
@@ -52,12 +53,39 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.black]
 line-length = 120
-target_version = ["py37", "py38", "py39", "py310"]
+target_version = ["py37", "py38", "py39", "py310", "py311"]
 include = '\.pyi?$'
 exclude = '\.eggs/|\.egg-info/|\.git/|\.github/|\.mypy_cache/|\.venv/|\.pytest_cache/|\.vscode/|__pycache__/|build/|dist/|setup\.py'
 
 [tool.isort]
 profile = "black"
 line_length = 120
+src_paths = ["stockholm", "tests"]
 known_first_party = "stockholm"
-skip = ".mypy_cache,__pycache__,.pytest_cache,.eggs,.venv,.git,.vscode,.github,dist"
+skip = [".mypy_cache", ".pytest_cache", "__pycache__", "stockholm.egg-info", ".eggs", ".git", ".venv", ".vscode", "build", "dist", "tmp"]
+
+[tool.mypy]
+pretty = true
+files = ["$MYPY_CONFIG_FILE_DIR/stockholm", "$MYPY_CONFIG_FILE_DIR/tests/types", "$MYPY_CONFIG_FILE_DIR/tests/examples"]
+ignore_missing_imports = true
+show_error_codes = true
+no_implicit_reexport = true
+no_implicit_optional = true
+strict_equality = true
+strict_optional = true
+check_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_untyped_defs = true
+local_partial_types = true
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_return_any = true
+warn_unreachable = true
+
+[tool.flake8]
+ignore = ["E203", "E501", "W503"]
+exclude = ["stockholm.egg-info", ".git", ".mypy_cache", ".pytest_cache", ".venv", ".vscode", "__pycache__", "build", "dist", "tmp"]
+
+[tool.coverage.run]
+omit = ["tests/*"]

@@ -157,6 +157,21 @@ isort = ">=4.3.5,<6"
 test = ["pytest"]
 
 [[package]]
+name = "flake8-pyproject"
+version = "1.2.0"
+description = "Flake8 plug-in loading the configuration from pyproject.toml"
+category = "dev"
+optional = false
+python-versions = ">= 3.6"
+
+[package.dependencies]
+Flake8 = ">=5,<6"
+TOMLi = {version = "*", markers = "python_version < \"3.11\""}
+
+[package.extras]
+dev = ["pyTest", "pyTest-cov"]
+
+[[package]]
 name = "idna"
 version = "3.4"
 description = "Internationalized Domain Names in Applications (IDNA)"
@@ -435,7 +450,7 @@ protobuf = ["protobuf"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "cd545e62bb3716422ecad4ded4dd2a2bf15a6dcb2874fe436fec2dbc159b7f82"
+content-hash = "75e865f87bec6e3b54fc41e31c4c7b7a44a34875be7f39cc194c78cefd399a59"
 
 [metadata.files]
 attrs = [
@@ -479,6 +494,7 @@ click = [
 ]
 codecov = [
     {file = "codecov-2.1.12-py2.py3-none-any.whl", hash = "sha256:585dc217dc3d8185198ceb402f85d5cb5dbfa0c5f350a5abcdf9e347776a5b47"},
+    {file = "codecov-2.1.12-py3.8.egg", hash = "sha256:782a8e5352f22593cbc5427a35320b99490eb24d9dcfa2155fd99d2b75cfb635"},
     {file = "codecov-2.1.12.tar.gz", hash = "sha256:a0da46bb5025426da895af90938def8ee12d37fcbcbbbc15b6dc64cf7ebc51c1"},
 ]
 colorama = [
@@ -552,6 +568,9 @@ flake8-black = [
 flake8-isort = [
     {file = "flake8-isort-5.0.3.tar.gz", hash = "sha256:0951398c343c67f4933407adbbfb495d4df7c038650c5d05753a006efcfeb390"},
     {file = "flake8_isort-5.0.3-py3-none-any.whl", hash = "sha256:8c4ab431d87780d0c8336e9614e50ef11201bc848ef64ca017532dec39d4bf49"},
+]
+flake8-pyproject = [
+    {file = "flake8_pyproject-1.2.0-py3-none-any.whl", hash = "sha256:0f90aced603bd47b1b60d83fb0b1d127e3d96a53e7a8cc980b4fb96b785be101"},
 ]
 idna = [
     {file = "idna-3.4-py3-none-any.whl", hash = "sha256:90b77e79eaa3eba6de819a0c442c0b4ceefc341a7a2ab77d7562bf49f425c5c2"},
