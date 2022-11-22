@@ -18,7 +18,7 @@
 * Generate (and parse) structured data to be used in transport layers such as GraphQL or Protobuf.
 * Type hinted, battle tested and supporting several versions of Python.
 
-#### Full feature set further down, but in its simplest form
+#### Full feature set further down, but in its simplest form 👇
 
 ```pycon
 >>> Money("9001.42", currency="USD")
@@ -107,7 +107,7 @@ If any of these sounds familiar, a library for handling monetary amounts could h
 
 ## The basic interfaces
 
-#### `from stockholm import Money`
+### `from stockholm import Money`
 
 The `stockholm.Money` object has full arithmetic support together with `int`, `float`, `Decimal`, other `Money` objects as well as `string`. The `stockholm.Money` object also supports complex string formatting functionality for easy debugging and a clean coding pattern.
 
@@ -118,7 +118,7 @@ Money("99.95 USD")
 # <stockholm.Money: "99.95 USD">
 ```
 
-#### `from stockholm import Currency`
+### `from stockholm import Currency`
 
 Currencies to monetary amounts can be specified using either currencies built with the `stockholm.Currency` metaclasses or simply by specifying the currency ticker as a string (for example `"SEK"` or `"EUR"`) when creating a new `Money` object.
 
@@ -139,7 +139,7 @@ Money(1000, Currency.JPY)
 
 Currencies using the `stockholm.Currency` metaclasses can hold additional options, such as default number of decimals in string output. Note that the amounts behind the scenes actually uses the same precision and backend as `Decimal` values and can as well be interchangable with such values, as such they are way more exact to do calculations with than floating point values.
 
-#### `from stockholm import Number, Rate`
+### `from stockholm import Number, Rate`
 
 The `Number` and `Rate` classes works in the same way and is similar to the `Money` class, with the exception that they cannot hold a currency type and cannot operate with sub units. Examples of when to use them could be to differentiate some values from monetary values, while still getting the benefits from the `Money` class.
 
@@ -181,10 +181,7 @@ $ pip install stockholm[protobuf]
   - [**Parsing and loading JSON data.**](#reading-or-outputting-monetary-amounts-as-json)
 * [**Parameters and functions of the `stockholm.Money` object.**](#parameters-of-the-money-object)
 
-
-## Usage and examples
-
-#### Arithmetics - fully supported
+### Arithmetics - fully supported
 
 *Full arithmetic support with different types, backed by `Decimal` for dealing with rounding errors, while also keeping the monetary amount fully currency aware.*
 
@@ -249,7 +246,7 @@ Money("5 EUR") * Money("5 EUR")
 
 ```
 
-#### Formatting / Advanced string formatting
+### Formatting and advanced string formatting
 
 *Advanced string formatting functionality.*
 
@@ -286,6 +283,8 @@ print(f"{sek_money:.4M}")  # SEK 119889.5760
 print(f"{sek_money:c}")  # SEK
 ```
 
+### Currency class
+
 ##### *Use `stockholm.Currency` types for proper defaults of minimum number of decimal digits to output in strings, etc. All ISO 4217 currency codes implemented, see https://github.com/kalaspuff/stockholm/blob/master/stockholm/currency.py for the full list.*
 
 ```python
@@ -315,6 +314,8 @@ print(Money(1338, Currency.JPY))  # 1338 JPY
 print(Money(1338, get_currency("JPY")))  # 1338 JPY
 
 ```
+
+### Parsing input
 
 #### Input data types in flexible variants
 
@@ -351,7 +352,7 @@ money.sub_units
 # Decimal('471100')
 ```
 
-#### List arithmetics - summary of monetary amounts in list
+### List arithmetics - summary of monetary amounts in list
 
 *Adding several monetary amounts from a list.*
 
@@ -373,7 +374,7 @@ sum(amounts)
 # <stockholm.Money: "1002.50">
 ```
 
-#### Conversion for other transport medium (for example Protocol Buffers or JSON)
+### Conversion for other transport medium (for example Protocol Buffers or JSON)
 
 ##### *Easily splittable into `units` and `nanos` for transport in network medium, for example using the [`google.type.Money` protobuf definition](https://github.com/googleapis/googleapis/blob/master/google/type/money.proto) when using Protocol Buffers.*
 
