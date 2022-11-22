@@ -2,7 +2,7 @@
 
 **This brings a fully featured `Money` class for Python 3 – `stockholm.Money`.**
 
-![Python package](https://github.com/kalaspuff/stockholm/workflows/Python%20package/badge.svg)
+[![Python package](https://github.com/kalaspuff/stockholm/workflows/Python%20package/badge.svg)](https://github.com/kalaspuff/stockholm/actions/workflows/pythonpackage.yml)
 [![pypi](https://badge.fury.io/py/stockholm.svg)](https://pypi.python.org/pypi/stockholm/)
 [![Made with Python](https://img.shields.io/pypi/pyversions/stockholm)](https://www.python.org/)
 [![MIT License](https://img.shields.io/github/license/kalaspuff/stockholm.svg)](https://github.com/kalaspuff/stockholm/blob/master/LICENSE)
