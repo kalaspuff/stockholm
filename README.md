@@ -10,7 +10,7 @@
 
 *Library for formatting and performing arithmetic and comparison operations on monetary amounts. Also with support for currency handling, rates, exchange and serialization + deserialization for when transporting monetary amount data across network layers (built-in data generation and parsing).* 💰
 
-### Why a library for monetary amounts - why this library?
+### A library for monetary amounts
 
 * Combining an amount with a currency to create a monetary amount, as they usually should be read, written and transported together.
 * Able to work with a plethora of different source types. Human friendly approach with developer experience in mind.
@@ -18,14 +18,16 @@
 * Generate (and parse) structured data to be used in transport layers such as GraphQL or Protobuf.
 * Type hinted, battle tested and supporting several versions of Python.
 
-In its simplest form:
+#### Full feature set further down, but in its simplest form
 
 ```pycon
->>> Money("9001.42", currency=USD)
+>>> Money("9001.42", currency="USD")
 <stockholm.Money: "9001.42 USD">
 ```
 
 ![stockholm.Money](https://user-images.githubusercontent.com/89139/123852607-c9a0c380-d91c-11eb-9d47-cf7cd5751c01.png)
+
+### Brief description with basic examples
 
 Basically `stockholm` is a human friendly and modern `Money` class for Python 3. This is a library to be used by backend and frontend API coders of fintech companies, web merchants or subscription services. It's great for calculations of amounts while keeping a great level of precision.
 
@@ -87,7 +89,7 @@ total_sum / 4  # total split on four people
 
 Coding applications, libaries and microservices that consume and publish events that contain monetary amounts shouldn't be any harder than anything else. This package aims to ease that work. You can also use it for just numerical values of course.
 
-### When to use `stockholm`
+#### Real life use-cases
 
 There are times when you want to receive or publish events with monetary amounts or you need to expose an API endpoint and have a structured way to respond with balances, prices, vat, etc. without risking additional weirdness.
 
