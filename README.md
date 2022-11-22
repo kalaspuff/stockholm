@@ -1,18 +1,18 @@
 # `stockholm`
+
 **This brings a fully featured `Money` class for Python 3 – `stockholm.Money`.**
 
 ![Python package](https://github.com/kalaspuff/stockholm/workflows/Python%20package/badge.svg)
 [![pypi](https://badge.fury.io/py/stockholm.svg)](https://pypi.python.org/pypi/stockholm/)
 [![Made with Python](https://img.shields.io/pypi/pyversions/stockholm)](https://www.python.org/)
-[![Type hinted - mypy validated](https://img.shields.io/badge/typehinted-yes-teal)](https://github.com/kalaspuff/stockholm)
 [![MIT License](https://img.shields.io/github/license/kalaspuff/stockholm.svg)](https://github.com/kalaspuff/stockholm/blob/master/LICENSE)
 [![Code coverage](https://codecov.io/gh/kalaspuff/stockholm/branch/master/graph/badge.svg)](https://codecov.io/gh/kalaspuff/stockholm/tree/master/stockholm)
 
-*Library for formatting and performing arithmetic and comparison operations on monetary amounts. Also with support for currency handling, rates, exchange and serialization + deserialization for when transporting monetary amount data across network layers (built-in data generation and parsing).*
+*Library for formatting and performing arithmetic and comparison operations on monetary amounts. Also with support for currency handling, rates, exchange and serialization + deserialization for when transporting monetary amount data across network layers (built-in data generation and parsing).* 💰
 
 ### Why a library for monetary amounts - why this library?
 
-* Combine a value with a currency, as they usually should be read, written and transported together.
+* Combining an amount with a currency to create a monetary amount, as they usually should be read, written and transported together.
 * Able to work with a plethora of different source types. Human friendly approach with developer experience in mind.
 * Get rid of the gotchas if otherwise using `decimal.Decimal`. Sensible rounding by default. Never lose precision when making arithmetic operations. String output as you would expect.
 * Generate (and parse) structured data to be used in transport layers such as GraphQL or Protobuf.
@@ -29,67 +29,63 @@ In its simplest form:
 
 Basically `stockholm` is a human friendly and modern `Money` class for Python 3. This is a library to be used by backend and frontend API coders of fintech companies, web merchants or subscription services. It's great for calculations of amounts while keeping a great level of precision.
 
-```pycon
->>> from stockholm import Money, Rate
->>> from stockholm.currency import GBP
+```python
+from stockholm import Money, Rate
+from stockholm.currency import GBP
 
->>> loan_amount = Money("250380.00", GBP)
-<stockholm.Money: "250380.00 GBP">
+loan_amount = Money("250380.00", GBP)
+# <stockholm.Money: "250380.00 GBP">
 
->>> interest_rate = Rate(0.073)
-<stockholm.Rate: "0.073">
+interest_rate = Rate(0.073)
+# <stockholm.Rate: "0.073">
 
->>> # added interest per day - simple year calculation (365 days)
->>> interest_per_day = loan_amount * (interest_rate / 365)
-<stockholm.Money: "50.076 GBP">
+interest_per_day = loan_amount * (interest_rate / 365)
+# <stockholm.Money: "50.076 GBP">
 ```
 
 Comes with functions to produce output for transport layers as well as having a robust and easy way to import/export values in *GraphQL*, *JSON*, *Protocol Buffers*, etc.
 
-```pycon
->>> # by default asdict() uses "value", "units", "nanos", "currency_code"
->>> interest_per_day.asdict()
-{'value': '50.076 GBP', 'units': 50, 'nanos': 76000000, 'currency_code': 'GBP'}
+```python
+interest_per_day.asdict()
+# {'value': '50.076 GBP', 'units': 50, 'nanos': 76000000, 'currency_code': 'GBP'}
 
->>> # a set of alternative keys can be specified, for example to fit a graphql type
->>> interest_per_day.asdict(keys=("amount", "currency"))
-{'amount': '50.076', 'currency': 'GBP'}
+interest_per_day.asdict(keys=("amount", "currency"))
+# {'amount': '50.076', 'currency': 'GBP'}
 ```
 
-```pycon
->>> # transform monetary object to a protobuf message (default: google.type.Money)
->>> interest_per_day.as_protobuf()
-<class 'google.type.money_pb2.Money'>
-· currency_code: "GBP"
-· units: 50
-· nanos: 76000000
+```python
+interest_per_day.as_protobuf()
+# <class 'google.type.money_pb2.Money'>
+# · currency_code: "GBP"
+# · units: 50
+# · nanos: 76000000
 ```
 
 The goal is to provide a flexible and robust package for development with any kind of monetary amounts. No more working with floats or having to deal with having to think about values in subunits for data transport layers or losing hours of sleep because of the default way that `Decimal` does rounding.
 
 The monetary amounts can be transformed from (or into) dicts, strings, protobuf messages, json, floats, ints, Python Decimals, even other monetary amounts.
 
-Coding applications, libaries and microservices that consume and publish events that contain monetary amounts shouldn't be any harder than anything else. This package aims to ease that work. You can also use it for just numerical values of course.
+```python
+from stockholm import Money, Number
 
-```pycon
->>> from stockholm import Money, Number
+gross_price = Money("319.20 SEK")
+# <stockholm.Money: "319.20 SEK">
 
->>> gross_price = Money("319.20 SEK")
-<stockholm.Money: "319.20 SEK">
+vat_rate = Number(0.25)  # 25% vat
+vat_price = gross_price * vat_rate
+# <stockholm.Money: "79.80 SEK">
 
->>> vat_rate = Number(0.25)  # 25% vat
->>> vat_price = gross_price * vat_rate
-<stockholm.Money: "79.80 SEK">
+net_price = gross_price + vat_price
+# <stockholm.Money: "399.00 SEK">
 
->>> net_price = gross_price + vat_price
-<stockholm.Money: "399.00 SEK">
+total_sum = net_price * 5  # price of five items
+# <stockholm.Money: "1995.00 SEK">
 
->>> net_sum = net_price * 5  # price of five items
-<stockholm.Money: "1995.00 SEK">
-
->>> net_sum / 4  # split on four people
-<stockholm.Money: "498.75 SEK">
+total_sum / 4  # total split on four people
+# <stockholm.Money: "498.75 SEK">
 ```
+
+Coding applications, libaries and microservices that consume and publish events that contain monetary amounts shouldn't be any harder than anything else. This package aims to ease that work. You can also use it for just numerical values of course.
 
 ### When to use `stockholm`
 
@@ -97,7 +93,7 @@ There are times when you want to receive or publish events with monetary amounts
 
 If you're developing a merchant solution, a ticketing service or webshop it can be great to have easy and structured interfaces for calculating orders and building summaries or reports.
 
-#### We're no fan of `float`, but you can do more than just `int`
+#### We don't want to use `float`, but you can do more than just rely on `int` 🤔
 
 Some may be interfacing with banking infrastructure from the 70s or 80s 😓 and has to process data in insanly old string based formats like the example below and validate sums, currencies, etc.
 
