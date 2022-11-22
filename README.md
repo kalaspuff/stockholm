@@ -51,7 +51,7 @@ interest_per_day.asdict()
 # {'value': '50.076 EUR', 'units': 50, 'nanos': 76000000, 'currency_code': 'EUR'}
 ```
 
-```
+```python
 interest_per_day.asdict(keys=("amount", "currency"))
 # {'amount': '50.076', 'currency': 'EUR'}
 ```
