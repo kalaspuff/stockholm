@@ -3,34 +3,38 @@
 ## [0.5.4] - 2022-XX-XX
 
 * The `money.asdict()` function can now be called with an optional `keys` argument, which can be used to specify a tuple of keys which shuld be used in the returned dict.
+* A `Number` class has been added, which can be used to differentiate between monetary values and values that doesn't hold a currency – `stockholm.Number`. Like `Rate` objects, the `Number` objects cannot be instantiated with a currency or currency code.
+* Added additional documentation and examples to the README.
 
-  The default behaviour has not changed. `money.asdict()` is equivalent to `money.asdict(keys=("value", "units", "nanos", "currency_code"))`.
+#### How to use `money.asdict(keys)`
 
-  Values to use in the `keys` tuple for `stockholm.Money` objects are any combination of the following:
+The default behaviour for `money.asdict()` has not changed. `money.asdict()` is equivalent to `money.asdict(keys=("value", "units", "nanos", "currency_code"))`.
 
-  | key | description | return type | example |
-  | :-- | :---------- | :---------- | -------: |
-  | `value` | amount + currency code | `str` | `"9001.50 USD"`
-  | `units` | units of the amount | `int` | `9001` |
-  | `nanos` | number of nano units of the amount | `int` | `500000000` |
-  | `currency_code` | currency code if available | `str \| None` | `"USD"` |
-  | `currency` | currency code if available | `str \| None` | `"USD"` |
-  | `amount` | the monetary amount (excl. currency code) | `str` | `"9001.50"` |
+Values to use in the `keys` tuple for `stockholm.Money` objects are any combination of the following:
 
-  Code example:
+| key | description | return type | example |
+| :-- | :---------- | :---------- | -------: |
+| `value` | amount + currency code | `str` | `"9001.50 USD"`
+| `units` | units of the amount | `int` | `9001` |
+| `nanos` | number of nano units of the amount | `int` | `500000000` |
+| `currency_code` | currency code if available | `str \| None` | `"USD"` |
+| `currency` | currency code if available | `str \| None` | `"USD"` |
+| `amount` | the monetary amount (excl. currency code) | `str` | `"9001.50"` |
 
-  ```python
-  from stockholm import Money
+Code example:
 
-  Money("4711 USD").asdict(keys=("value", "units", "nanos", "currency_code"))
-  # {'value': '4711.00 USD', 'units': 4711, 'nanos': 0, 'currency_code': 'USD'}
+```python
+from stockholm import Money
 
-  Money("4711 USD").asdict(keys=("amount", "currency"))
-  # {'amount': '4711.00', 'currency': 'USD'}
+Money("4711 USD").asdict(keys=("value", "units", "nanos", "currency_code"))
+# {'value': '4711.00 USD', 'units': 4711, 'nanos': 0, 'currency_code': 'USD'}
 
-  Money(nanos=10).asdict(keys=("value", "currency", "units", "nanos"))
-  # {'value': '0.00000001', 'currency': None, 'units': 0, 'nanos': 10}
-  ```
+Money("4711 USD").asdict(keys=("amount", "currency"))
+# {'amount': '4711.00', 'currency': 'USD'}
+
+Money(nanos=10).asdict(keys=("value", "currency", "units", "nanos"))
+# {'value': '0.00000001', 'currency': None, 'units': 0, 'nanos': 10}
+```
 
 
 ## [0.5.3] - 2022-10-25
