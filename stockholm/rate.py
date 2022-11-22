@@ -2,7 +2,8 @@ import decimal
 from decimal import ROUND_HALF_UP, Decimal
 from typing import Any, Dict, Optional, Union, cast
 
-from .currency import CurrencyValue, DefaultCurrency, DefaultCurrencyValue
+from .compat import CurrencyValue
+from .currency import DefaultCurrency, DefaultCurrencyValue
 from .exceptions import ConversionError
 from .money import Money, MoneyType
 

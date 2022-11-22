@@ -9,12 +9,17 @@ assert Money(100, Currency.DKK) == Money("100 DKK")
 assert Money(100, get_currency("JPY")) == Money("100 JPY")
 assert Money(100) == Money("100")
 
-assert isinstance(stockholm.currency.EUR, BaseCurrency)
 assert isinstance(BaseCurrency("SEK"), BaseCurrency)
 assert isinstance(Currency("USD"), BaseCurrency)
-assert isinstance(Currency.GBP, BaseCurrency)
-assert isinstance(Currency.DKK, BaseCurrency)
 assert isinstance(get_currency("JPY"), BaseCurrency)
+
+assert all(
+    [
+        isinstance(stockholm.currency.EUR, BaseCurrency),
+        isinstance(Currency.GBP, BaseCurrency),
+        isinstance(Currency.DKK, BaseCurrency),
+    ]
+)
 
 assert Currency("SEK") == stockholm.currency.SEK == get_currency("SEK") == Currency.SEK == BaseCurrency("SEK")
 
