@@ -101,7 +101,7 @@ class Rate(Money):
             max_decimals = DEFAULT_MAX_DECIMALS
         return super().amount_as_string(min_decimals=min_decimals, max_decimals=max_decimals)
 
-    def to_currency(self, currency: Optional[Union[CurrencyValue, str]]) -> MoneyType:  # type: ignore
+    def to_currency(self, currency: Optional[Union[CurrencyValue, str]]) -> Money:
         return Money(self, currency=currency)
 
     def to_sub_units(self) -> MoneyType:  # type: ignore
