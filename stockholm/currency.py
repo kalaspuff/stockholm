@@ -778,7 +778,7 @@ class SHP(BaseCurrency):
     pass
 
 
-class SLL(BaseCurrency):
+class SLE(BaseCurrency):
     pass
 
 
@@ -875,6 +875,10 @@ class UYW(BaseCurrency):
 
 
 class UZS(BaseCurrency):
+    pass
+
+
+class VED(BaseCurrency):
     pass
 
 
@@ -1324,6 +1328,10 @@ class SKK(BaseCurrency):
     pass
 
 
+class SLL(BaseCurrency):
+    pass
+
+
 class SML(BaseCurrency):
     decimal_digits = 0
 
@@ -1768,6 +1776,7 @@ class Currency(BaseCurrency):
     SIT = SIT
     SKK = SKK
     SLL = SLL
+    SLE = SLE
     SLS = SLS
     SML = SML
     SOS = SOS
@@ -1811,6 +1820,7 @@ class Currency(BaseCurrency):
     UZS = UZS
     VAL = VAL
     VEB = VEB
+    VED = VED
     VEF = VEF
     VES = VES
     VND = VND
