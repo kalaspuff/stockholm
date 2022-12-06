@@ -405,7 +405,7 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "types-protobuf"
-version = "4.21.0.1"
+version = "4.21.0.2"
 description = "Typing stubs for protobuf"
 category = "dev"
 optional = false
@@ -714,8 +714,8 @@ typed-ast = [
     {file = "typed_ast-1.5.4.tar.gz", hash = "sha256:39e21ceb7388e4bb37f4c679d72707ed46c2fbf2a5609b8b8ebc4b067d977df2"},
 ]
 types-protobuf = [
-    {file = "types-protobuf-4.21.0.1.tar.gz", hash = "sha256:d8ce2e1dc54e9b5830e553d31308e87732c916a0b0e288d280bddaa00fa98113"},
-    {file = "types_protobuf-4.21.0.1-py3-none-any.whl", hash = "sha256:80aa071fcbcf1372222aed7deb97a49757095b71a05edcf14ff89cc8caa4a165"},
+    {file = "types-protobuf-4.21.0.2.tar.gz", hash = "sha256:7df483d34ad3fcb1fa7fff1073560d596c9ac1f419cfa851b220c9a93386c998"},
+    {file = "types_protobuf-4.21.0.2-py3-none-any.whl", hash = "sha256:aeefcf39d637016998b3c7b699750847071b555f7c2e0c9873d42ab6103d1a39"},
 ]
 typing-extensions = [
     {file = "typing_extensions-4.4.0-py3-none-any.whl", hash = "sha256:16fa4864408f655d35ec496218b85f79b3437c829e93320c7c9215ccfd92489e"},
