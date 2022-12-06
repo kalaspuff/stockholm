@@ -294,17 +294,30 @@ class MoneyModel(Generic[MoneyType]):
             amount = amount.strip()
             match_currency = None
 
-            matches = re.match(r"^(?P<amount>[-+]?[0-9.]+)[ ]+(?P<currency>[a-zA-Z]+)$", amount)
+            matches = re.match(r"^(?P<amount>[-+]?[0-9,.]+)[ ]+(?P<currency>[a-zA-Z]+)$", amount)
             if not matches:
-                matches = re.match(r"^(?P<currency>[a-zA-Z]+)[ ]+(?P<amount>[-+]?[0-9.]+)$", amount)
+                matches = re.match(r"^(?P<currency>[a-zA-Z]+)[ ]+(?P<amount>[-+]?[0-9,.]+)$", amount)
+            if not matches:
+                matches = re.match(r"^(?P<class>Money|Overdraft)[(](?P<amount>[-+]?[0-9,.]+)[ ]+(?P<currency>[a-zA-Z]+)[)]$", amount)
+            if not matches:
+                matches = re.match(r"^(?P<class>Money|Overdraft)[(](?P<currency>[a-zA-Z]+)[ ]+(?P<amount>[-+]?[0-9,.]+)[)]$", amount)
+            if not matches:
+                matches = re.match(r"^(?P<class>Money|Overdraft)[(]['\"](?P<amount>[-+]?[0-9,.]+)['\"],[ ]+['\"]?(?P<currency>[a-zA-Z]+)['\"]?[)]$", amount)
             if matches:
-                amount = matches.group("amount").strip()
+                amount = matches.group("amount").strip().rstrip(",")
                 match_currency = matches.group("currency").strip()
                 match_currency = (
                     match_currency.upper()
                     if match_currency and isinstance(match_currency, str) and len(match_currency) == 3
                     else match_currency
                 )
+                if "," in amount and re.match(r"^[-+]?[0-9,]+,[0-9]{3}(?:[.][0-9]*|)$", amount):
+                    amount = amount.replace(",", "")
+                try:
+                    if matches.group("class") and matches.group("class") == "Overdraft":
+                        amount = f"-{amount}"
+                except IndexError:
+                    pass
 
             if match_currency is not None:
                 if output_currency is not None and match_currency != output_currency:
