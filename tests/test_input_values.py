@@ -195,6 +195,53 @@ def test_object_input() -> None:
         Money(ThirdPartyMoney("1.6666", "USD"), currency="SEK")
 
 
+def test_custom_class_input() -> None:
+    class ThirdPartyMoney:
+        value_: str
+
+        def __init__(self, value: str) -> None:
+            self.value_ = value
+
+        def __str__(self) -> str:
+            return self.value_
+
+    # Dialects of 'money' (https://github.com/carlospalol/money) and 'py-money' (https://github.com/vimeo/py-money)
+    m = Money(ThirdPartyMoney("EUR 2.22"))
+    assert m.as_dict() == {"value": "2.22 EUR", "units": 2, "nanos": 220000000, "currency_code": "EUR"}
+
+    m = Money(ThirdPartyMoney("USD 4,711,995.42"))
+    assert m.as_dict() == {"value": "4711995.42 USD", "units": 4711995, "nanos": 420000000, "currency_code": "USD"}
+
+    m = Money(ThirdPartyMoney("GBP -1,995.01"))
+    assert m.as_dict() == {"value": "-1995.01 GBP", "units": -1995, "nanos": -10000000, "currency_code": "GBP"}
+
+    # Data model outputs
+    m = Money(ThirdPartyMoney("Money(-9995.00 NOK)"))
+    assert m.as_dict() == {"value": "-9995.00 NOK", "units": -9995, "nanos": 0, "currency_code": "NOK"}
+
+    m = Money(ThirdPartyMoney("Money(9995.00, NOK)"))
+    assert m.as_dict() == {"value": "9995.00 NOK", "units": 9995, "nanos": 0, "currency_code": "NOK"}
+
+    m = Money(ThirdPartyMoney('Money("9995.00", "NOK")'))
+    assert m.as_dict() == {"value": "9995.00 NOK", "units": 9995, "nanos": 0, "currency_code": "NOK"}
+
+    m = Money(ThirdPartyMoney("Money(-9,995.00 NOK)"))
+    assert m.as_dict() == {"value": "-9995.00 NOK", "units": -9995, "nanos": 0, "currency_code": "NOK"}
+
+    m = Money(ThirdPartyMoney("Money(NOK -9,995.00)"))
+    assert m.as_dict() == {"value": "-9995.00 NOK", "units": -9995, "nanos": 0, "currency_code": "NOK"}
+
+    # 👋 Hi 'immoney'! (https://github.com/antonagestam/immoney)
+    m = Money(ThirdPartyMoney("Money('4711.99', EUR)"))
+    assert m.as_dict() == {"value": "4711.99 EUR", "units": 4711, "nanos": 990000000, "currency_code": "EUR"}
+
+    m = Money(ThirdPartyMoney("Overdraft('4711.99', EUR)"))
+    assert m.as_dict() == {"value": "-4711.99 EUR", "units": -4711, "nanos": -990000000, "currency_code": "EUR"}
+
+    m = Money(ThirdPartyMoney("Money('-4711.99', EUR)"))
+    assert m.as_dict() == {"value": "-4711.99 EUR", "units": -4711, "nanos": -990000000, "currency_code": "EUR"}
+
+
 def test_dumb_object_input() -> None:
     class ThirdPartyMoney:
         amount: Any
