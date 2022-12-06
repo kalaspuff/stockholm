@@ -491,7 +491,7 @@ class MoneyModel(Generic[MoneyType]):
     def json(self, keys: Union[List[str], Tuple[str, ...]] = ("value", "units", "nanos", "currency_code")) -> str:
         return self.as_json(keys=keys)
 
-    def as_protobuf(self, proto_class: Type[ProtobufMessageType] = MoneyProtobufMessage) -> ProtobufMessageType:  # type: ignore
+    def as_protobuf(self, proto_class: Type[ProtobufMessageType] = MoneyProtobufMessage) -> ProtobufMessageType:
         message: ProtobufMessageType = proto_class()
 
         values = self.asdict(keys=tuple(proto_class.DESCRIPTOR.fields_by_name.keys()))
@@ -506,13 +506,13 @@ class MoneyModel(Generic[MoneyType]):
 
         return message
 
-    def as_proto(self, proto_class: Type[ProtobufMessageType] = MoneyProtobufMessage) -> ProtobufMessageType:  # type: ignore
+    def as_proto(self, proto_class: Type[ProtobufMessageType] = MoneyProtobufMessage) -> ProtobufMessageType:
         return self.as_protobuf(proto_class=proto_class)
 
-    def protobuf(self, proto_class: Type[ProtobufMessageType] = MoneyProtobufMessage) -> ProtobufMessageType:  # type: ignore
+    def protobuf(self, proto_class: Type[ProtobufMessageType] = MoneyProtobufMessage) -> ProtobufMessageType:
         return self.as_protobuf(proto_class=proto_class)
 
-    def proto(self, proto_class: Type[ProtobufMessageType] = MoneyProtobufMessage) -> ProtobufMessageType:  # type: ignore
+    def proto(self, proto_class: Type[ProtobufMessageType] = MoneyProtobufMessage) -> ProtobufMessageType:
         return self.as_protobuf(proto_class=proto_class)
 
     def is_signed(self) -> bool:
