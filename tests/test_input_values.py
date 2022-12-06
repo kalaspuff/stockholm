@@ -222,7 +222,7 @@ def test_custom_class_input() -> None:
     m = Money(ThirdPartyMoney("Money(9995.00, NOK)"))
     assert m.as_dict() == {"value": "9995.00 NOK", "units": 9995, "nanos": 0, "currency_code": "NOK"}
 
-    m = Money(ThirdPartyMoney("Money(\"9995.00\", \"NOK\")"))
+    m = Money(ThirdPartyMoney('Money("9995.00", "NOK")'))
     assert m.as_dict() == {"value": "9995.00 NOK", "units": 9995, "nanos": 0, "currency_code": "NOK"}
 
     m = Money(ThirdPartyMoney("Money(-9,995.00 NOK)"))

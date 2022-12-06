@@ -298,11 +298,18 @@ class MoneyModel(Generic[MoneyType]):
             if not matches:
                 matches = re.match(r"^(?P<currency>[a-zA-Z]+)[ ]+(?P<amount>[-+]?[0-9,.]+)$", amount)
             if not matches:
-                matches = re.match(r"^(?P<class>Money|Overdraft)[(](?P<amount>[-+]?[0-9,.]+)[ ]+(?P<currency>[a-zA-Z]+)[)]$", amount)
+                matches = re.match(
+                    r"^(?P<class>Money|Overdraft)[(](?P<amount>[-+]?[0-9,.]+)[ ]+(?P<currency>[a-zA-Z]+)[)]$", amount
+                )
             if not matches:
-                matches = re.match(r"^(?P<class>Money|Overdraft)[(](?P<currency>[a-zA-Z]+)[ ]+(?P<amount>[-+]?[0-9,.]+)[)]$", amount)
+                matches = re.match(
+                    r"^(?P<class>Money|Overdraft)[(](?P<currency>[a-zA-Z]+)[ ]+(?P<amount>[-+]?[0-9,.]+)[)]$", amount
+                )
             if not matches:
-                matches = re.match(r"^(?P<class>Money|Overdraft)[(]['\"](?P<amount>[-+]?[0-9,.]+)['\"],[ ]+['\"]?(?P<currency>[a-zA-Z]+)['\"]?[)]$", amount)
+                matches = re.match(
+                    r"^(?P<class>Money|Overdraft)[(]['\"](?P<amount>[-+]?[0-9,.]+)['\"],[ ]+['\"]?(?P<currency>[a-zA-Z]+)['\"]?[)]$",
+                    amount,
+                )
             if matches:
                 amount = matches.group("amount").strip().rstrip(",")
                 match_currency = matches.group("currency").strip()
