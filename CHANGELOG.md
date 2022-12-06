@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.5.5] - 2022-12-06
+## [0.5.5] - 2022-12-07
 
 * Additional support to parse input values from third parties, data models, etc.
 * Primarily load protobuf message class from `google.type.money_pb2` before falling back to the included class in `stockholm.protobuf.money_pb2`.
