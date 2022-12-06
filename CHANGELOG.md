@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.5] - 2022-12-06
+
+* Additional support to parse input values from third parties, data models, etc.
+* Primarily load protobuf message class from `google.type.money_pb2` before falling back to the included class in `stockholm.protobuf.money_pb2`.
+
+---
+
 ## [0.5.4] - 2022-11-22
 
 * The `money.asdict()` function can now be called with an optional `keys` argument, which can be used to specify a tuple of keys which shuld be used in the returned dict.
