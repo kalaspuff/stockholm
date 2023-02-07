@@ -394,9 +394,9 @@ class MoneyModel(Generic[MoneyType]):
         amount = self._amount.quantize(Decimal(f"1e-{NANOS_LENGTH}"), ROUND_HALF_UP)
         sign, digits, exponent = amount.as_tuple()
 
-        units_str = "".join(map(str, digits))[:exponent] or "0"
-        nanos_str = "".join(map(str, digits))[exponent:]
-        nanos_str = nanos_str.rjust((-exponent), "0").ljust(NANOS_LENGTH, "0")[0:NANOS_LENGTH]
+        units_str = "".join(map(str, digits))[: int(exponent)] or "0"
+        nanos_str = "".join(map(str, digits))[int(exponent) :]
+        nanos_str = nanos_str.rjust((-int(exponent)), "0").ljust(NANOS_LENGTH, "0")[0:NANOS_LENGTH]
 
         if sign and int(units_str):
             units_str = f"-{units_str}"
