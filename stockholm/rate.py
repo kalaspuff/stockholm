@@ -30,10 +30,10 @@ class NumericType(MoneyModel[MoneyType]):
 
     def __init__(
         self,
-        amount: Optional[Union[MoneyType, Decimal, Dict, int, float, str, object]] = None,
+        amount: Optional[Union[MoneyType, MoneyModel[Any], Decimal, Dict, int, float, str, object]] = None,
         units: Optional[int] = None,
         nanos: Optional[int] = None,
-        value: Optional[Union[MoneyType, Decimal, int, float, str]] = None,
+        value: Optional[Union[MoneyType, MoneyModel[Any], Decimal, int, float, str]] = None,
         **kwargs: Any,
     ) -> None:
         currency = kwargs.get("currency", DefaultCurrency)
