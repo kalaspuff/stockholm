@@ -85,7 +85,7 @@ warn_return_any = true
 warn_unreachable = true
 
 [tool.flake8]
-ignore = ["E203", "E501", "W503", "E231]
+ignore = ["E203", "E501", "W503", "E231"]
 exclude = ["stockholm.egg-info", ".git", ".mypy_cache", ".pytest_cache", ".venv", ".vscode", "__pycache__", "build", "dist", "tmp"]
 
 [tool.coverage.run]
