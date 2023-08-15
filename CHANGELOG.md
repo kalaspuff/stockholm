@@ -6,6 +6,8 @@
 * Python 3.12 added to test matrix and trove classifiers.
 * Fixes some type hints that previously would show as `Unknown` in some LSPs.
 
+---
+
 ## [0.5.5] - 2022-12-07
 
 * Additional support to parse input values from third parties, data models, etc.
