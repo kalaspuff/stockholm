@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.5.6] - 2023-08-15
+
+* Added so that `Money`, `Number` and `Rate` objects can now be copied using the `copy.copy()` and `copy.deepcopy()` functions.
+
 ## [0.5.5] - 2022-12-07
 
 * Additional support to parse input values from third parties, data models, etc.
