@@ -1,7 +1,7 @@
 import decimal
 import json
 from decimal import ROUND_HALF_UP, Decimal
-from typing import Any, Dict, List, Optional, Tuple, Type, Union, cast
+from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
 from .compat import CurrencyValue
 from .currency import DefaultCurrency, DefaultCurrencyValue
@@ -19,7 +19,7 @@ class NumericType(MoneyModel[MoneyType]):
 
     @classmethod
     def from_sub_units(
-        cls: Type[MoneyType],
+        cls,
         amount: Optional[Union[MoneyType, MoneyModel[Any], Decimal, int, float, str, object]],
         currency: Optional[Union[DefaultCurrencyValue, CurrencyValue, str]] = DefaultCurrency,
         value: Optional[Union[MoneyType, MoneyModel[Any], Decimal, int, float, str]] = None,
