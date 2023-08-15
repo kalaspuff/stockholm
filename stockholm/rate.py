@@ -1,12 +1,12 @@
 import decimal
 import json
 from decimal import ROUND_HALF_UP, Decimal
-from typing import Any, Dict, List, Optional, Tuple, Union, cast
+from typing import Any, Dict, List, Optional, Tuple, Type, Union, cast
 
 from .compat import CurrencyValue
 from .currency import DefaultCurrency, DefaultCurrencyValue
 from .exceptions import ConversionError
-from .money import Money, MoneyType
+from .money import Money, MoneyModel, MoneyType
 
 DEFAULT_MIN_DECIMALS = 0
 DEFAULT_MAX_DECIMALS = 9
@@ -14,23 +14,19 @@ DEFAULT_MAX_DECIMALS = 9
 RoundingContext = decimal.Context(rounding=ROUND_HALF_UP)
 
 
-class Rate(Money):
+class NumericType(MoneyModel[MoneyType]):
     _currency: None
 
     @classmethod
     def from_sub_units(
-        cls,
-        amount: Optional[Union[MoneyType, Decimal, int, float, str, object]],
+        cls: Type[MoneyType],
+        amount: Optional[Union[MoneyType, MoneyModel[Any], Decimal, int, float, str, object]],
         currency: Optional[Union[DefaultCurrencyValue, CurrencyValue, str]] = DefaultCurrency,
-        value: Optional[Union[MoneyType, Decimal, int, float, str]] = None,
+        value: Optional[Union[MoneyType, MoneyModel[Any], Decimal, int, float, str]] = None,
         currency_code: Optional[str] = None,
         **kwargs: Any,
-    ) -> "Rate":
+    ) -> MoneyType:
         raise ConversionError("Rates and numbers cannot be created from sub units")
-
-    @classmethod
-    def from_dict(cls, input_dict: Dict) -> "Rate":
-        return cls(**input_dict)
 
     def __init__(
         self,
@@ -104,22 +100,22 @@ class Rate(Money):
     def to_currency(self, currency: Optional[Union[CurrencyValue, str]]) -> Money:
         return Money(self, currency=currency)
 
-    def to_sub_units(self) -> MoneyType:  # type: ignore
+    def to_sub_units(self) -> MoneyType:
         raise ConversionError("Rates and numbers cannot be measured in sub units")
 
     def __repr__(self) -> str:
-        return f'<stockholm.Rate: "{self}">'
+        return f'<stockholm.{self.__class__.__name__}: "{self}">'
 
     def __hash__(self) -> int:
-        return hash(("stockholm.Rate", self._amount))
+        return hash((f"stockholm.{self.__class__.__name__}", self._amount))
+
+
+class Rate(NumericType["Rate"]):
+    pass
 
 
 ExchangeRate = Rate
 
 
-class Number(Rate):
-    def __repr__(self) -> str:
-        return f'<stockholm.Number: "{self}">'
-
-    def __hash__(self) -> int:
-        return hash(("stockholm.Number", self._amount))
+class Number(NumericType["Number"]):
+    pass

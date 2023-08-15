@@ -74,15 +74,17 @@ class MoneyModel(Generic[MoneyType]):
         )
 
     @classmethod
-    def _is_unknown_amount_type(cls, amount: Optional[Union[MoneyType, Decimal, int, float, str, object]]) -> bool:
+    def _is_unknown_amount_type(
+        cls, amount: Optional[Union[MoneyType, "MoneyModel[Any]", Decimal, int, float, str, object]]
+    ) -> bool:
         return not any(map(lambda type_: isinstance(amount, type_), (Money, Decimal, int, bool, float, str)))
 
     @classmethod
     def from_sub_units(
         cls: Type[MoneyType],
-        amount: Optional[Union[MoneyType, Decimal, int, float, str, object]],
+        amount: Optional[Union[MoneyType, "MoneyModel[Any]", Decimal, int, float, str, object]],
         currency: Optional[Union[DefaultCurrencyValue, CurrencyValue, str]] = DefaultCurrency,
-        value: Optional[Union[MoneyType, Decimal, int, float, str]] = None,
+        value: Optional[Union[MoneyType, "MoneyModel[Any]", Decimal, int, float, str]] = None,
         currency_code: Optional[str] = None,
         **kwargs: Any,
     ) -> MoneyType:
@@ -122,14 +124,22 @@ class MoneyModel(Generic[MoneyType]):
             }
         )
 
+    @classmethod
+    def from_proto(
+        cls: Type[MoneyType],
+        input_value: Union[str, bytes, object],
+        proto_class: Type[GenericProtobufMessage] = MoneyProtobufMessage,
+    ) -> MoneyType:
+        return cast(MoneyType, cls.from_protobuf(input_value, proto_class=proto_class))
+
     def __init__(
         self,
-        amount: Optional[Union[MoneyType, Decimal, Dict, int, float, str, object]] = None,
+        amount: Optional[Union[MoneyType, "MoneyModel[Any]", Decimal, Dict, int, float, str, object]] = None,
         currency: Optional[Union[DefaultCurrencyValue, CurrencyValue, str]] = DefaultCurrency,
         from_sub_units: Optional[bool] = None,
         units: Optional[int] = None,
         nanos: Optional[int] = None,
-        value: Optional[Union[MoneyType, Decimal, int, float, str]] = None,
+        value: Optional[Union[MoneyType, "MoneyModel[Any]", Decimal, int, float, str]] = None,
         currency_code: Optional[str] = None,
         **kwargs: Any,
     ) -> None:
@@ -241,6 +251,7 @@ class MoneyModel(Generic[MoneyType]):
                             "currency",
                             "currency_code",
                             "from_sub_units",
+                            "sub_units",
                         )
                         if hasattr(amount, k)
                     }
@@ -533,10 +544,10 @@ class MoneyModel(Generic[MoneyType]):
     def to_integral(self) -> MoneyType:
         return self.__round__(0)
 
-    def to_currency(self, currency: Optional[Union[CurrencyValue, str]]) -> MoneyType:
+    def to_currency(self, currency: Optional[Union[CurrencyValue, str]]) -> Union[MoneyType, "MoneyModel[Any]"]:
         return cast(MoneyType, self.__class__(self, currency=currency))
 
-    def to(self, currency: Optional[Union[CurrencyValue, str]]) -> MoneyType:
+    def to(self, currency: Optional[Union[CurrencyValue, str]]) -> Union[MoneyType, "MoneyModel[Any]"]:
         return self.to_currency(currency)
 
     def to_sub_units(self) -> MoneyType:
@@ -584,7 +595,7 @@ class MoneyModel(Generic[MoneyType]):
         return value
 
     def __repr__(self) -> str:
-        return f'<stockholm.Money: "{self}">'
+        return f'<stockholm.{self.__class__.__name__}: "{self}">'
 
     def __str__(self) -> str:
         return self.as_string()
@@ -692,7 +703,7 @@ class MoneyModel(Generic[MoneyType]):
         return output
 
     def __hash__(self) -> int:
-        return hash(("stockholm.Money", self._amount, self._currency))
+        return hash((f"stockholm.{self.__class__.__name__}", str(self._amount), self._currency))
 
     def __bool__(self) -> bool:
         return bool(self._amount)
@@ -897,57 +908,21 @@ class MoneyModel(Generic[MoneyType]):
 
         return cast(MoneyType, self.__class__(amount, currency=self._currency))
 
+    def __reduce__(
+        self,
+    ) -> Tuple[Type[MoneyType], Tuple[str, Optional[Union[CurrencyValue, str]]]]:
+        return cast(Type[MoneyType], self.__class__), (str(self._amount), self._currency)
 
-class Money(MoneyModel):
-    @classmethod
-    def from_sub_units(
-        cls,
-        amount: Optional[Union[MoneyType, Decimal, int, float, str, object]],
-        currency: Optional[Union[DefaultCurrencyValue, CurrencyValue, str]] = DefaultCurrency,
-        value: Optional[Union[MoneyType, Decimal, int, float, str]] = None,
-        currency_code: Optional[str] = None,
-        **kwargs: Any,
-    ) -> "Money":
-        return cast(
-            Money,
-            super().from_sub_units(
-                amount=amount, currency=currency, value=value, currency_code=currency_code, **kwargs
-            ),
-        )
+    def __copy__(self) -> MoneyModel[MoneyType]:
+        return self
 
-    @classmethod
-    def from_dict(cls, input_dict: Dict) -> "Money":
-        return cls(**input_dict)
+    def __deepcopy__(self, memo: Dict) -> MoneyModel[MoneyType]:
+        return self
 
-    @classmethod
-    def from_json(cls, input_value: Union[str, bytes]) -> "Money":
-        return cls(**json.loads(input_value))
 
-    @classmethod
-    def from_protobuf(
-        cls, input_value: Union[str, bytes, object], proto_class: Type[GenericProtobufMessage] = MoneyProtobufMessage
-    ) -> "Money":
-        if input_value is not None and isinstance(input_value, bytes):
-            input_value = proto_class.FromString(input_value)
+class Money(MoneyModel["Money"]):
+    def to_currency(self, currency: Optional[Union[CurrencyValue, str]]) -> "Money":
+        return cast("Money", super().to_currency(currency=currency))
 
-        return cls(
-            **{
-                k: getattr(input_value, k)
-                for k in (
-                    "value",
-                    "units",
-                    "nanos",
-                    "amount",
-                    "currency",
-                    "currency_code",
-                    "from_sub_units",
-                )
-                if hasattr(input_value, k)
-            }
-        )
-
-    @classmethod
-    def from_proto(
-        cls, input_value: Union[str, bytes, object], proto_class: Type[GenericProtobufMessage] = MoneyProtobufMessage
-    ) -> "Money":
-        return cls.from_protobuf(input_value, proto_class=proto_class)
+    def to(self, currency: Optional[Union[CurrencyValue, str]]) -> "Money":
+        return cast("Money", super().to(currency=currency))

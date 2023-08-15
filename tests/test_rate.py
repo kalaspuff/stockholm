@@ -6,7 +6,7 @@ import stockholm
 from stockholm import ConversionError, ExchangeRate, Money, Number, Rate
 
 
-def test_rate():
+def test_rate() -> None:
     assert Rate(100) == 100
     assert Rate("100.50551") == ExchangeRate("100.50551")
     assert str(Rate("4711.1338")) == "4711.1338"
@@ -38,7 +38,7 @@ def test_rate():
     assert Rate(Money(100)).__class__ is Rate
 
 
-def test_number():
+def test_number() -> None:
     assert Number(100) == 100
     assert Number("100.50551") == 100.50551
     assert str(Number("4711.1338")) == "4711.1338"
@@ -55,7 +55,7 @@ def test_number():
     assert Number(Money(100)).__class__ is Number
 
 
-def test_bad_rates():
+def test_bad_rates() -> None:
     with pytest.raises(ConversionError):
         Rate(1, currency="EUR")
 
@@ -87,7 +87,7 @@ def test_rate_hashable() -> None:
     assert hash(r1) != hash(n)
 
 
-def test_rate_asdict():
+def test_rate_asdict() -> None:
     assert Rate(1338).asdict() == {
         "value": "1338",
         "units": 1338,
@@ -118,7 +118,7 @@ def test_rate_asdict():
         Rate(1338)["does_not_exist"]
 
 
-def test_asdict_with_keys():
+def test_asdict_with_keys() -> None:
     assert Rate(1338).asdict(keys=("value", "amount")) == {
         "value": "1338",
         "amount": "1338",
@@ -129,7 +129,7 @@ def test_asdict_with_keys():
     }
 
 
-def test_rate_from_dict():
+def test_rate_from_dict() -> None:
     d = {"value": "13384711", "units": 13384711, "nanos": 0}
     assert str(Rate.from_dict(d)) == "13384711"
     assert str(Rate(d)) == "13384711"
@@ -139,7 +139,7 @@ def test_rate_from_dict():
     assert str(Rate(d)) == "5.0001"
 
 
-def test_rate_json():
+def test_rate_json() -> None:
     rate = Rate("-999999999999999999.999999999")
     json_string = json.dumps({"rate": rate.asdict()})
     assert str(Rate(json.loads(json_string).get("rate"))) == "-999999999999999999.999999999"
