@@ -4,6 +4,7 @@
 
 * Added so that `Money`, `Number` and `Rate` objects can now be copied using the `copy.copy()` and `copy.deepcopy()` functions.
 * Python 3.12 added to test matrix and trove classifiers.
+* Fixes some type hints that previously would show as `Unknown` in some LSPs.
 
 ## [0.5.5] - 2022-12-07
 
