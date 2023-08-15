@@ -3,6 +3,7 @@
 ## [0.5.6] - 2023-08-15
 
 * Added so that `Money`, `Number` and `Rate` objects can now be copied using the `copy.copy()` and `copy.deepcopy()` functions.
+* Python 3.12 added to test matrix and trove classifiers.
 
 ## [0.5.5] - 2022-12-07
 
