@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import sys
 from decimal import Decimal
-from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union, cast
+from typing import Any, Dict, List, Optional, Protocol, Set, Tuple, Type, Union, cast
 
 
 class DefaultCurrencyValue(type):
@@ -12,6 +12,13 @@ class DefaultCurrencyValue(type):
 class DefaultCurrency(metaclass=DefaultCurrencyValue):
     def __new__(cls: Type[DefaultCurrency]) -> DefaultCurrency:
         raise TypeError("'DefaultCurrency' object is not callable")
+
+
+class CurrencyValue(Protocol):
+    ticker: str
+    decimal_digits: int
+    interchangeable_with: Optional[Union[Tuple[str, ...], List[str], Set[str]]]
+    preferred_ticker: Optional[str]
 
 
 class MetaCurrency(type):
@@ -1873,5 +1880,4 @@ class Currency(BaseCurrency):
     ZWR = ZWR
 
 
-from .compat import CurrencyValue  # noqa isort:skip
 from stockholm.money import Money  # noqa isort:skip

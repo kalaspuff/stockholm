@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.5.7] - 2023-XX-XX
+
+* Dropped support for Python 3.7.
+
+---
+
 ## [0.5.6] - 2023-08-15
 
 * Added so that `Money`, `Number` and `Rate` objects can now be copied using the `copy.copy()` and `copy.deepcopy()` functions.

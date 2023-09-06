@@ -3,8 +3,7 @@ import json
 from decimal import ROUND_HALF_UP, Decimal
 from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
-from .compat import CurrencyValue
-from .currency import DefaultCurrency, DefaultCurrencyValue
+from .currency import CurrencyValue, DefaultCurrency, DefaultCurrencyValue
 from .exceptions import ConversionError
 from .money import Money, MoneyModel, MoneyType
 
