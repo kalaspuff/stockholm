@@ -14,7 +14,6 @@ classifiers = [
     "Topic :: Office/Business :: Financial",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -27,13 +26,13 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 protobuf = { version = ">=3.20.0,<5.0.0", optional = true }
 
 [tool.poetry.dev-dependencies]
 flake8 = { version = ">=3.8.4", markers = "sys_platform != \"win32\"" }
 flake8-black = { version = ">=0.2.0", markers = "sys_platform != \"win32\"" }
-flake8-isort = { version = ">=4.0.0", markers = "python_version < \"3.12\" and sys_platform != \"win32\"" }
+flake8-isort = { version = ">=4.0.0", markers = "sys_platform != \"win32\"" }
 flake8-pyproject = { version = ">=1.1.0", markers = "sys_platform != \"win32\"" }
 isort = { version = ">=5.6.0", markers = "sys_platform != \"win32\"" }
 pytest = { version = ">=6.1.0", markers = "sys_platform != \"win32\"" }
@@ -43,7 +42,7 @@ mypy = { version = ">=0.800", markers = "sys_platform != \"win32\"" }
 codecov = { version = ">=2.1.10", markers = "sys_platform != \"win32\"" }
 protobuf = { version = ">=3.20.0,<5.0.0", markers = "sys_platform != \"win32\"" }
 types-protobuf = { version = ">=0.1.13", markers = "sys_platform != \"win32\"" }
-typing-extensions = { version = ">=3.7.4", markers = "python_version < \"3.8\" and sys_platform != \"win32\"" }
+setuptools = { version = ">=68.1.2", markers = "sys_platform != \"win32\"" }
 
 [tool.poetry.extras]
 protobuf = ["protobuf"]
@@ -54,7 +53,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.black]
 line-length = 120
-target_version = ["py37", "py38", "py39", "py310", "py311"]
+target_version = ["py38", "py39", "py310", "py311"]
 include = '\.pyi?$'
 exclude = '\.eggs/|\.egg-info/|\.git/|\.github/|\.mypy_cache/|\.venv/|\.pytest_cache/|\.vscode/|__pycache__/|build/|dist/|setup\.py'
 
