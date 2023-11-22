@@ -5,7 +5,7 @@ from abc import abstractmethod
 from decimal import Decimal
 from typing import Any, Callable, Generic, NotRequired, Required, TypeAlias, TypeVar
 
-from .currency import CurrencyValue, MetaCurrency
+from .currency import BaseCurrency, CurrencyValue, MetaCurrency
 from .money import Money, MoneyModel
 from .rate import Number, NumericType
 
@@ -194,5 +194,5 @@ ConvertibleToMoneyWithRequiredCurrency = ConvertibleTypeDescriptor[
     Money, Money, ConvertibleToMoneyWithRequiredCurrencyT
 ]
 
-ConvertibleToCurrencyCodeT: TypeAlias = CurrencyValue | str
-ConvertibleToCurrency = ConvertibleTypeDescriptor[MetaCurrency, str, ConvertibleToCurrencyCodeT]
+ConvertibleToCurrencyT: TypeAlias = CurrencyValue | str
+ConvertibleToCurrency = ConvertibleTypeDescriptor[MetaCurrency, BaseCurrency, ConvertibleToCurrencyT]
