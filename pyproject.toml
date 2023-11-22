@@ -44,6 +44,7 @@ codecov = { version = ">=2.1.10", markers = "sys_platform != \"win32\"" }
 protobuf = { version = ">=3.20.0,<5.0.0", markers = "sys_platform != \"win32\"" }
 types-protobuf = { version = ">=0.1.13", markers = "sys_platform != \"win32\"" }
 setuptools = { version = ">=68.1.2", markers = "sys_platform != \"win32\"" }
+pydantic = { version = ">=2.5", markers = "sys_platform != \"win32\"" }
 
 [tool.poetry.extras]
 protobuf = ["protobuf"]
