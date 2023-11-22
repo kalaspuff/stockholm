@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import sys
 from decimal import Decimal
-from typing import Any, Dict, List, Optional, Protocol, Set, Tuple, Type, Union, cast
+from typing import Any, Callable, Dict, List, Optional, Protocol, Set, Tuple, Type, Union, cast
 
 
 class DefaultCurrencyValue(type):
@@ -139,6 +139,61 @@ class MetaCurrency(type):
         if not return_value and type(instance) is BaseCurrencyType:
             return True
         return return_value
+
+    @classmethod
+    def __get_pydantic_core_schema__(
+        cls,
+        _source_type: Any,
+        _handler: Callable,
+    ) -> Any:
+        def validate_currency_code(value: Any) -> str:
+            return str(value)
+
+        def serialize(value: Any) -> str:
+            return str(value)
+
+        currency_validator_function_schema = {
+            "type": "function-plain",
+            "function": {"type": "no-info", "function": validate_currency_code},
+        }
+        currency_regex_str_schema = {
+            "type": "str",
+            "pattern": "^[a-zA-Z]+$",
+        }
+        is_currency_instance_schema = {"type": "is-instance", "cls": BaseCurrencyType}
+
+        schemas = [
+            {
+                "type": "chain",
+                "steps": [step, currency_validator_function_schema],
+            }
+            for step in (
+                is_currency_instance_schema,
+                currency_regex_str_schema,
+            )
+        ]
+
+        return {
+            "type": "json-or-python",
+            "json_schema": {
+                "type": "union",
+                "choices": schemas,
+            },
+            "python_schema": {
+                "type": "union",
+                "choices": schemas,
+                "strict": True,
+            },
+            "serialization": {
+                "type": "function-plain",
+                "function": serialize,
+                "when_used": "json-unless-none",
+            },
+        }
+
+    @classmethod
+    def _validate(cls, value: Any, handler: Callable[..., str]) -> str:
+        return handler(value)
 
 
 class BaseCurrencyType(metaclass=MetaCurrency):
