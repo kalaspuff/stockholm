@@ -146,8 +146,8 @@ class MetaCurrency(type):
         _source_type: Any,
         _handler: Callable,
     ) -> Any:
-        def validate_currency_code(value: Any) -> str:
-            return str(value)
+        def validate_currency_code(value: Any) -> BaseCurrency:
+            return get_currency(str(value))
 
         def serialize(value: Any) -> str:
             return str(value)
@@ -1933,6 +1933,12 @@ class Currency(BaseCurrency):
     ZWL = ZWL
     ZWN = ZWN
     ZWR = ZWR
+
+    def __get__(self, instance: Any, owner: Any) -> BaseCurrency:
+        return cast(BaseCurrency, ...)
+
+    def __set__(self, instance: Any, value: CurrencyValue) -> None:
+        ...
 
 
 from stockholm.money import Money  # noqa isort:skip
