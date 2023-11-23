@@ -392,7 +392,7 @@ sum(amounts)
 
 ### Use in Pydantic models
 
-`Money` objects can be used in Pydantic models and used with Pydantic's JSON serialization and validation – the same goes for `Number` and `Currency` objects as well.
+`Money` objects can be used in Pydantic (`Pydantic>=2.2` supported) models and used with Pydantic's JSON serialization and validation – the same goes for `Number` and `Currency` objects as well. Specify the `stockholm.Money` type as the field type and you're good to go.
 
 ```python
 from pydantic import BaseModel
