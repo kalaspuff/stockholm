@@ -1,8 +1,57 @@
 # Changelog
 
-## [0.5.7] - 2023-XX-XX
+## [0.5.7] - 2023-11-23
 
+* `Money` objects can be used in Pydantic (`Pydantic>=2.2` supported) models and used with Pydantic's JSON serialization and validation – the same goes for `Number` and `Currency` objects as well. See examples below.
+
+  Previously validation of these types required the Pydantic config option `arbitrary_types_allowed` and JSON serialization with `model_dump_json()` resulted in an exception. With these updates there's no need for `arbitrary_types_allowed` and pydantic model's using `Money` fields can use JSON serialization+deserialization natively.
+* It's also possible to use the coercible types as Pydantic field type – mainly suited for experimentation and early development. These types will automatically coerce input into `Money`, `Number` or `Currency` objects.
+  * `stockholm.types.ConvertibleToMoney`
+  * `stockholm.types.ConvertibleToMoneyWithRequiredCurrency`
+  * `stockholm.types.ConvertibleToNumber`
+  * `stockholm.types.ConvertibleToCurrency`
 * Dropped support for Python 3.7.
+
+---
+
+#### Example of using `Money` fields in Pydantic models
+
+```python
+from pydantic import BaseModel
+from stockholm import Money
+
+class Transaction(BaseModel):
+    reference: str
+    amount: Money
+
+transaction = Transaction(reference="abc123", amount=Money("100.00", "SEK"))
+# Transaction(reference='abc123', amount=<stockholm.Money: "100.00 SEK">)
+
+json_data = transaction.model_dump_json()
+# '{"reference":"abc123","amount":{"value":"100.00 SEK","units":100,"nanos":0,"currency_code":"SEK"}}'
+
+Transaction.model_validate_json(json_data)
+# Transaction(reference='abc123', amount=<stockholm.Money: "100.00 SEK">)
+```
+
+#### Example of using coercible fields such as `ConvertibleToMoney` in Pydantic models
+
+```python
+from pydantic import BaseModel
+from stockholm import Money
+from stockholm.types import ConvertibleToMoney
+
+class ExampleModel(BaseModel):
+    amount: ConvertibleToMoney
+
+example = ExampleModel(amount="4711.50 USD")
+# ExampleModel(amount=<stockholm.Money: "4711.50 USD">)
+
+example.model_dump_json()
+# '{"amount":{"value":"4711.50 USD","units":4711,"nanos":500000000,"currency_code":"USD"}}'
+```
+
+Note that it's generally recommended to opt for the more strict types (`stockholm.Money`, `stockholm.Number` and `stockholm.Currency`) when possible.
 
 ---
 
