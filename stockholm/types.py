@@ -153,24 +153,37 @@ class MoneyDictWithValueAndCurrencyCode(NumberDictWithValue):
 
 
 NumberDict = Union[NumberDictWithAmount, NumberDictWithUnits, NumberDictWithNanos, NumberDictWithValue]
-NumberDictWithEmptyCurrency = (
-    Union[NumberDictWithAmountAndEmptyCurrency, NumberDictWithUnitsAndEmptyCurrency, NumberDictWithNanosAndEmptyCurrency, NumberDictWithValueAndEmptyCurrency]
-)
-MoneyDictWithOptionalCurrency = (
-    Union[MoneyDictWithAmountAndOptionalCurrency, MoneyDictWithUnitsAndOptionalCurrency, MoneyDictWithNanosAndOptionalCurrency, MoneyDictWithValueAndOptionalCurrency]
-)
-MoneyDictWithCurrency = (
-    Union[MoneyDictWithAmountAndCurrency, MoneyDictWithUnitsAndCurrency, MoneyDictWithNanosAndCurrency, MoneyDictWithValueAndCurrency, MoneyDictWithAmountAndCurrencyCode, MoneyDictWithUnitsAndCurrencyCode, MoneyDictWithNanosAndCurrencyCode, MoneyDictWithValueAndCurrencyCode]
-)
+NumberDictWithEmptyCurrency = Union[
+    NumberDictWithAmountAndEmptyCurrency,
+    NumberDictWithUnitsAndEmptyCurrency,
+    NumberDictWithNanosAndEmptyCurrency,
+    NumberDictWithValueAndEmptyCurrency,
+]
+MoneyDictWithOptionalCurrency = Union[
+    MoneyDictWithAmountAndOptionalCurrency,
+    MoneyDictWithUnitsAndOptionalCurrency,
+    MoneyDictWithNanosAndOptionalCurrency,
+    MoneyDictWithValueAndOptionalCurrency,
+]
+MoneyDictWithCurrency = Union[
+    MoneyDictWithAmountAndCurrency,
+    MoneyDictWithUnitsAndCurrency,
+    MoneyDictWithNanosAndCurrency,
+    MoneyDictWithValueAndCurrency,
+    MoneyDictWithAmountAndCurrencyCode,
+    MoneyDictWithUnitsAndCurrencyCode,
+    MoneyDictWithNanosAndCurrencyCode,
+    MoneyDictWithValueAndCurrencyCode,
+]
 
-ConvertibleToNumberT = (
-    Union[Number, NumericType[Any], MoneyModel[Any], NumberDict, NumberDictWithEmptyCurrency, int, float, Decimal, str]
-)
+ConvertibleToNumberT = Union[
+    Number, NumericType[Any], MoneyModel[Any], NumberDict, NumberDictWithEmptyCurrency, int, float, Decimal, str
+]
 ConvertibleToNumber = ConvertibleTypeDescriptor[Number, Number, ConvertibleToNumberT]
 
-ConvertibleToMoneyWithOptionalCurrencyT = (
-    Union[Money, MoneyModel[Any], NumberDict, MoneyDictWithOptionalCurrency, int, float, Decimal, str]
-)
+ConvertibleToMoneyWithOptionalCurrencyT = Union[
+    Money, MoneyModel[Any], NumberDict, MoneyDictWithOptionalCurrency, int, float, Decimal, str
+]
 ConvertibleToMoneyWithOptionalCurrency = ConvertibleTypeDescriptor[
     Money, Money, ConvertibleToMoneyWithOptionalCurrencyT
 ]
