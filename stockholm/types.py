@@ -12,7 +12,7 @@ from .rate import Number, NumericType
 if sys.version_info < (3, 11):
     from typing_extensions import NotRequired, Required, TypedDict  # pragma: no cover
 else:
-    from typing import NotRequired, Required, TypedDict
+    from typing import NotRequired, Required, TypedDict  # pragma: no cover
 
 SchemaT = TypeVar("SchemaT", bound=Union[MoneyModel, MetaCurrency])
 GetT = TypeVar("GetT")
