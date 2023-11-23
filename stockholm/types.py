@@ -3,7 +3,7 @@ from __future__ import annotations
 import sys
 from abc import abstractmethod
 from decimal import Decimal
-from typing import TYPE_CHECKING, Any, Callable, Generic, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, Generic, TypeVar, Union
 
 from .currency import BaseCurrency, CurrencyValue, MetaCurrency
 from .money import Money, MoneyModel
@@ -14,7 +14,7 @@ if sys.version_info < (3, 11):
 else:
     from typing import NotRequired, Required, TypedDict
 
-SchemaT = TypeVar("SchemaT", bound=MoneyModel | MetaCurrency)
+SchemaT = TypeVar("SchemaT", bound=Union[MoneyModel, MetaCurrency])
 GetT = TypeVar("GetT")
 SetT = TypeVar("SetT")
 
@@ -41,11 +41,11 @@ class ConvertibleTypeDescriptor(Generic[SchemaT, GetT, SetT]):
 
 
 class NumberDictWithAmount(TypedDict):
-    amount: Required[Money | MoneyModel[Any] | int | float | Decimal | str]
+    amount: Required[Union[Money, MoneyModel[Any], int, float, Decimal, str]]
     units: NotRequired[int]
     nanos: NotRequired[int]
-    from_sub_units: NotRequired[bool | None]
-    value: NotRequired[Money | MoneyModel[Any] | int | float | Decimal | str | None]
+    from_sub_units: NotRequired[Union[bool, None]]
+    value: NotRequired[Union[Money, MoneyModel[Any], int, float, Decimal, str, None]]
 
 
 class NumberDictWithAmountAndEmptyCurrency(NumberDictWithAmount):
@@ -54,26 +54,26 @@ class NumberDictWithAmountAndEmptyCurrency(NumberDictWithAmount):
 
 
 class MoneyDictWithAmountAndOptionalCurrency(NumberDictWithAmount):
-    currency: NotRequired[CurrencyValue | str | None]
-    currency_code: NotRequired[str | None]
+    currency: NotRequired[Union[CurrencyValue, str, None]]
+    currency_code: NotRequired[Union[str, None]]
 
 
 class MoneyDictWithAmountAndCurrency(NumberDictWithAmount):
-    currency: Required[CurrencyValue | str]
-    currency_code: NotRequired[str | None]
+    currency: Required[Union[CurrencyValue, str]]
+    currency_code: NotRequired[Union[str, None]]
 
 
 class MoneyDictWithAmountAndCurrencyCode(NumberDictWithAmount):
-    currency: NotRequired[CurrencyValue | str | None]
+    currency: NotRequired[Union[CurrencyValue, str, None]]
     currency_code: Required[str]
 
 
 class NumberDictWithUnits(TypedDict):
-    amount: NotRequired[Money | MoneyModel[Any] | int | float | Decimal | str | None]
+    amount: NotRequired[Union[Money, MoneyModel[Any], int, float, Decimal, str, None]]
     units: Required[int]
     nanos: NotRequired[int]
-    from_sub_units: NotRequired[bool | None]
-    value: NotRequired[Money | MoneyModel[Any] | int | float | Decimal | str | None]
+    from_sub_units: NotRequired[Union[bool, None]]
+    value: NotRequired[Union[Money, MoneyModel[Any], int, float, Decimal, str, None]]
 
 
 class NumberDictWithUnitsAndEmptyCurrency(NumberDictWithUnits):
@@ -82,26 +82,26 @@ class NumberDictWithUnitsAndEmptyCurrency(NumberDictWithUnits):
 
 
 class MoneyDictWithUnitsAndOptionalCurrency(NumberDictWithUnits):
-    currency: NotRequired[CurrencyValue | str | None]
-    currency_code: NotRequired[str | None]
+    currency: NotRequired[Union[CurrencyValue, str, None]]
+    currency_code: NotRequired[Union[str, None]]
 
 
 class MoneyDictWithUnitsAndCurrency(NumberDictWithUnits):
-    currency: Required[CurrencyValue | str]
-    currency_code: NotRequired[str | None]
+    currency: Required[Union[CurrencyValue, str]]
+    currency_code: NotRequired[Union[str, None]]
 
 
 class MoneyDictWithUnitsAndCurrencyCode(NumberDictWithUnits):
-    currency: NotRequired[CurrencyValue | str | None]
+    currency: NotRequired[Union[CurrencyValue, str, None]]
     currency_code: Required[str]
 
 
 class NumberDictWithNanos(TypedDict):
-    amount: NotRequired[Money | MoneyModel[Any] | int | float | Decimal | str | None]
+    amount: NotRequired[Union[Money, MoneyModel[Any], int, float, Decimal, str, None]]
     units: NotRequired[int]
     nanos: Required[int]
-    from_sub_units: NotRequired[bool | None]
-    value: NotRequired[Money | MoneyModel[Any] | int | float | Decimal | str | None]
+    from_sub_units: NotRequired[Union[bool, None]]
+    value: NotRequired[Union[Money, MoneyModel[Any], int, float, Decimal, str, None]]
 
 
 class NumberDictWithNanosAndEmptyCurrency(NumberDictWithNanos):
@@ -110,26 +110,26 @@ class NumberDictWithNanosAndEmptyCurrency(NumberDictWithNanos):
 
 
 class MoneyDictWithNanosAndOptionalCurrency(NumberDictWithNanos):
-    currency: NotRequired[CurrencyValue | str | None]
-    currency_code: NotRequired[str | None]
+    currency: NotRequired[Union[CurrencyValue, str, None]]
+    currency_code: NotRequired[Union[str, None]]
 
 
 class MoneyDictWithNanosAndCurrency(NumberDictWithNanos):
-    currency: Required[CurrencyValue | str]
-    currency_code: NotRequired[str | None]
+    currency: Required[Union[CurrencyValue, str]]
+    currency_code: NotRequired[Union[str, None]]
 
 
 class MoneyDictWithNanosAndCurrencyCode(NumberDictWithNanos):
-    currency: NotRequired[CurrencyValue | str | None]
+    currency: NotRequired[Union[CurrencyValue, str, None]]
     currency_code: Required[str]
 
 
 class NumberDictWithValue(TypedDict):
-    amount: NotRequired[Money | MoneyModel[Any] | int | float | Decimal | str | None]
+    amount: NotRequired[Union[Money, MoneyModel[Any], int, float, Decimal, str, None]]
     units: NotRequired[int]
     nanos: NotRequired[int]
-    from_sub_units: NotRequired[bool | None]
-    value: Required[Money | MoneyModel[Any] | int | float | Decimal | str]
+    from_sub_units: NotRequired[Union[bool, None]]
+    value: Required[Union[Money, MoneyModel[Any], int, float, Decimal, str]]
 
 
 class NumberDictWithValueAndEmptyCurrency(NumberDictWithValue):
@@ -138,51 +138,38 @@ class NumberDictWithValueAndEmptyCurrency(NumberDictWithValue):
 
 
 class MoneyDictWithValueAndOptionalCurrency(NumberDictWithValue):
-    currency: NotRequired[CurrencyValue | str | None]
-    currency_code: NotRequired[str | None]
+    currency: NotRequired[Union[CurrencyValue, str, None]]
+    currency_code: NotRequired[Union[str, None]]
 
 
 class MoneyDictWithValueAndCurrency(NumberDictWithValue):
-    currency: Required[CurrencyValue | str]
-    currency_code: NotRequired[str | None]
+    currency: Required[Union[CurrencyValue, str]]
+    currency_code: NotRequired[Union[str, None]]
 
 
 class MoneyDictWithValueAndCurrencyCode(NumberDictWithValue):
-    currency: NotRequired[CurrencyValue | str | None]
+    currency: NotRequired[Union[CurrencyValue, str, None]]
     currency_code: Required[str]
 
 
-NumberDict = NumberDictWithAmount | NumberDictWithUnits | NumberDictWithNanos | NumberDictWithValue
+NumberDict = Union[NumberDictWithAmount, NumberDictWithUnits, NumberDictWithNanos, NumberDictWithValue]
 NumberDictWithEmptyCurrency = (
-    NumberDictWithAmountAndEmptyCurrency
-    | NumberDictWithUnitsAndEmptyCurrency
-    | NumberDictWithNanosAndEmptyCurrency
-    | NumberDictWithValueAndEmptyCurrency
+    Union[NumberDictWithAmountAndEmptyCurrency, NumberDictWithUnitsAndEmptyCurrency, NumberDictWithNanosAndEmptyCurrency, NumberDictWithValueAndEmptyCurrency]
 )
 MoneyDictWithOptionalCurrency = (
-    MoneyDictWithAmountAndOptionalCurrency
-    | MoneyDictWithUnitsAndOptionalCurrency
-    | MoneyDictWithNanosAndOptionalCurrency
-    | MoneyDictWithValueAndOptionalCurrency
+    Union[MoneyDictWithAmountAndOptionalCurrency, MoneyDictWithUnitsAndOptionalCurrency, MoneyDictWithNanosAndOptionalCurrency, MoneyDictWithValueAndOptionalCurrency]
 )
 MoneyDictWithCurrency = (
-    MoneyDictWithAmountAndCurrency
-    | MoneyDictWithUnitsAndCurrency
-    | MoneyDictWithNanosAndCurrency
-    | MoneyDictWithValueAndCurrency
-    | MoneyDictWithAmountAndCurrencyCode
-    | MoneyDictWithUnitsAndCurrencyCode
-    | MoneyDictWithNanosAndCurrencyCode
-    | MoneyDictWithValueAndCurrencyCode
+    Union[MoneyDictWithAmountAndCurrency, MoneyDictWithUnitsAndCurrency, MoneyDictWithNanosAndCurrency, MoneyDictWithValueAndCurrency, MoneyDictWithAmountAndCurrencyCode, MoneyDictWithUnitsAndCurrencyCode, MoneyDictWithNanosAndCurrencyCode, MoneyDictWithValueAndCurrencyCode]
 )
 
 ConvertibleToNumberT = (
-    Number | NumericType[Any] | MoneyModel[Any] | NumberDict | NumberDictWithEmptyCurrency | int | float | Decimal | str
+    Union[Number, NumericType[Any], MoneyModel[Any], NumberDict, NumberDictWithEmptyCurrency, int, float, Decimal, str]
 )
 ConvertibleToNumber = ConvertibleTypeDescriptor[Number, Number, ConvertibleToNumberT]
 
 ConvertibleToMoneyWithOptionalCurrencyT = (
-    Money | MoneyModel[Any] | NumberDict | MoneyDictWithOptionalCurrency | int | float | Decimal | str
+    Union[Money, MoneyModel[Any], NumberDict, MoneyDictWithOptionalCurrency, int, float, Decimal, str]
 )
 ConvertibleToMoneyWithOptionalCurrency = ConvertibleTypeDescriptor[
     Money, Money, ConvertibleToMoneyWithOptionalCurrencyT
@@ -191,10 +178,10 @@ ConvertibleToMoneyWithOptionalCurrency = ConvertibleTypeDescriptor[
 ConvertibleToMoneyT = ConvertibleToMoneyWithOptionalCurrencyT
 ConvertibleToMoney = ConvertibleToMoneyWithOptionalCurrency
 
-ConvertibleToMoneyWithRequiredCurrencyT = Money | MoneyModel[Any] | MoneyDictWithCurrency | str
+ConvertibleToMoneyWithRequiredCurrencyT = Union[Money, MoneyModel[Any], MoneyDictWithCurrency, str]
 ConvertibleToMoneyWithRequiredCurrency = ConvertibleTypeDescriptor[
     Money, Money, ConvertibleToMoneyWithRequiredCurrencyT
 ]
 
-ConvertibleToCurrencyT = CurrencyValue | str
+ConvertibleToCurrencyT = Union[CurrencyValue, str]
 ConvertibleToCurrency = ConvertibleTypeDescriptor[MetaCurrency, BaseCurrency, ConvertibleToCurrencyT]
