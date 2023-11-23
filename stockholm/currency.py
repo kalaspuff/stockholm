@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import sys
 from decimal import Decimal
-from typing import Any, Dict, List, Optional, Protocol, Set, Tuple, Type, Union, cast
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Protocol, Set, Tuple, Type, Union, cast
 
 
 class DefaultCurrencyValue(type):
@@ -139,6 +139,70 @@ class MetaCurrency(type):
         if not return_value and type(instance) is BaseCurrencyType:
             return True
         return return_value
+
+    @classmethod
+    def __get_pydantic_core_schema__(
+        cls,
+        _source_type: Any,
+        _handler: Any,
+    ) -> Any:
+        def validate_currency_code(value: Any) -> BaseCurrency:
+            return get_currency(str(value))
+
+        def serialize(value: Any) -> str:
+            return str(value)
+
+        currency_validator_function_schema = {
+            "type": "function-plain",
+            "function": {"type": "no-info", "function": validate_currency_code},
+        }
+        currency_regex_str_schema = {
+            "type": "str",
+            "pattern": "^[a-zA-Z]+$",
+        }
+        is_currency_instance_schema = {"type": "is-instance", "cls": BaseCurrencyType}
+
+        schemas = [
+            {
+                "type": "chain",
+                "steps": [step, currency_validator_function_schema],
+            }
+            for step in (
+                is_currency_instance_schema,
+                currency_regex_str_schema,
+            )
+        ]
+
+        def json_schema(schema: Any) -> Any:
+            if isinstance(schema, dict):
+                if schema.get("type") == "is-instance":
+                    return None
+                return {k: json_schema(v) for k, v in schema.items() if json_schema(v) is not None}
+            elif isinstance(schema, list):
+                return [json_schema(v) for v in schema if json_schema(v) is not None]
+            return schema
+
+        return {
+            "type": "json-or-python",
+            "json_schema": {
+                "type": "union",
+                "choices": json_schema(schemas),
+            },
+            "python_schema": {
+                "type": "union",
+                "choices": schemas,
+                "strict": True,
+            },
+            "serialization": {
+                "type": "function-plain",
+                "function": serialize,
+                "when_used": "json-unless-none",
+            },
+        }
+
+    @classmethod
+    def _validate(cls, value: Any, handler: Callable[..., BaseCurrency]) -> BaseCurrency:
+        return handler(value)
 
 
 class BaseCurrencyType(metaclass=MetaCurrency):
@@ -1878,6 +1942,14 @@ class Currency(BaseCurrency):
     ZWL = ZWL
     ZWN = ZWN
     ZWR = ZWR
+
+    if TYPE_CHECKING:  # pragma: no cover
+
+        def __get__(self, instance: Any, owner: Any) -> BaseCurrency:
+            return cast(BaseCurrency, ...)
+
+        def __set__(self, instance: Any, value: CurrencyValue) -> None:
+            ...
 
 
 from stockholm.money import Money  # noqa isort:skip

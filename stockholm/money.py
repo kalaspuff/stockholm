@@ -5,7 +5,7 @@ import json
 import re
 from decimal import ROUND_HALF_UP, Decimal
 from functools import reduce
-from typing import Any, Dict, Generic, Iterable, List, Optional, Tuple, Type, TypeVar, Union, cast
+from typing import Any, Callable, Dict, Generic, Iterable, List, Optional, Tuple, Type, TypeVar, Union, cast
 
 from .currency import BaseCurrencyType, CurrencyValue, DefaultCurrency, DefaultCurrencyValue
 from .exceptions import ConversionError, CurrencyMismatchError, InvalidOperandError
@@ -917,6 +917,149 @@ class MoneyModel(Generic[MoneyType]):
 
     def __deepcopy__(self, memo: Dict) -> MoneyModel[MoneyType]:
         return self
+
+    @classmethod
+    def __get_pydantic_core_schema__(
+        cls,
+        _source_type: Any,
+        _handler: Any,
+    ) -> Any:
+        def validate_money(value: Any) -> MoneyModel[MoneyType]:
+            return cls(value)
+
+        def serialize(value: MoneyModel[MoneyType]) -> Dict:
+            return value.asdict()
+
+        money_validator_function_schema = {
+            "type": "function-plain",
+            "function": {"type": "no-info", "function": validate_money},
+        }
+        money_regex_str_schema = {
+            "type": "str",
+            "pattern": "^(?:[-+]?[0-9.]+([ ]+[a-zA-Z]+)?|[a-zA-Z]+[ ]+[-+]?[0-9.]+)$",
+        }
+        currency_regex_str_schema = {
+            "type": "str",
+            "pattern": "^[a-zA-Z]+$",
+        }
+        float_schema = {"type": "float", "allow_inf_nan": False}
+        int_schema = {"type": "int"}
+        decimal_schema = {"type": "decimal", "allow_inf_nan": False}
+        is_money_model_instance_schema = {"type": "is-instance", "cls": MoneyModel}
+        is_currency_instance_schema = {"type": "is-instance", "cls": BaseCurrencyType}
+
+        field_value = field_amount = {
+            "type": "typed-dict-field",
+            "schema": {
+                "type": "nullable",
+                "schema": {
+                    "type": "union",
+                    "choices": [
+                        is_money_model_instance_schema,
+                        money_regex_str_schema,
+                        float_schema,
+                        int_schema,
+                        decimal_schema,
+                    ],
+                },
+            },
+            "required": False,
+        }
+        field_currency = {
+            "type": "typed-dict-field",
+            "schema": {
+                "type": "nullable",
+                "schema": {
+                    "type": "union",
+                    "choices": [
+                        is_currency_instance_schema,
+                        currency_regex_str_schema,
+                    ],
+                },
+            },
+            "required": False,
+        }
+        field_currency_code = {
+            "type": "typed-dict-field",
+            "schema": {"type": "nullable", "schema": currency_regex_str_schema},
+            "required": False,
+        }
+        field_from_sub_units = {
+            "type": "typed-dict-field",
+            "schema": {"type": "nullable", "schema": {"type": "bool"}},
+            "required": False,
+        }
+        field_units = {
+            "type": "typed-dict-field",
+            "schema": {"type": "int", "le": 999999999999999999, "ge": -999999999999999999},
+            "required": False,
+        }
+        field_nanos = {
+            "type": "typed-dict-field",
+            "schema": {"type": "int", "le": 999999999, "ge": -999999999},
+            "required": False,
+        }
+        money_model_dict_schema = {
+            "type": "typed-dict",
+            "fields": {
+                "amount": field_amount,
+                "units": field_units,
+                "nanos": field_nanos,
+                "currency": field_currency,
+                "currency_code": field_currency_code,
+                "from_sub_units": field_from_sub_units,
+                "value": field_value,
+            },
+        }
+
+        schemas = [
+            {
+                "type": "chain",
+                "steps": [step, money_validator_function_schema],
+            }
+            for step in (
+                is_money_model_instance_schema,
+                money_regex_str_schema,
+                float_schema,
+                int_schema,
+                decimal_schema,
+                money_model_dict_schema,
+            )
+        ]
+
+        def json_schema(schema: Any) -> Any:
+            if isinstance(schema, dict):
+                if schema.get("type") == "is-instance":
+                    return None
+                return {k: json_schema(v) for k, v in schema.items() if json_schema(v) is not None}
+            elif isinstance(schema, list):
+                return [json_schema(v) for v in schema if json_schema(v) is not None]
+            return schema
+
+        return {
+            "type": "json-or-python",
+            "json_schema": {
+                "type": "union",
+                "choices": json_schema(schemas),
+            },
+            "python_schema": {
+                "type": "union",
+                "choices": [
+                    {"type": "is-instance", "cls": cls},
+                    *schemas,
+                ],
+                "strict": True,
+            },
+            "serialization": {
+                "type": "function-plain",
+                "function": serialize,
+                "when_used": "json-unless-none",
+            },
+        }
+
+    @classmethod
+    def _validate(cls, value: Any, handler: Callable[..., MoneyType]) -> MoneyType:
+        return handler(value)
 
 
 class Money(MoneyModel["Money"]):

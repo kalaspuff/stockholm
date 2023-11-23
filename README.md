@@ -176,6 +176,7 @@ $ pip install stockholm[protobuf]
 
 * [**Arithmetics – works with loads of compatible types – completely currency aware.**](#arithmetics---fully-supported)
 * [**Instantiating a monetary amount in many flexible ways.**](#input-data-types-in-flexible-variants)
+* [**Use in Pydantic models.**](#use-in-pydantic-models)
 * [**Using `stockholm.Money` monetary amount with Protocol Buffers.**](#using-protocol-buffers-for-transporting-monetary-amounts-over-the-network)
 * [**Conversion between dicts, JSON and values for use in GraphQL or other JSON-based API:s:**](#conversion-for-other-transport-medium-for-example-protocol-buffers-or-json)
   - [**Using dict values for input and output / having GraphQL in mind.**](#monetary-amounts-can-also-be-exported-to-dict-as-well-as-created-with-dict-value-input-which-can-be-great-to-for-example-transport-a-monetary-value-in-json)
@@ -388,6 +389,49 @@ Money.sum(amounts)
 sum(amounts)
 # <stockholm.Money: "1002.50">
 ```
+
+### Use in Pydantic models
+
+`Money` objects can be used in Pydantic (`Pydantic>=2.2` supported) models and used with Pydantic's JSON serialization and validation – the same goes for `Number` and `Currency` objects as well. Specify the `stockholm.Money` type as the field type and you're good to go.
+
+```python
+from pydantic import BaseModel
+from stockholm import Money
+
+class Transaction(BaseModel):
+    reference: str
+    amount: Money
+
+transaction = Transaction(reference="abc123", amount=Money("100.00", "SEK"))
+# Transaction(reference='abc123', amount=<stockholm.Money: "100.00 SEK">)
+
+json_data = transaction.model_dump_json()
+# '{"reference":"abc123","amount":{"value":"100.00 SEK","units":100,"nanos":0,"currency_code":"SEK"}}'
+
+Transaction.model_validate_json(json_data)
+# Transaction(reference='abc123', amount=<stockholm.Money: "100.00 SEK">)
+```
+
+It's also possible to use the `stockholm.types` Pydantic field types, for example `stockholm.types.ConvertibleToMoney`, which will automatically coerce input into a `Money` object.
+
+```python
+from pydantic import BaseModel
+from stockholm import Money
+from stockholm.types import ConvertibleToMoney
+
+class ExampleModel(BaseModel):
+    amount: ConvertibleToMoney
+
+example = ExampleModel(amount="4711.50 USD")
+# ExampleModel(amount=<stockholm.Money: "4711.50 USD">)
+
+example.model_dump_json()
+# '{"amount":{"value":"4711.50 USD","units":4711,"nanos":500000000,"currency_code":"USD"}}'
+```
+
+Other similar field types that can be used on Pydantic fields are `ConvertibleToNumber`, `ConvertibleToMoneyWithRequiredCurrency` and `ConvertibleToCurrency` – all imported from `stockholm.types`.
+
+Note that it's generally recommended to opt for the more strict types (`stockholm.Money`, `stockholm.Number` and `stockholm.Currency`) when possible and the coercion types should be used with caution and is mainly suited for experimentation and early development.
 
 ### Conversion for other transport medium (for example Protocol Buffers or JSON)
 
