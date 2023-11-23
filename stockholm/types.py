@@ -3,16 +3,16 @@ from __future__ import annotations
 import sys
 from abc import abstractmethod
 from decimal import Decimal
-from typing import TYPE_CHECKING, Any, Callable, Generic, NotRequired, Required, TypeAlias, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, Generic, TypeVar
 
 from .currency import BaseCurrency, CurrencyValue, MetaCurrency
 from .money import Money, MoneyModel
 from .rate import Number, NumericType
 
-if sys.version_info < (3, 9):
-    from typing_extensions import TypedDict  # pragma: no cover
+if sys.version_info < (3, 11):
+    from typing_extensions import NotRequired, Required, TypedDict  # pragma: no cover
 else:
-    from typing import TypedDict
+    from typing import NotRequired, Required, TypedDict
 
 SchemaT = TypeVar("SchemaT", bound=MoneyModel | MetaCurrency)
 GetT = TypeVar("GetT")
@@ -176,12 +176,12 @@ MoneyDictWithCurrency = (
     | MoneyDictWithValueAndCurrencyCode
 )
 
-ConvertibleToNumberT: TypeAlias = (
+ConvertibleToNumberT = (
     Number | NumericType[Any] | MoneyModel[Any] | NumberDict | NumberDictWithEmptyCurrency | int | float | Decimal | str
 )
 ConvertibleToNumber = ConvertibleTypeDescriptor[Number, Number, ConvertibleToNumberT]
 
-ConvertibleToMoneyWithOptionalCurrencyT: TypeAlias = (
+ConvertibleToMoneyWithOptionalCurrencyT = (
     Money | MoneyModel[Any] | NumberDict | MoneyDictWithOptionalCurrency | int | float | Decimal | str
 )
 ConvertibleToMoneyWithOptionalCurrency = ConvertibleTypeDescriptor[
@@ -191,10 +191,10 @@ ConvertibleToMoneyWithOptionalCurrency = ConvertibleTypeDescriptor[
 ConvertibleToMoneyT = ConvertibleToMoneyWithOptionalCurrencyT
 ConvertibleToMoney = ConvertibleToMoneyWithOptionalCurrency
 
-ConvertibleToMoneyWithRequiredCurrencyT: TypeAlias = Money | MoneyModel[Any] | MoneyDictWithCurrency | str
+ConvertibleToMoneyWithRequiredCurrencyT = Money | MoneyModel[Any] | MoneyDictWithCurrency | str
 ConvertibleToMoneyWithRequiredCurrency = ConvertibleTypeDescriptor[
     Money, Money, ConvertibleToMoneyWithRequiredCurrencyT
 ]
 
-ConvertibleToCurrencyT: TypeAlias = CurrencyValue | str
+ConvertibleToCurrencyT = CurrencyValue | str
 ConvertibleToCurrency = ConvertibleTypeDescriptor[MetaCurrency, BaseCurrency, ConvertibleToCurrencyT]
