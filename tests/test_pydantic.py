@@ -2,7 +2,7 @@ import json
 from decimal import Decimal
 from typing import Any
 
-from pydantic import BaseModel
+import pytest
 
 from stockholm import Currency, Money, get_currency
 from stockholm.currency import JPY, USD, BaseCurrency
@@ -13,7 +13,15 @@ from stockholm.types import (
     ConvertibleToNumber,
 )
 
+try:
+    from pydantic import BaseModel  # noqa: F401
 
+    pydantic_is_installed = True
+except ModuleNotFoundError:
+    pydantic_is_installed = False
+
+
+@pytest.mark.skipif(pydantic_is_installed is False, reason="pydantic is not installed")
 def test_pydantic_model_money_field() -> None:
     class TestModel(BaseModel):
         value: Money
@@ -28,7 +36,10 @@ def test_pydantic_model_money_field() -> None:
     assert TestModel(value=Money(4711.42, "JPY")).value.currency == "JPY"
 
 
+@pytest.mark.skipif(pydantic_is_installed is False, reason="pydantic is not installed")
 def test_pydantic_model_currency_field() -> None:
+    from pydantic import BaseModel
+
     class TestModel(BaseModel):
         currency: Currency
 
@@ -42,7 +53,10 @@ def test_pydantic_model_currency_field() -> None:
     assert TestModel(currency=Currency("ILP")).currency.decimal_digits == 3
 
 
+@pytest.mark.skipif(pydantic_is_installed is False, reason="pydantic is not installed")
 def test_pydantic_convertible_model() -> None:
+    from pydantic import BaseModel
+
     class TestConvertibleModel(BaseModel):
         money: ConvertibleToMoney
         money_with_currency: ConvertibleToMoneyWithRequiredCurrency
