@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import sys
 from decimal import Decimal
-from typing import Any, Callable, Dict, List, Optional, Protocol, Set, Tuple, Type, Union, cast
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Protocol, Set, Tuple, Type, Union, cast
 
 
 class DefaultCurrencyValue(type):
@@ -144,7 +144,7 @@ class MetaCurrency(type):
     def __get_pydantic_core_schema__(
         cls,
         _source_type: Any,
-        _handler: Callable,
+        _handler: Any,
     ) -> Any:
         def validate_currency_code(value: Any) -> BaseCurrency:
             return get_currency(str(value))
@@ -173,11 +173,20 @@ class MetaCurrency(type):
             )
         ]
 
+        def json_schema(schema: Any) -> Any:
+            if isinstance(schema, dict):
+                if schema.get("type") == "is-instance":
+                    return None
+                return {k: json_schema(v) for k, v in schema.items() if json_schema(v) is not None}
+            elif isinstance(schema, list):
+                return [json_schema(v) for v in schema if json_schema(v) is not None]
+            return schema
+
         return {
             "type": "json-or-python",
             "json_schema": {
                 "type": "union",
-                "choices": schemas,
+                "choices": json_schema(schemas),
             },
             "python_schema": {
                 "type": "union",
@@ -192,7 +201,7 @@ class MetaCurrency(type):
         }
 
     @classmethod
-    def _validate(cls, value: Any, handler: Callable[..., str]) -> str:
+    def _validate(cls, value: Any, handler: Callable[..., BaseCurrency]) -> BaseCurrency:
         return handler(value)
 
 
@@ -1934,11 +1943,13 @@ class Currency(BaseCurrency):
     ZWN = ZWN
     ZWR = ZWR
 
-    def __get__(self, instance: Any, owner: Any) -> BaseCurrency:
-        return cast(BaseCurrency, ...)
+    if TYPE_CHECKING:  # pragma: no cover
 
-    def __set__(self, instance: Any, value: CurrencyValue) -> None:
-        ...
+        def __get__(self, instance: Any, owner: Any) -> BaseCurrency:
+            return cast(BaseCurrency, ...)
+
+        def __set__(self, instance: Any, value: CurrencyValue) -> None:
+            ...
 
 
 from stockholm.money import Money  # noqa isort:skip

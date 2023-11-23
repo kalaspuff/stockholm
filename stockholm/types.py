@@ -3,14 +3,14 @@ from __future__ import annotations
 import sys
 from abc import abstractmethod
 from decimal import Decimal
-from typing import Any, Callable, Generic, NotRequired, Required, TypeAlias, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, Generic, NotRequired, Required, TypeAlias, TypeVar
 
 from .currency import BaseCurrency, CurrencyValue, MetaCurrency
 from .money import Money, MoneyModel
 from .rate import Number, NumericType
 
 if sys.version_info < (3, 9):
-    from typing_extensions import TypedDict  # isort: skip
+    from typing_extensions import TypedDict  # pragma: no cover
 else:
     from typing import TypedDict
 
@@ -22,12 +22,14 @@ SetT = TypeVar("SetT")
 class ConvertibleTypeDescriptor(Generic[SchemaT, GetT, SetT]):
     __args__: tuple[SchemaT, GetT, SetT]
 
-    @abstractmethod
-    def __get__(self, instance: Any, owner: Any) -> GetT:
-        ...
+    if TYPE_CHECKING:  # pragma: no cover
 
-    def __set__(self, instance: Any, value: SetT) -> None:
-        ...
+        @abstractmethod
+        def __get__(self, instance: Any, owner: Any) -> GetT:
+            ...
+
+        def __set__(self, instance: Any, value: SetT) -> None:
+            ...
 
     @classmethod
     def __get_pydantic_core_schema__(

@@ -1,3 +1,4 @@
+import json
 from decimal import Decimal
 
 from pydantic import BaseModel
@@ -60,3 +61,13 @@ assert m1.number.as_dict() == {
     "units": 42,
     "nanos": 0,
 }
+
+assert json.loads(m1.model_dump_json()) == {
+    "money": {"value": "100.45", "units": 100, "nanos": 450000000, "currency_code": None},
+    "money_with_currency": {"value": "42.999 SEK", "units": 42, "nanos": 999000000, "currency_code": "SEK"},
+    "number": {"value": "42", "units": 42, "nanos": 0},
+    "currency": "JPY",
+}
+
+assert m1 == TestConvertibleModel.model_validate_json(m1.model_dump_json())
+assert m1.model_dump_json() == TestConvertibleModel.model_validate_json(m1.model_dump_json()).model_dump_json()

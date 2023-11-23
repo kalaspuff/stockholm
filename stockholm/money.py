@@ -922,7 +922,7 @@ class MoneyModel(Generic[MoneyType]):
     def __get_pydantic_core_schema__(
         cls,
         _source_type: Any,
-        _handler: Callable,
+        _handler: Any,
     ) -> Any:
         def validate_money(value: Any) -> MoneyModel[MoneyType]:
             return cls(value)
@@ -972,8 +972,8 @@ class MoneyModel(Generic[MoneyType]):
                 "schema": {
                     "type": "union",
                     "choices": [
-                        currency_regex_str_schema,
                         is_currency_instance_schema,
+                        currency_regex_str_schema,
                     ],
                 },
             },
@@ -1027,11 +1027,20 @@ class MoneyModel(Generic[MoneyType]):
             )
         ]
 
+        def json_schema(schema: Any) -> Any:
+            if isinstance(schema, dict):
+                if schema.get("type") == "is-instance":
+                    return None
+                return {k: json_schema(v) for k, v in schema.items() if json_schema(v) is not None}
+            elif isinstance(schema, list):
+                return [json_schema(v) for v in schema if json_schema(v) is not None]
+            return schema
+
         return {
             "type": "json-or-python",
             "json_schema": {
                 "type": "union",
-                "choices": schemas,
+                "choices": json_schema(schemas),
             },
             "python_schema": {
                 "type": "union",

@@ -1,9 +1,11 @@
+import json
 from decimal import Decimal
+from typing import Any
 
 from pydantic import BaseModel
 
-from stockholm import Currency, Money
-from stockholm.currency import JPY, USD
+from stockholm import Currency, Money, get_currency
+from stockholm.currency import JPY, USD, BaseCurrency
 from stockholm.types import (
     ConvertibleToCurrency,
     ConvertibleToMoney,
@@ -69,3 +71,47 @@ def test_pydantic_convertible_model() -> None:
         "units": 42,
         "nanos": 0,
     }
+
+    assert json.loads(m.model_dump_json()) == {
+        "money": {"value": "100.45", "units": 100, "nanos": 450000000, "currency_code": None},
+        "money_with_currency": {"value": "42.999 SEK", "units": 42, "nanos": 999000000, "currency_code": "SEK"},
+        "number": {"value": "42", "units": 42, "nanos": 0},
+        "currency": "JPY",
+    }
+
+    assert m == TestConvertibleModel.model_validate_json(m.model_dump_json())
+    assert m.model_dump_json() == TestConvertibleModel.model_validate_json(m.model_dump_json()).model_dump_json()
+
+
+def test_validate_money() -> None:
+    def validate_money(value: Any) -> Money:
+        return Money(value)
+
+    assert Money._validate(-0.01, validate_money).as_dict() == {
+        "value": "-0.01",
+        "units": 0,
+        "nanos": -10000000,
+        "currency_code": None,
+    }
+    assert Money._validate("4711.00499 EUR", validate_money).as_dict() == {
+        "value": "4711.00499 EUR",
+        "units": 4711,
+        "nanos": 4990000,
+        "currency_code": "EUR",
+    }
+    assert Money._validate({"units": 42, "nanos": 15000000, "currency": "USD"}, validate_money).as_dict() == {
+        "value": "42.015 USD",
+        "units": 42,
+        "nanos": 15000000,
+        "currency_code": "USD",
+    }
+
+
+def test_validate_currency() -> None:
+    def validate_currency_code(value: Any) -> BaseCurrency:
+        return get_currency(str(value))
+
+    assert Currency._validate(Currency.USD, validate_currency_code).ticker == "USD"
+    assert Currency._validate("JPY", validate_currency_code).ticker == "JPY"
+    assert Currency._validate(Currency.USD, validate_currency_code).decimal_digits == 2
+    assert Currency._validate("JPY", validate_currency_code).decimal_digits == 0
