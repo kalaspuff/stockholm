@@ -732,7 +732,9 @@ class MoneyModel(Generic[MoneyType]):
 
     def _preferred_currency(self, other: MoneyType) -> Optional[Union[CurrencyValue, str]]:
         currency = self._currency if self._currency and isinstance(self._currency, BaseCurrencyType) else None
+        # fmt: off
         currency = other._currency if not currency and other._currency and isinstance(other, BaseCurrencyType) else None  # noqa: SLF001
+        # fmt: on
         return currency or self._currency or other._currency  # noqa: SLF001
 
     def __eq__(self, other: Any) -> bool:
