@@ -185,6 +185,41 @@ def test_custom_currency():
     assert str(m) == "100 CarlosCoin"
 
 
+def test_custom_currency_attributes():
+    class _XYZ(BaseCurrency):
+        ticker = "XYZ"
+        decimal_digits = 5
+        interchangeable_with = ("CNH", "RMB")
+        preferred_ticker = "ZYX"
+
+    class Currency(BaseCurrency):
+        XYZ = _XYZ
+
+    c1 = Currency("XYZ")
+    assert c1 != Money(0, Currency.XYZ)
+    assert c1.decimal_digits == _XYZ.decimal_digits
+    assert c1.interchangeable_with == _XYZ.interchangeable_with
+    assert c1.preferred_ticker == _XYZ.preferred_ticker
+
+    c2 = Currency(c1)
+    assert c2.ticker == "XYZ"
+    assert c2 == c1
+    assert str(c2) == "XYZ"
+    assert c2 == "XYZ"
+
+    c3 = Currency()
+    assert c3.ticker == ""
+    assert c3 != c1
+    assert c3 == ""
+    assert str(c3) == ""
+    assert c3 != Money(0, Currency.XYZ)
+
+    c4 = Currency(Currency.XYZ)
+    assert c4.ticker == "XYZ"
+    assert c4 == c1
+    assert c4 == "XYZ"
+
+
 def test_currency_hashable() -> None:
     class CNY(BaseCurrency):
         interchangeable_with = ("CNH", "RMB")

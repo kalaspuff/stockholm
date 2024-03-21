@@ -321,6 +321,10 @@ class BaseCurrency(BaseCurrencyType):
     ) -> BaseCurrency:
         if not cls._meta:
             raise TypeError("'BaseCurrency' object is not callable")
+
+        if currency and isinstance(currency, str):
+            currency = getattr(cls, currency, currency)
+
         return cast(
             BaseCurrency,
             BaseCurrencyType(
