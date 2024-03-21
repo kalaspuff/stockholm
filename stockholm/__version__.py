@@ -1,7 +1,12 @@
-__version_info__ = (0, 5, 7)
-__version__ = "".join([".{}".format(str(n)) if type(n) is int else str(n) for n in __version_info__]).replace(
-    ".", "", 1 if type(__version_info__[0]) is int else 0
-)
+from typing import Tuple, Union
+
+__version_info__: Tuple[Union[int, str], ...] = (0, 5, 7)
+__version__: str = "".join(
+    [
+        f".{n}" if isinstance(n, int) or str(n).isdigit() or str(n)[0:4] == "post" or str(n)[0:3] == "dev" else f"{n}"
+        for n in __version_info__
+    ]
+).strip(".")
 
 if __name__ == "__main__":  # pragma: no cover
-    print(__version__)
+    print(__version__)  # noqa: T201

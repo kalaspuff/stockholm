@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import decimal
 import json
 import re
@@ -17,6 +18,7 @@ DEFAULT_MIN_DECIMALS = 2
 DEFAULT_MAX_DECIMALS = 9
 UNITS_MAX_LENGTH = 18
 NANOS_LENGTH = 9
+MATCHED_CURRENCY_LENGTH = 3
 
 HIGHEST_SUPPORTED_AMOUNT = "999999999999999999.999999999"
 LOWEST_SUPPORTED_AMOUNT = "-999999999999999999.999999999"
@@ -55,7 +57,7 @@ class MoneyModel(Generic[MoneyType]):
         return sorted(iterable, key=lambda x: x if isinstance(x, cls) else cls(x), reverse=reverse)
 
     @classmethod
-    def sum(
+    def sum(  # noqa: A003
         cls,
         iterable: Iterable,
         currency: Optional[Union[DefaultCurrencyValue, CurrencyValue, str]] = DefaultCurrency,
@@ -76,7 +78,7 @@ class MoneyModel(Generic[MoneyType]):
     def _is_unknown_amount_type(
         cls, amount: Optional[Union[MoneyType, "MoneyModel[Any]", Decimal, int, float, str, object]]
     ) -> bool:
-        return not any(map(lambda type_: isinstance(amount, type_), (Money, Decimal, int, bool, float, str)))
+        return not any(isinstance(amount, type_) for type_ in (Money, Decimal, int, bool, float, str))
 
     @classmethod
     def from_sub_units(
@@ -131,7 +133,7 @@ class MoneyModel(Generic[MoneyType]):
     ) -> MoneyType:
         return cast(MoneyType, cls.from_protobuf(input_value, proto_class=proto_class))
 
-    def __init__(
+    def __init__(  # noqa: C901, PLR0912, PLR0915
         self,
         amount: Optional[Union[MoneyType, "MoneyModel[Any]", Decimal, Dict, int, float, str, object]] = None,
         currency: Optional[Union[DefaultCurrencyValue, CurrencyValue, str]] = DefaultCurrency,
@@ -162,8 +164,8 @@ class MoneyModel(Generic[MoneyType]):
                     amount = new_decimal
                 else:
                     validate_amounts.append(new_decimal)
-            except Exception:
-                raise ConversionError("Invalid values for 'units' and 'nanos'")
+            except (TypeError, ValueError, ArithmeticError) as exc:
+                raise ConversionError("Invalid values for 'units' and 'nanos'") from exc
 
         if value is not None:
             try:
@@ -176,8 +178,8 @@ class MoneyModel(Generic[MoneyType]):
                     amount = new_amount
                 else:
                     validate_amounts.append(new_amount.amount)
-            except Exception:
-                raise ConversionError("Invalid value for 'value'")
+            except (ConversionError, AttributeError, TypeError, ValueError) as exc:
+                raise ConversionError("Invalid value for 'value'") from exc
 
         if amount is not None and isinstance(amount, Dict):
             amount = self.__class__.from_dict(amount)
@@ -199,8 +201,8 @@ class MoneyModel(Generic[MoneyType]):
             and units is None
             and nanos is None
         ):
-            object.__setattr__(self, "_amount", amount._amount)
-            object.__setattr__(self, "_currency", amount._currency)
+            object.__setattr__(self, "_amount", amount._amount)  # noqa: SLF001
+            object.__setattr__(self, "_currency", amount._currency)  # noqa: SLF001
             return
 
         if (
@@ -219,23 +221,21 @@ class MoneyModel(Generic[MoneyType]):
             else:
                 output_currency = str(currency or "").strip() or None
                 output_currency = (
-                    output_currency.upper() if output_currency and len(output_currency) == 3 else output_currency
+                    output_currency.upper()
+                    if output_currency and len(output_currency) == MATCHED_CURRENCY_LENGTH
+                    else output_currency
                 )
 
         if amount is not None and (
             (isinstance(amount, str) and len(amount) > 1 and amount[0] == "{")
-            or (isinstance(amount, bytes) and len(amount) > 1 and amount[0] == 123)
+            or (isinstance(amount, bytes) and len(amount) > 1 and amount[0] == ord("{"))
         ):
-            try:
+            with contextlib.suppress(Exception):
                 amount = str(self.__class__.from_dict(json.loads(amount)))
-            except Exception:
-                pass
 
         if amount is not None and isinstance(amount, bytes):
-            try:
+            with contextlib.suppress(Exception):
                 amount = MoneyProtobufMessage.FromString(amount)
-            except Exception:
-                pass
 
         if amount is not None and isinstance(amount, GenericProtobufMessage):
             amount = str(
@@ -257,16 +257,16 @@ class MoneyModel(Generic[MoneyType]):
                 )
             )
 
-        if Money._is_unknown_amount_type(amount):
+        if Money._is_unknown_amount_type(amount):  # noqa: SLF001
             try:
-                match_amount = getattr(amount, "amount")
+                match_amount = getattr(amount, "amount")  # noqa: B009
                 match_amount = (match_amount()) if match_amount and callable(match_amount) else match_amount
-                if match_amount is None or Money._is_unknown_amount_type(match_amount):
+                if match_amount is None or Money._is_unknown_amount_type(match_amount):  # noqa: SLF001
                     raise AttributeError
 
                 match_currency = None
                 try:
-                    match_currency = getattr(amount, "currency")
+                    match_currency = getattr(amount, "currency")  # noqa: B009
                     match_currency = (
                         (match_currency()) if match_currency and callable(match_currency) else match_currency
                     )
@@ -283,7 +283,9 @@ class MoneyModel(Generic[MoneyType]):
                     match_currency = str(match_currency).strip()
                     match_currency = (
                         match_currency.upper()
-                        if match_currency and isinstance(match_currency, str) and len(match_currency) == 3
+                        if match_currency
+                        and isinstance(match_currency, str)
+                        and len(match_currency) == MATCHED_CURRENCY_LENGTH
                         else match_currency
                     )
                     if output_currency is not None and match_currency != output_currency:
@@ -317,15 +319,17 @@ class MoneyModel(Generic[MoneyType]):
                 )
             if not matches:
                 matches = re.match(
-                    r"^(?P<class>Money|Overdraft)[(]['\"](?P<amount>[-+]?[0-9,.]+)['\"],[ ]+['\"]?(?P<currency>[a-zA-Z]+)['\"]?[)]$",
+                    r"^(?P<class>Money|Overdraft)[(]['\"](?P<amount>[-+]?[0-9,.]+)['\"],[ ]+['\"]?(?P<currency>[a-zA-Z]+)['\"]?[)]$",  # noqa: E501
                     amount,
                 )
             if matches:
-                amount = matches.group("amount").strip().rstrip(",")
+                amount = cast(str, matches.group("amount").strip().rstrip(","))
                 match_currency = matches.group("currency").strip()
                 match_currency = (
                     match_currency.upper()
-                    if match_currency and isinstance(match_currency, str) and len(match_currency) == 3
+                    if match_currency
+                    and isinstance(match_currency, str)
+                    and len(match_currency) == MATCHED_CURRENCY_LENGTH
                     else match_currency
                 )
                 if "," in amount and re.match(r"^[-+]?[0-9,]+,[0-9]{3}(?:[.][0-9]*|)$", amount):
@@ -343,13 +347,13 @@ class MoneyModel(Generic[MoneyType]):
 
             try:
                 output_amount = Decimal(amount)
-            except Exception:
-                raise ConversionError("Input value cannot be used as monetary amount")
+            except (TypeError, ValueError, ArithmeticError) as exc:
+                raise ConversionError("Input value cannot be used as monetary amount") from exc
         elif amount is not None and isinstance(amount, Money):
             if amount.currency and not output_currency and currency is DefaultCurrency:
                 output_currency = amount.currency
 
-            output_amount = amount._amount
+            output_amount = amount._amount  # noqa: SLF001
         elif amount is not None and isinstance(amount, Decimal):
             output_amount = amount
 
@@ -381,7 +385,7 @@ class MoneyModel(Generic[MoneyType]):
         if output_amount == 0 and output_amount.is_signed():
             output_amount = Decimal(0)
 
-        if any([output_amount != a for a in validate_amounts]):
+        if any(output_amount != a for a in validate_amounts):
             raise ConversionError("Values in input arguments does not match")
 
         object.__setattr__(self, "_amount", output_amount)
@@ -509,10 +513,8 @@ class MoneyModel(Generic[MoneyType]):
             if v is None:
                 continue
             if hasattr(message, k):
-                try:
+                with contextlib.suppress(TypeError):
                     setattr(message, k, type(getattr(message, k))(v))
-                except TypeError:  # pragma: no cover
-                    pass
 
         return message
 
@@ -599,7 +601,7 @@ class MoneyModel(Generic[MoneyType]):
     def __str__(self) -> str:
         return self.as_string()
 
-    def __format__(self, format_spec: str) -> str:
+    def __format__(self, format_spec: str) -> str:  # noqa: C901, PLR0915
         if not format_spec:
             return str(self)
 
@@ -647,7 +649,7 @@ class MoneyModel(Generic[MoneyType]):
 
                 output_amount = Money(output).amount
 
-                if thousands_sep and (output_amount >= 1000 or output_amount <= -1000):
+                if thousands_sep and (output_amount >= 1000 or output_amount <= -1000):  # noqa: PLR2004
                     integral = int(output.split(".")[0])
                     try:
                         decimals = output.split(".")[1]
@@ -721,8 +723,8 @@ class MoneyModel(Generic[MoneyType]):
         if (
             not allow_currency_mismatch
             and self._currency
-            and converted_other._currency
-            and self._currency != converted_other._currency
+            and converted_other._currency  # noqa: SLF001
+            and self._currency != converted_other._currency  # noqa: SLF001
         ):
             raise CurrencyMismatchError("Unable to perform operations on values with differing currencies")
 
@@ -730,8 +732,10 @@ class MoneyModel(Generic[MoneyType]):
 
     def _preferred_currency(self, other: MoneyType) -> Optional[Union[CurrencyValue, str]]:
         currency = self._currency if self._currency and isinstance(self._currency, BaseCurrencyType) else None
-        currency = other._currency if not currency and other._currency and isinstance(other, BaseCurrencyType) else None
-        return currency or self._currency or other._currency
+        # fmt: off
+        currency = other._currency if not currency and other._currency and isinstance(other, BaseCurrencyType) else None  # noqa: SLF001
+        # fmt: on
+        return currency or self._currency or other._currency  # noqa: SLF001
 
     def __eq__(self, other: Any) -> bool:
         try:
@@ -766,7 +770,7 @@ class MoneyModel(Generic[MoneyType]):
         return self._amount >= converted_other._amount
 
     def __add__(self, other: Any) -> MoneyType:
-        cls: Type[MoneyType] = self.__class__ if self.__class__ == other.__class__ else Money
+        cls: Type[MoneyType] = cast(Type[MoneyType], self.__class__ if self.__class__ == other.__class__ else Money)
 
         converted_other = self._convert_other(other)
         amount = self._amount + converted_other._amount
@@ -778,7 +782,7 @@ class MoneyModel(Generic[MoneyType]):
         return self.__add__(other)
 
     def __sub__(self, other: Any) -> MoneyType:
-        cls: Type[MoneyType] = self.__class__ if self.__class__ == other.__class__ else Money
+        cls: Type[MoneyType] = cast(Type[MoneyType], self.__class__ if self.__class__ == other.__class__ else Money)
 
         converted_other = self._convert_other(other)
         amount = self._amount - converted_other._amount
@@ -787,7 +791,7 @@ class MoneyModel(Generic[MoneyType]):
         return cls(amount, currency=currency)
 
     def __rsub__(self, other: Any) -> MoneyType:
-        cls: Type[MoneyType] = self.__class__ if self.__class__ == other.__class__ else Money
+        cls: Type[MoneyType] = cast(Type[MoneyType], self.__class__ if self.__class__ == other.__class__ else Money)
 
         converted_other = self._convert_other(other)
         amount = converted_other._amount - self._amount
@@ -796,12 +800,9 @@ class MoneyModel(Generic[MoneyType]):
         return cls(amount, currency=currency)
 
     def __mul__(self, other: Any) -> MoneyType:
-        cls: Type[MoneyType] = self.__class__ if self.__class__ == other.__class__ else Money
+        cls: Type[MoneyType] = cast(Type[MoneyType], self.__class__ if self.__class__ == other.__class__ else Money)
 
-        if not isinstance(other, Money):
-            converted_other = self._convert_other(other)
-        else:
-            converted_other = cast(MoneyType, other)
+        converted_other = self._convert_other(other) if not isinstance(other, Money) else cast(MoneyType, other)
 
         if converted_other._currency is not None and self._currency is not None:
             raise InvalidOperandError("Unable to multiply two monetary amounts with each other")
@@ -814,7 +815,7 @@ class MoneyModel(Generic[MoneyType]):
         return self.__mul__(other)
 
     def __truediv__(self, other: Any) -> MoneyType:
-        cls: Type[MoneyType] = self.__class__ if self.__class__ == other.__class__ else Money
+        cls: Type[MoneyType] = cast(Type[MoneyType], self.__class__ if self.__class__ == other.__class__ else Money)
 
         converted_other = self._convert_other(other, allow_currency_mismatch=True)
 
@@ -829,7 +830,7 @@ class MoneyModel(Generic[MoneyType]):
         return cls(amount, currency=self._currency)
 
     def __floordiv__(self, other: Any) -> MoneyType:
-        cls: Type[MoneyType] = self.__class__ if self.__class__ == other.__class__ else Money
+        cls: Type[MoneyType] = cast(Type[MoneyType], self.__class__ if self.__class__ == other.__class__ else Money)
 
         converted_other = self._convert_other(other, allow_currency_mismatch=True)
 
@@ -844,7 +845,7 @@ class MoneyModel(Generic[MoneyType]):
         return cls(amount, currency=self._currency)
 
     def __mod__(self, other: Any) -> MoneyType:
-        cls: Type[MoneyType] = self.__class__ if self.__class__ == other.__class__ else Money
+        cls: Type[MoneyType] = cast(Type[MoneyType], self.__class__ if self.__class__ == other.__class__ else Money)
 
         converted_other = self._convert_other(other, allow_currency_mismatch=True)
         amount = self._amount % converted_other._amount
@@ -857,7 +858,7 @@ class MoneyModel(Generic[MoneyType]):
         return cls(amount, currency=currency)
 
     def __divmod__(self, other: Any) -> Tuple[MoneyType, MoneyType]:
-        cls: Type[MoneyType] = self.__class__ if self.__class__ == other.__class__ else Money
+        cls: Type[MoneyType] = cast(Type[MoneyType], self.__class__ if self.__class__ == other.__class__ else Money)
 
         converted_other = self._convert_other(other, allow_currency_mismatch=True)
         quotient, remainder = divmod(self._amount, converted_other._amount)
@@ -873,12 +874,9 @@ class MoneyModel(Generic[MoneyType]):
         return cls(quotient, currency=currency), cls(remainder, currency=currency)
 
     def __pow__(self, other: Any) -> MoneyType:
-        cls: Type[MoneyType] = self.__class__ if self.__class__ == other.__class__ else Money
+        cls: Type[MoneyType] = cast(Type[MoneyType], self.__class__ if self.__class__ == other.__class__ else Money)
 
-        if not isinstance(other, Money):
-            converted_other = self._convert_other(other)
-        else:
-            converted_other = cast(MoneyType, other)
+        converted_other = self._convert_other(other) if not isinstance(other, Money) else cast(MoneyType, other)
 
         if converted_other._currency is not None:
             raise InvalidOperandError("Unable to use a monetary amount as an exponent")
@@ -1032,7 +1030,7 @@ class MoneyModel(Generic[MoneyType]):
                 if schema.get("type") == "is-instance":
                     return None
                 return {k: json_schema(v) for k, v in schema.items() if json_schema(v) is not None}
-            elif isinstance(schema, list):
+            if isinstance(schema, list):
                 return [json_schema(v) for v in schema if json_schema(v) is not None]
             return schema
 

@@ -46,10 +46,10 @@ class NumericType(MoneyModel[MoneyType]):
         cls = self.__class__.__bases__[0]
         money = cast(MoneyType, cls(amount=amount, units=units, nanos=nanos, value=value, **kwargs))
 
-        if money._currency:
+        if money._currency:  # noqa: SLF001
             raise ConversionError("Rates and numbers does not have a currency")
 
-        object.__setattr__(self, "_amount", money._amount)
+        object.__setattr__(self, "_amount", money._amount)  # noqa: SLF001
         object.__setattr__(self, "_currency", None)
 
     @property

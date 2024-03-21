@@ -54,7 +54,7 @@ class MetaCurrency(type):
         return cast(Type["BaseCurrency"], super().__new__(cls, name, bases, attributedict))
 
     def money(
-        self,
+        cls,
         amount: Optional[Union["Money", Decimal, int, float, str, object]] = None,
         from_sub_units: Optional[bool] = None,
         units: Optional[int] = None,
@@ -67,7 +67,7 @@ class MetaCurrency(type):
 
         return Money(
             amount,
-            currency=self,
+            currency=cls,
             from_sub_units=from_sub_units,
             units=units,
             nanos=nanos,
@@ -76,65 +76,65 @@ class MetaCurrency(type):
             **kwargs,
         )
 
-    def __setattr__(self, *args: Any) -> None:
+    def __setattr__(cls, *args: Any) -> None:
         raise AttributeError("Attributes of currencies cannot be changed")
 
-    def __delattr__(self, *args: Any) -> None:
+    def __delattr__(cls, *args: Any) -> None:
         raise AttributeError("Attributes of currencies cannot be deleted")
 
-    def __repr__(self) -> str:
-        if self._meta:
+    def __repr__(cls) -> str:
+        if cls._meta:
             return "<class 'stockholm.currency.Currency'>"
-        return f'<stockholm.Currency: "{self}">'
+        return f'<stockholm.Currency: "{cls}">'
 
-    def __str__(self) -> str:
-        if self._meta:
+    def __str__(cls) -> str:
+        if cls._meta:
             return "<class 'stockholm.currency.Currency'>"
-        return self.ticker or ""
+        return cls.ticker or ""
 
-    def __format__(self, format_spec: str) -> str:
-        output = str(self)
+    def __format__(cls, format_spec: str) -> str:
+        output = str(cls)
         if format_spec.endswith("c"):
             format_spec = f"{format_spec[:-1]}s"
         return f"{output:{format_spec}}"
 
-    def __eq__(self, other: Any) -> bool:
-        if self.ticker:
+    def __eq__(cls, other: Any) -> bool:
+        if cls.ticker:
             if not other:
                 return False
-            elif isinstance(other, BaseCurrency):
-                return bool(self.ticker == other.ticker)
-            elif isinstance(other, str):
-                return bool(self.ticker == other)
+            if isinstance(other, BaseCurrency):
+                return bool(cls.ticker == other.ticker)
+            if isinstance(other, str):
+                return bool(cls.ticker == other)
         else:
             if isinstance(other, BaseCurrency):
                 return not other.ticker
-            elif isinstance(other, str):
+            if isinstance(other, str):
                 return bool(other == "")
         return False
 
-    def __ne__(self, other: Any) -> bool:
-        return not self == other
+    def __ne__(cls, other: Any) -> bool:
+        return not cls == other
 
-    @property  # type: ignore
-    def __class__(self) -> Any:
+    @property  # type: ignore[misc]
+    def __class__(cls) -> Any:
         return BaseCurrency
 
-    def __hash__(self) -> int:
+    def __hash__(cls) -> int:
         return hash(
             (
                 "stockholm.MetaCurrency",
-                self.ticker,
-                self.decimal_digits,
-                self.interchangeable_with,
-                self.preferred_ticker,
+                cls.ticker,
+                cls.decimal_digits,
+                cls.interchangeable_with,
+                cls.preferred_ticker,
             )
         )
 
-    def __bool__(self) -> bool:
-        return bool(self.ticker)
+    def __bool__(cls) -> bool:
+        return bool(cls.ticker)
 
-    def __instancecheck__(self, instance: Any) -> bool:
+    def __instancecheck__(cls, instance: Any) -> bool:
         return_value = super().__instancecheck__(instance)
         if not return_value and type(instance) is BaseCurrencyType:
             return True
@@ -178,7 +178,7 @@ class MetaCurrency(type):
                 if schema.get("type") == "is-instance":
                     return None
                 return {k: json_schema(v) for k, v in schema.items() if json_schema(v) is not None}
-            elif isinstance(schema, list):
+            if isinstance(schema, list):
                 return [json_schema(v) for v in schema if json_schema(v) is not None]
             return schema
 
@@ -288,14 +288,14 @@ class BaseCurrencyType(metaclass=MetaCurrency):
         if self.ticker:
             if not other:
                 return False
-            elif isinstance(other, BaseCurrency):
+            if isinstance(other, BaseCurrency):
                 return bool(self.ticker == other.ticker)
-            elif isinstance(other, str):
+            if isinstance(other, str):
                 return bool(self.ticker == other)
         else:
             if isinstance(other, BaseCurrency):
                 return not other.ticker
-            elif isinstance(other, str):
+            if isinstance(other, str):
                 return bool(other == "")
         return False
 
@@ -1627,7 +1627,7 @@ def get_currency(ticker: str) -> BaseCurrency:
     return cast(BaseCurrency, getattr(sys.modules[__name__], ticker, BaseCurrency(ticker)))
 
 
-# Note to future self – this is generally bad practice (but helps with type hint annotations).
+# Note to future self - this is generally bad practice (but helps with type hint annotations).
 class Currency(BaseCurrency):
     ADF = ADF
     ADP = ADP
@@ -1952,4 +1952,4 @@ class Currency(BaseCurrency):
             ...
 
 
-from stockholm.money import Money  # noqa isort:skip
+from stockholm.money import Money  # noqa: E402

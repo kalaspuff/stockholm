@@ -1,9 +1,9 @@
-from .__version__ import __version__, __version_info__  # noqa
-from .currency import BaseCurrency, Currency, CurrencyValue, DefaultCurrency, DefaultCurrencyValue, get_currency  # noqa
-from .exceptions import ConversionError, CurrencyMismatchError, InvalidOperandError, MoneyException  # noqa
-from .money import Money, MoneyType  # noqa
+from .__version__ import __version__, __version_info__
+from .currency import BaseCurrency, Currency, CurrencyValue, DefaultCurrency, DefaultCurrencyValue, get_currency
+from .exceptions import ConversionError, CurrencyMismatchError, InvalidOperandError, MoneyException, MoneyExceptionError
+from .money import Money, MoneyType
 from .protobuf import MoneyProtobufMessage
-from .rate import ExchangeRate, Number, Rate  # noqa
+from .rate import ExchangeRate, Number, Rate
 
 __author__ = "Carl Oscar Aaro"
 __email__ = "hello@carloscar.com"
@@ -23,6 +23,7 @@ __all__ = [
     "CurrencyMismatchError",
     "InvalidOperandError",
     "MoneyException",
+    "MoneyExceptionError",
     "Money",
     "MoneyProtobufMessage",
     "MoneyType",

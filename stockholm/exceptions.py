@@ -1,4 +1,9 @@
-class MoneyException(Exception):
+class MoneyExceptionError(Exception):
+    pass
+
+
+# deprecated: use `MoneyExceptionError` instead of `MoneyException`
+class MoneyException(MoneyExceptionError):  # noqa: N818
     pass
 
 
