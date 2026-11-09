@@ -15,6 +15,9 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
     "Intended Audience :: Developers",
     "Intended Audience :: Financial and Insurance Industry",
     "Typing :: Typed",
@@ -25,7 +28,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-protobuf = ["protobuf>=3.20.0,<5.0.0"]
+protobuf = ["protobuf>=3.20.0,<8.0.0"]
 
 [project.urls]
 Homepage = "https://github.com/kalaspuff/stockholm"
@@ -42,7 +45,7 @@ pytest-cov = { version = ">=2.10.0", markers = "sys_platform != \"win32\"" }
 black = { version = "*", markers = "sys_platform != \"win32\"", allow-prereleases = true }
 mypy = { version = ">=0.800", markers = "sys_platform != \"win32\"" }
 codecov = { version = ">=2.1.10", markers = "sys_platform != \"win32\"" }
-protobuf = { version = ">=3.20.0,<5.0.0", markers = "sys_platform != \"win32\"" }
+protobuf = { version = ">=3.20.0,<8.0.0", markers = "sys_platform != \"win32\"" }
 types-protobuf = { version = ">=0.1.13", markers = "sys_platform != \"win32\"" }
 setuptools = { version = ">=68.1.2", markers = "sys_platform != \"win32\"" }
 pydantic = { version = ">=2.2", markers = "sys_platform != \"win32\"" }
