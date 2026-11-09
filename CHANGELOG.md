@@ -2,6 +2,8 @@
 
 ## [0.6.0] - 2026-XX-XX
 
+* Fixed currencies given as ticker strings always using two decimal digits: they now use the options of the predefined currency with that ticker. For example `Money(100, "JPY", from_sub_units=True)` is now `100 JPY` (previously `1.00 JPY`), `Money("1673861354.00", "RWF").sub_units` is no longer 100 times too large, and `Currency("RWF").decimal_digits` is now `0`.
+* As a result, `Money.currency` is now the predefined currency object (for example `Currency.JPY`) instead of a `str` when the currency is given as a known ticker string, and string output follows that currency's decimal digits: `Money(100, "JPY")` is now `100 JPY` (previously `100.00 JPY`).
 * Python 3.13, 3.14 and 3.15 added to test matrix and trove classifiers.
 * Dropped support for Python 3.8 and 3.9.
 * The `protobuf` extra now accepts `protobuf` versions up to 7.x (previously `<5.0.0`), since `protobuf` 4.x can't be imported on Python 3.14 and newer.
