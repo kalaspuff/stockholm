@@ -136,9 +136,12 @@ Money(1000, Currency.USD)
 
 Money(1000, Currency.JPY)
 # <stockholm.Money: "1000 JPY">
+
+Money(1000, "JPY", from_sub_units=True)
+# <stockholm.Money: "1000 JPY">
 ```
 
-Currencies using the `stockholm.Currency` metaclasses can hold additional options, such as default number of decimals in string output. Note that the amounts behind the scenes actually uses the same precision and backend as `Decimal` values and can as well be interchangable with such values, as such they are way more exact to do calculations with than floating point values.
+Currencies using the `stockholm.Currency` metaclasses can hold additional options, such as default number of decimals in string output. A currency ticker given as a string (for example `"JPY"`) uses the same options as the predefined currency with that ticker – the same goes for `Currency("JPY")`. Note that the amounts behind the scenes actually uses the same precision and backend as `Decimal` values and can as well be interchangable with such values, as such they are way more exact to do calculations with than floating point values.
 
 ### `from stockholm import Number, Rate`
 

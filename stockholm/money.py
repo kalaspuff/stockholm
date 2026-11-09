@@ -7,7 +7,7 @@ from decimal import ROUND_HALF_UP, Decimal
 from functools import reduce
 from typing import Any, Callable, Dict, Generic, Iterable, List, Optional, Tuple, Type, TypeVar, Union, cast
 
-from .currency import BaseCurrencyType, CurrencyValue, DefaultCurrency, DefaultCurrencyValue
+from .currency import BaseCurrencyType, CurrencyValue, DefaultCurrency, DefaultCurrencyValue, _get_known_currency
 from .exceptions import ConversionError, CurrencyMismatchError, InvalidOperandError
 from .protobuf import GenericProtobufMessage, MoneyProtobufMessage
 
@@ -361,6 +361,9 @@ class MoneyModel(Generic[MoneyType]):
 
         if output_amount.is_nan():
             raise ConversionError("Input amount is not a number")
+
+        if output_currency and isinstance(output_currency, str):
+            output_currency = _get_known_currency(output_currency) or output_currency
 
         if from_sub_units:
             if output_currency and isinstance(output_currency, BaseCurrencyType):
