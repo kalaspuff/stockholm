@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.5.8] - 2026-XX-XX
+
+* Python 3.13, 3.14 and 3.15 added to test matrix and trove classifiers.
+* Dropped support for Python 3.8 and 3.9.
+* The `protobuf` extra now accepts `protobuf` versions up to 7.x (previously `<5.0.0`), since `protobuf` 4.x can't be imported on Python 3.14 and newer.
+* Fixed the `typing-extensions` dependency not being installed on Python 3.10.1 and later, which made `stockholm.types` fail to import on those versions.
+
+---
+
 ## [0.5.7] - 2023-11-23
 
 * `Money` objects can be used in Pydantic (`Pydantic>=2.2` supported) models and used with Pydantic's JSON serialization and validation – the same goes for `Number` and `Currency` objects as well. See examples below.
