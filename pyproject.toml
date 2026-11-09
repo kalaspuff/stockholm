@@ -1,10 +1,8 @@
-[tool.poetry]
+[project]
 name = "stockholm"
 version = "0.5.7"
 description = "Human friendly and flexible package for working with monetary amounts"
-authors = ["Carl Oscar Aaro <hello@carloscar.com>"]
-homepage = "https://github.com/kalaspuff/stockholm"
-repository = "https://github.com/kalaspuff/stockholm"
+authors = [{ name = "Carl Oscar Aaro", email = "hello@carloscar.com" }]
 keywords = ["money", "monetary amount", "monetary value", "currency", "formatting", "protobuf", "protocol buffers", "graphql", "money graphql", "protobuf money", "protocol buffers money", "json", "python money", "monetary object", "python money class", "finance", "fintech"]
 readme = "README.md"
 license = "MIT"
@@ -14,23 +12,26 @@ classifiers = [
     "Topic :: Office/Business :: Financial",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Intended Audience :: Developers",
     "Intended Audience :: Financial and Insurance Industry",
     "Typing :: Typed",
-    "License :: OSI Approved :: MIT License"
+]
+requires-python = ">=3.10,<4.0"
+dependencies = [
+    "typing-extensions>=4.7.0; python_version < \"3.11\"",
 ]
 
-[tool.poetry.dependencies]
-python = "^3.8"
-protobuf = { version = ">=3.20.0,<5.0.0", optional = true }
-typing-extensions = { version = ">=4.7.0", python = "<=3.10" }
+[project.optional-dependencies]
+protobuf = ["protobuf>=3.20.0,<5.0.0"]
 
-[tool.poetry.dev-dependencies]
+[project.urls]
+Homepage = "https://github.com/kalaspuff/stockholm"
+Repository = "https://github.com/kalaspuff/stockholm"
+
+[tool.poetry.group.dev.dependencies]
 flake8 = { version = ">=3.8.4", markers = "sys_platform != \"win32\"" }
 flake8-black = { version = ">=0.2.0", markers = "sys_platform != \"win32\"" }
 flake8-isort = { version = ">=4.0.0", markers = "sys_platform != \"win32\"" }
@@ -46,16 +47,13 @@ types-protobuf = { version = ">=0.1.13", markers = "sys_platform != \"win32\"" }
 setuptools = { version = ">=68.1.2", markers = "sys_platform != \"win32\"" }
 pydantic = { version = ">=2.2", markers = "sys_platform != \"win32\"" }
 
-[tool.poetry.extras]
-protobuf = ["protobuf"]
-
 [build-system]
-requires = ["poetry_core>=1.0.0"]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.black]
 line-length = 120
-target_version = ["py38", "py39", "py310", "py311"]
+target_version = ["py310", "py311", "py312"]
 include = '\.pyi?$'
 exclude = '\.eggs/|\.egg-info/|\.git/|\.github/|\.mypy_cache/|\.venv/|\.pytest_cache/|\.vscode/|__pycache__/|build/|dist/|setup\.py'
 
@@ -68,7 +66,7 @@ skip = [".mypy_cache", ".pytest_cache", "__pycache__", "stockholm.egg-info", ".e
 
 [tool.ruff]
 line-length = 120
-target-version = "py38"
+target-version = "py310"
 select = [
     "F", # pyflakes
     "E", # pycodestyle (erorr)
