@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.5.8] - 2026-XX-XX
+## [0.6.0] - 2026-XX-XX
 
 * Python 3.13, 3.14 and 3.15 added to test matrix and trove classifiers.
 * Dropped support for Python 3.8 and 3.9.
