@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.6.0] - 2026-XX-XX
+## [0.6.0] - 2026-11-10
 
 * Fixed currencies given as ticker strings always using two decimal digits: they now use the options of the predefined currency with that ticker. For example `Money(100, "JPY", from_sub_units=True)` is now `100 JPY` (previously `1.00 JPY`), `Money("1673861354.00", "RWF").sub_units` is no longer 100 times too large, and `Currency("RWF").decimal_digits` is now `0`.
 * As a result, `Money.currency` is now the predefined currency object (for example `Currency.JPY`) instead of a `str` when the currency is given as a known ticker string, and string output follows that currency's decimal digits: `Money(100, "JPY")` is now `100 JPY` (previously `100.00 JPY`).

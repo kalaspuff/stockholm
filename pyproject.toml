@@ -1,6 +1,6 @@
 [project]
 name = "stockholm"
-version = "0.5.7"
+version = "0.6.0"
 description = "Human friendly and flexible package for working with monetary amounts"
 authors = [{ name = "Carl Oscar Aaro", email = "hello@carloscar.com" }]
 keywords = ["money", "monetary amount", "monetary value", "currency", "formatting", "protobuf", "protocol buffers", "graphql", "money graphql", "protobuf money", "protocol buffers money", "json", "python money", "monetary object", "python money class", "finance", "fintech"]
