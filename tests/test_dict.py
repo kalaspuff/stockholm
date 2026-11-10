@@ -73,18 +73,18 @@ def test_asdict_with_keys():
 
 def test_from_dict():
     input_dict = {"value": "13384711 JPY", "units": 13384711, "nanos": 0, "currency_code": "JPY"}
-    assert str(Money.from_dict(input_dict)) == "13384711.00 JPY"
+    assert str(Money.from_dict(input_dict)) == "13384711 JPY"
     assert str(Money.from_dict(input_dict).to_currency(get_currency(input_dict.get("currency_code")))) == "13384711 JPY"
-    assert str(Money(input_dict)) == "13384711.00 JPY"
+    assert str(Money(input_dict)) == "13384711 JPY"
     assert str(Money(input_dict, currency=get_currency(input_dict.get("currency_code")))) == "13384711 JPY"
 
 
 def test_from_json():
     input_value = '{"value": "13384711 JPY", "units": 13384711, "nanos": 0, "currency_code": "JPY"}'
-    assert str(Money.from_json(input_value)) == "13384711.00 JPY"
+    assert str(Money.from_json(input_value)) == "13384711 JPY"
     assert str(Money.from_json(input_value).to_currency(get_currency("JPY"))) == "13384711 JPY"
     assert str(Money.from_json(input_value).to_currency(get_currency("SEK"))) == "13384711.00 SEK"
-    assert str(Money(input_value)) == "13384711.00 JPY"
+    assert str(Money(input_value)) == "13384711 JPY"
     assert str(Money(input_value, currency=get_currency("JPY"))) == "13384711 JPY"
 
 

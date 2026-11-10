@@ -228,6 +228,13 @@ class BaseCurrencyType(metaclass=MetaCurrency):
             preferred_ticker = currency.preferred_ticker if preferred_ticker is None else preferred_ticker
         elif currency and isinstance(currency, str):
             object.__setattr__(self, "ticker", currency)
+            known_currency = _get_known_currency(currency)
+            if known_currency is not None:
+                decimal_digits = known_currency.decimal_digits if decimal_digits is None else decimal_digits
+                interchangeable_with = (
+                    known_currency.interchangeable_with if interchangeable_with is None else interchangeable_with
+                )
+                preferred_ticker = known_currency.preferred_ticker if preferred_ticker is None else preferred_ticker
         else:
             object.__setattr__(self, "ticker", "")
 
@@ -1625,6 +1632,16 @@ DOGE = DogeCoin
 
 def get_currency(ticker: str) -> BaseCurrency:
     return cast(BaseCurrency, getattr(sys.modules[__name__], ticker, BaseCurrency(ticker)))
+
+
+def _get_known_currency(ticker: str) -> Optional[BaseCurrency]:
+    # Returns the predefined currency (for example `JPY`) whose ticker is exactly the given string, so that a
+    # currency specified as a string gets the same decimal digits as the predefined currency. Aliases whose
+    # ticker differs (such as "XBT" for `Bitcoin` with ticker "BTC") and non-currency attributes are ignored.
+    currency = getattr(sys.modules[__name__], ticker, None) if ticker else None
+    if not isinstance(currency, MetaCurrency) or currency._meta or currency.ticker != ticker:
+        return None
+    return cast(BaseCurrency, currency)
 
 
 # Note to future self – this is generally bad practice (but helps with type hint annotations).

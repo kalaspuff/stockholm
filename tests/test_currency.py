@@ -356,3 +356,64 @@ def test_dogecoin():
     assert Money(1, DogeCoin) == Money(1, CustomDoge)
     assert Money(1, "DOGE") == Money(1, CustomDoge)
     assert Money(1, CustomDoge) == Money(1, DOGE)
+
+
+def test_currency_from_ticker_string() -> None:
+    assert Currency("JPY").decimal_digits == 0
+    assert Currency("RWF").decimal_digits == 0
+    assert Currency("IQD").decimal_digits == 3
+    assert Currency("CLF").decimal_digits == 4
+    assert Currency("SEK").decimal_digits == 2
+    assert Currency("DOGE").decimal_digits == 2
+    assert Currency("RWF").decimal_digits == Currency.RWF.decimal_digits
+    assert BaseCurrency("JPY").decimal_digits == 0
+
+    assert Currency("CNY").interchangeable_with == ("CNH", "RMB")
+    assert Currency("NIS").preferred_ticker == "ILS"
+
+    # Explicit options still override the predefined currency's values
+    assert Currency("JPY", decimal_digits=2).decimal_digits == 2
+    assert Currency("CNY", interchangeable_with=("RMB",)).interchangeable_with == ("RMB",)
+    assert Currency("NIS", preferred_ticker="NIS").preferred_ticker == "NIS"
+
+    # Unknown tickers, aliases with another ticker and non-currency names use the defaults
+    assert Currency("NEW").decimal_digits == 2
+    assert Currency("jpy").decimal_digits == 2
+    assert Currency("XBT").decimal_digits == 2
+    assert Currency("Money").decimal_digits == 2
+    assert Currency("Currency").decimal_digits == 2
+
+
+def test_money_from_currency_ticker_string() -> None:
+    assert Money(100, "JPY", from_sub_units=True) == Money(100, Currency.JPY)
+    assert str(Money(100, "JPY", from_sub_units=True)) == "100 JPY"
+    assert str(Money(100, "jpy", from_sub_units=True)) == "100 JPY"
+    assert str(Money("100 JPY", from_sub_units=True)) == "100 JPY"
+    assert str(Money.from_sub_units(100, "JPY")) == "100 JPY"
+    assert str(Money(100, Currency("JPY"), from_sub_units=True)) == "100 JPY"
+    assert str(Currency("JPY").money(100, from_sub_units=True)) == "100 JPY"
+    assert str(Money(100, currency_code="JPY", from_sub_units=True)) == "100 JPY"
+    assert str(Money(1000, "KWD", from_sub_units=True)) == "1.000 KWD"
+    assert str(Money(10000, "CLF", from_sub_units=True)) == "1.0000 CLF"
+    assert str(Money(100, "SEK", from_sub_units=True)) == "1.00 SEK"
+
+    m = Money("1673861354.00", "RWF")
+    assert str(m) == "1673861354 RWF"
+    assert m.sub_units == 1673861354
+    assert m.to_sub_units() == Money(1673861354, "RWF")
+    assert m.currency is Currency.RWF
+    assert m.currency == "RWF"
+    assert m.currency_code == "RWF"
+
+    assert Money(100, "JPY").sub_units == 100
+    assert Money(100, "IQD").sub_units == 100000
+    assert Money(100, "SEK").sub_units == 10000
+    assert Money(100, "BTC").currency is Currency.BTC
+
+    # Unknown tickers and aliases with another ticker are kept as strings with two decimals
+    for ticker in ("NEW", "XBT", "Bitcoin", "Money", "Currency", "doge"):
+        m = Money(100, ticker, from_sub_units=True)
+        assert m.currency == ticker
+        assert isinstance(m.currency, str)
+        assert str(m) == f"1.00 {ticker}"
+        assert m.sub_units == 100
